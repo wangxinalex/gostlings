@@ -1,0 +1,15 @@
+// Concept: assignment versus redeclaration
+// Task: fix this program so it compiles and runs
+// Expected output: second
+// Hint: := declares a new variable and may only be used once per variable; use = to assign a new value (Go Tour: Basics 9)
+
+package main
+
+import "fmt"
+
+func main() {
+	message := "first"
+	// TODO: The line below redeclares message; assign a new value instead.
+	message := "second"
+	fmt.Println(message)
+}
