@@ -115,15 +115,15 @@ func main() {
 }
 ```
 
-`exercises/00_intro/intro2/main.go`：
+`exercises/00_intro/intro2/main.go`（保持可解析，只缺 `func main`）：
 
 ```go
-// Concept: package declaration and the main function
-// Task: an executable program needs `package main` and `func main()` — add them
+// Concept: the main function as the program entry point
+// Task: an executable program needs a `func main()` — add it, printing the expected line
 // Expected output: I can run!
 // Hint: a Go program starts in the main function of package main (Go Tour: Basics 1)
 
-// TODO: Add the package declaration on this line.
+package main
 
 import "fmt"
 
@@ -133,8 +133,8 @@ import "fmt"
 `solutions/00_intro/intro2/main.go`：
 
 ```go
-// Concept: package declaration and the main function
-// Task: an executable program needs `package main` and `func main()` — add them
+// Concept: the main function as the program entry point
+// Task: an executable program needs a `func main()` — add it, printing the expected line
 // Expected output: I can run!
 // Hint: a Go program starts in the main function of package main (Go Tour: Basics 1)
 
@@ -155,7 +155,7 @@ Expected: 依次输出 `Hello, gostlings!` 和 `I can run!`
 - [ ] **Step 3: 验证 exercises 按预期失败**
 
 Run: `go run ./exercises/00_intro/intro1; go run ./exercises/00_intro/intro2`
-Expected: 均编译失败（undefined: Println / expected 'package'）
+Expected: 均编译失败（undefined: Println / "fmt" imported and not used）
 
 - [ ] **Step 4: Commit**
 
