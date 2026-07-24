@@ -1,6 +1,8 @@
 // Concept: defer and LIFO order
 // Task: add three defer statements so the program prints 3, 2, 1
-// Expected output: 3, 2, 1 (each on its own line)
+// Expected output: 3
+// 2
+// 1
 // Hint: deferred calls run in last-in-first-out order when the function returns (Go Tour: Flowcontrol 12-13)
 
 package main

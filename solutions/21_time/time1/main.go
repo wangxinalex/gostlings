@@ -1,8 +1,7 @@
-// Concept: Go's unique date/time format — the reference time
-// Task: Format now using Go's reference time layout to get the output; the time after "Format:" must match the reference time format
+// Concept: Go's unique date/time layout — the reference time Mon Jan 2 15:04:05 MST 2006
+// Task: fill in the layout string so Format prints the time as shown
 // Expected output: Format: 2026-01-02 15:04:05
-// (the actual date/time will differ — the format pattern is what matters)
-// Hint: Go uses the magic reference time Mon Jan 2 15:04:05 MST 2006 for layout strings (Go doc: time)
+// Hint: Go layout strings use the reference time itself, not %Y-style verbs (Go doc: time)
 
 package main
 

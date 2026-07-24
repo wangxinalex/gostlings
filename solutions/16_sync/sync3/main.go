@@ -3,6 +3,8 @@
 // Expected output: config initialized
 // running
 // running
+// running
+// (any order)
 // Hint: var once sync.Once; once.Do(f) ensures f runs exactly once regardless of how many goroutines call it (Go doc: sync)
 
 package main

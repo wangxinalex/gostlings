@@ -1,8 +1,8 @@
-// Concept: deferred cleanup always runs — even after a panic
-// Task: the file should be closed whether or not a panic occurs; add deferred cleanup
-// Expected output: file opened
+// Concept: deferred cleanup runs even when a panic unwinds the stack
+// Task: the file is never closed because the function panics; add ONE line so the file is always closed
+// Expected output: file opened: data.txt
 // file closed
-// Hint: defer runs even when a panic happens; use a named return to set the error in the deferred func if needed (Go doc: builtin)
+// Hint: defer schedules a call to run when the surrounding function returns — even on panic (Go Tour: Flowcontrol 12)
 
 package main
 
@@ -14,19 +14,14 @@ func (f *File) Close() { fmt.Println("file closed") }
 
 func processFile() {
 	f := &File{Name: "data.txt"}
-	fmt.Println("file opened")
-
-	// TODO: Defer f.Close() so it runs whether or not a panic occurs.
-	//       Then trigger a panic with the message "processing error".
-
-	fmt.Println("file closed")
+	// TODO: Make sure the file gets closed even though the code below panics.
+	fmt.Println("file opened:", f.Name)
+	panic("processing error")
 }
 
 func main() {
 	defer func() {
-		if r := recover(); r != nil {
-			// Swallow the panic so we can see the output.
-		}
+		recover() // Swallow the panic so the program exits normally.
 	}()
 	processFile()
 }

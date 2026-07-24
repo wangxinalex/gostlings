@@ -1,6 +1,6 @@
 // Concept: select with a time.After timeout — don't block forever
 // Task: the select blocks on a slow channel that never fires; add a time.After timeout case
-// Expected output: timed out (each line may vary slightly, but expect the timeout message)
+// Expected output: timed out
 // Hint: case <-time.After(100 * time.Millisecond): fires after that duration and sets an upper bound on wait (Go Tour: Concurrency 5-6)
 
 package main
