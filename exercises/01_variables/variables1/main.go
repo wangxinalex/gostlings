@@ -1,7 +1,7 @@
 // Concept: declaring variables with :=
 // Task: fix this program so it compiles and runs
 // Expected output: x has the value 5
-// Hint: variables must be declared before use; the := operator declares and assigns in one step (Go Tour: Basics 8)
+// Hint: variables must be declared before use; the := operator declares and assigns in one step (Go Tour: Basics 10)
 
 package main
 

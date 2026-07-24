@@ -9,7 +9,7 @@ import "fmt"
 
 const (
 	Red = iota
-	// TODO: Add the Green and Blue constants here.
+	// TODO: Add the Green and Blue constants here, using iota.
 )
 
 func main() {
