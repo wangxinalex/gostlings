@@ -401,9 +401,9 @@ Go 1.23+（`go version` 确认）
 | 00_intro | 2 | Basics 1 |
 | 01_variables | 4 | Basics 8-12 |
 | 02_functions | 4 | Basics 4-7 |
-| 03_control_flow | 4 | Flowcontrol 1-12 |
-| 04_pointers | 3 | Moretypes 1-5 |
-| 05_slices | 4 | Moretypes 7-12 |
+| 03_control_flow | 4 | Flowcontrol 1-13 |
+| 04_pointers | 3 | Moretypes 1; Methods 5 |
+| 05_slices | 4 | Moretypes 7-15 |
 | 06_maps | 3 | Moretypes 19-23 |
 | 07_structs | 3 | Moretypes 2-5 |
 | 08_methods | 3 | Methods 1-6 |
