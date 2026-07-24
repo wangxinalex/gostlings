@@ -6,6 +6,6 @@
 package main
 
 func main() {
-	// TODO: Define the function sayHello so this program compiles.
+	// TODO: Define the function sayHello so it prints the expected line.
 	sayHello()
 }
