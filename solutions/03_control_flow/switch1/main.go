@@ -1,7 +1,7 @@
 // Concept: switch without a condition
 // Task: add the default branch so a score below 60 prints "fail"
 // Expected output: fail
-// Hint: a switch without a condition matches the first true case; default runs when no case matches (Go Tour: Flowcontrol 9)
+// Hint: a switch without a condition matches the first true case; default runs when no case matches (Go Tour: Flowcontrol 9, 11)
 
 package main
 
