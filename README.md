@@ -1,29 +1,31 @@
 # gostlings
 
-仿 [rustlings](https://github.com/rust-lang/rustlings) 的 Go 入门练习题：每题一个小程序，
-修好它、跑通它，你就学会了这个知识点。
+Go exercises inspired by [rustlings](https://github.com/rust-lang/rustlings): one small
+program per concept. Fix it, run it, and you have learned the topic.
 
-## 前置要求
+## Prerequisites
 
-Go 1.23+（`go version` 确认）
+Go 1.23+ (check with `go version`)
 
-## 怎么做题
+## How to solve
 
-1. 按下表顺序做题
-2. 打开 `exercises/<主题>/<题名>/main.go`，读题头注释（Concept / Task / Expected output / Hint）
-3. 修改 `// TODO:` 标记的地方
-4. 运行验证：
+1. Work through the topics in the table below, in order.
+2. Open `exercises/<topic>/<exercise>/main.go` and read the header comment
+   (Concept / Task / Expected output / Hint).
+3. Edit the line marked `// TODO:`.
+4. Verify it:
 
    ```sh
    go run ./exercises/01_variables/variables1
    ```
 
-   （14_testing 主题用 `go test ./exercises/14_testing/testing1`）
-5. 输出符合预期 = 过关。卡住了看 `solutions/` 里的同路径答案
+   (For the 14_testing topic, use `go test ./exercises/14_testing/testing1`.)
+5. Output matches the expected output → done. Stuck? Peek at the matching path
+   under `solutions/`.
 
-## 做题顺序与 Tour 章节映射
+## Topic order and Go Tour mapping
 
-| 主题 | 题数 | Go Tour 章节 |
+| Topic | # | Go Tour section |
 |---|---|---|
 | 00_intro | 2 | Basics 1 |
 | 01_variables | 4 | Basics 8-12 |
@@ -49,8 +51,14 @@ Go 1.23+（`go version` 确认）
 | 21_time | 2 | [time](https://pkg.go.dev/time) |
 | 22_strconv | 2 | [strconv](https://pkg.go.dev/strconv) |
 
-## 校验全部答案
+## Checking your work
 
 ```sh
-sh check.sh   # 跑通 solutions/ 下全部 73 题
+sh check.sh                      # run exercises/ in order, stop at the first failure and show its output
+sh check.sh --run-all            # run every exercise and report all PASS/FAIL
+sh check.sh solutions --run-all  # verify all 73 reference solutions pass
 ```
+
+Exercises that ship in a runnable-but-wrong state (so you can experiment before
+fixing them) come with a `main_test.go` that asserts stdout against the header's
+Expected output. `check.sh` uses `go test` for those, `go run` for the rest.
