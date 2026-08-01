@@ -1,6 +1,6 @@
 // Concept: data races — concurrent writes to a shared map are unsafe
-// Task: the program panics with a concurrent map write; add a mutex to make it safe
-// Expected output: done
+// Task: the program panics with a concurrent map write; add a mutex to make it safe and verify all 10000 entries exist
+// Expected output: entries: 10000
 // Hint: map reads and writes must all be protected by the SAME mutex (Go doc: sync)
 
 package main
@@ -26,5 +26,5 @@ func main() {
 	}
 
 	wg.Wait()
-	fmt.Println("done")
+	fmt.Println("entries:", len(m))
 }

@@ -1,12 +1,14 @@
 #!/bin/sh
 # Run exercises in order; report PASS/FAIL per exercise.
-# Usage: ./check.sh [exercises|solutions] [--run-all]
+# Usage: ./check.sh [exercises|solutions] [--run-all] [--race]
 # Default: stop at first FAIL and show its output. --run-all: continue and print a summary.
 target="exercises"
 run_all=0
+race=0
 for arg in "$@"; do
   case "$arg" in
     --run-all) run_all=1 ;;
+    --race) race=1 ;;
     *) target="$arg" ;;
   esac
 done
@@ -15,9 +17,17 @@ for dir in "$target"/*/*/; do
   [ -d "$dir" ] || continue
   d="./${dir%/}"
   if ls "$d"/*_test.go >/dev/null 2>&1; then
-    cmd="go test -timeout 5s"
+    if [ "$race" -eq 1 ]; then
+      cmd="go test -race -timeout 5s"
+    else
+      cmd="go test -timeout 5s"
+    fi
   else
-    cmd="go run"
+    if [ "$race" -eq 1 ]; then
+      cmd="go run -race"
+    else
+      cmd="go run"
+    fi
   fi
   total=$((total+1))
   out=$($cmd "$d" 2>&1)

@@ -1,7 +1,7 @@
-// Concept: select with a time.After timeout — don't block forever
-// Task: the select blocks on a slow channel that never fires; add a time.After timeout case
+// Concept: timeout plus cancellation — stop slow producers after the caller gives up
+// Task: add a timeout branch, signal the slow producer to stop, and wait for it before returning
 // Expected output: timed out
-// Hint: case <-time.After(100 * time.Millisecond): fires after that duration and sets an upper bound on wait (Go Tour: Concurrency 5-6)
+// Hint: select on time.After(100 * time.Millisecond); close stop exactly once and wait on done so no goroutine is left behind
 
 package main
 
@@ -10,18 +10,40 @@ import (
 	"time"
 )
 
-func main() {
+func run() string {
 	ch := make(chan string)
+	stop := make(chan struct{})
+	done := make(chan struct{})
 
 	go func() {
-		time.Sleep(2 * time.Second)
-		ch <- "late result"
+		defer close(done)
+		timer := time.NewTimer(2 * time.Second)
+		defer timer.Stop()
+
+		select {
+		case <-timer.C:
+		case <-stop:
+			return
+		}
+
+		select {
+		case ch <- "late result":
+		case <-stop:
+		}
 	}()
 
 	select {
 	case msg := <-ch:
-		fmt.Println(msg)
+		close(stop)
+		<-done
+		return msg
 	case <-time.After(100 * time.Millisecond):
-		fmt.Println("timed out")
+		close(stop)
+		<-done
+		return "timed out"
 	}
+}
+
+func main() {
+	fmt.Println(run())
 }

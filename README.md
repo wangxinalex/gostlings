@@ -23,7 +23,21 @@ Go 1.23+ (check with `go version`)
 5. Output matches the expected output → done. Stuck? Peek at the matching path
    under `solutions/`.
 
-## Topic order and Go Tour mapping
+## Topic order, levels, and Go Tour mapping
+
+The first 23 topics form the core and applied tracks. The final two topics are
+intermediate scenarios: each combines multiple standard-library contracts and
+uses focused tests instead of relying only on stdout.
+
+| Level | What it verifies |
+|---|---|
+| Core | Compilation, values, functions, and one concept at a time |
+| Applied | Coordination, cancellation, synchronization, and standard-library APIs |
+| Intermediate | HTTP behavior, channel ownership, cancellation, error paths, and race-safe state |
+
+Recommended progression: Core (`00_intro`–`11_generics`) → Applied
+(`12_goroutines`–`22_strconv`) → Intermediate (`23_http`–
+`24_concurrency_patterns`).
 
 | Topic | # | Go Tour section |
 |---|---|---|
@@ -50,15 +64,31 @@ Go 1.23+ (check with `go version`)
 | 20_io | 2 | [io](https://pkg.go.dev/io) |
 | 21_time | 2 | [time](https://pkg.go.dev/time) |
 | 22_strconv | 2 | [strconv](https://pkg.go.dev/strconv) |
+| 23_http | 3 | [net/http](https://pkg.go.dev/net/http), [httptest](https://pkg.go.dev/net/http/httptest) |
+| 24_concurrency_patterns | 3 | [context](https://pkg.go.dev/context), [sync/atomic](https://pkg.go.dev/sync/atomic) |
 
 ## Checking your work
 
 ```sh
 sh check.sh                      # run exercises/ in order, stop at the first failure and show its output
 sh check.sh --run-all            # run every exercise and report all PASS/FAIL
-sh check.sh solutions --run-all  # verify all 73 reference solutions pass
+sh check.sh solutions --run-all  # verify all 79 reference solutions pass
+sh check.sh solutions --run-all --race # verify reference solutions with the race detector
 ```
 
 Exercises that ship in a runnable-but-wrong state (so you can experiment before
 fixing them) come with a `main_test.go` that asserts stdout against the header's
 Expected output. `check.sh` uses `go test` for those, `go run` for the rest.
+
+For intermediate exercises, stdout is only part of the contract. Run the focused
+package tests to check response status and headers, error paths, channel closure,
+and cancellation. Before considering a solution complete, also run:
+
+~~~sh
+find exercises solutions -name '*.go' -print0 | xargs -0 gofmt -d
+GOCACHE=/tmp/gostlings-go-cache go test ./solutions/...
+GOCACHE=/tmp/gostlings-go-cache sh check.sh solutions --run-all --race
+~~~
+
+The exercise tree is intentionally incomplete, so package-wide tests target
+`solutions/...`; the learner validates each exercise after fixing it.

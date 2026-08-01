@@ -1,7 +1,7 @@
 // Concept: context.WithTimeout — automatic cancellation after a deadline
-// Task: the worker finishes its work before the parent cancels; wrap the context with a 50ms timeout so it prints "timed out"
+// Task: wrap the context with a 50ms timeout so the worker returns before its 100ms job finishes
 // Expected output: worker: timed out
-// Hint: context.WithTimeout(ctx, duration) auto-cancels after the duration and the ctx.Done channel fires (Go doc: context)
+// Hint: send the worker result through the buffered result channel and receive it; fixed sleeps are not synchronization
 
 package main
 
@@ -11,20 +11,27 @@ import (
 	"time"
 )
 
-func worker(ctx context.Context) {
+func worker(ctx context.Context) string {
 	select {
 	case <-ctx.Done():
-		fmt.Println("worker: timed out")
+		return "worker: timed out"
 	case <-time.After(100 * time.Millisecond):
-		fmt.Println("worker: finished work")
+		return "worker: finished work"
 	}
 }
 
-func main() {
+func run() string {
 	ctx := context.Background()
-	// TODO: Replace the line above with context.WithTimeout so the worker
-	//       detects the deadline (50ms) before its work finishes (100ms).
+	// TODO: Replace the line above with context.WithTimeout using 50ms,
+	//       and remember to call the returned cancel function.
 
-	go worker(ctx)
-	time.Sleep(200 * time.Millisecond)
+	result := make(chan string, 1)
+	go func() {
+		result <- worker(ctx)
+	}()
+	return <-result
+}
+
+func main() {
+	fmt.Println(run())
 }
