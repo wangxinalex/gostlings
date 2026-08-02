@@ -92,3 +92,25 @@ GOCACHE=/tmp/gostlings-go-cache sh check.sh solutions --run-all --race
 
 The exercise tree is intentionally incomplete, so package-wide tests target
 `solutions/...`; the learner validates each exercise after fixing it.
+
+## Release workflow
+
+semantic-release runs after the existing checks succeed on a push to `main`.
+`VERSION` is the canonical project version; successful releases update
+`CHANGELOG.md`, create a GitHub Release, and create the matching `vX.Y.Z` tag.
+
+Use Conventional Commits to describe release impact:
+
+- `fix:` or `perf:` → patch release
+- `feat:` → minor release
+- `!` after the type/scope or a `BREAKING CHANGE:` footer → major release
+- `docs:`, `test:`, `ci:`, `chore:`, and `refactor:` do not release by themselves
+
+Before merging the release configuration, mark the current `main` commit as
+the `0.1.0` baseline and push the tag. This prevents semantic-release from
+interpreting the first untagged release as `1.0.0`:
+
+```sh
+git tag -a v0.1.0 "$(git rev-parse main)" -m "chore: mark 0.1.0 baseline"
+git push origin v0.1.0
+```
