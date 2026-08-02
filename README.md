@@ -96,8 +96,9 @@ The exercise tree is intentionally incomplete, so package-wide tests target
 ## Release workflow
 
 semantic-release runs after the existing checks succeed on a push to `main`.
-`VERSION` is the canonical project version; successful releases update
-`CHANGELOG.md`, create a GitHub Release, and create the matching `vX.Y.Z` tag.
+`package.json` is the canonical project version; successful releases update
+the package manifests and `CHANGELOG.md`, create a GitHub Release, and create
+the matching `vX.Y.Z` tag.
 
 Use Conventional Commits to describe release impact:
 
