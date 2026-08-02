@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  format-and-layout:
+    name: Format and layout
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Check gofmt
+        shell: bash
+        run: |
+          set -euo pipefail
+          go_files="$(git ls-files '*.go')"
+          if [ -z "$go_files" ]; then
+            exit 0
+          fi
+
+          gofmt_output="$(gofmt -d $go_files)"
+          if [ -n "$gofmt_output" ]; then
+            printf '%s\n' "$gofmt_output"
+            exit 1
+          fi
+
+      - name: Check exercise and solution layout
+        shell: bash
+        run: |
+          set -euo pipefail
+          exercise_dirs="$(find exercises -mindepth 2 -maxdepth 2 -type d | sort)"
+          solution_dirs="$(find solutions -mindepth 2 -maxdepth 2 -type d | sed 's#^solutions/#exercises/#' | sort)"
+
+          if ! diff -u \
+            <(printf '%s\n' "$exercise_dirs") \
+            <(printf '%s\n' "$solution_dirs"); then
+            exit 1
+          fi
+
+  solutions:
+    name: Reference solutions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Test solutions
+        run: go test ./solutions/...
+
+      - name: Vet solutions
+        run: go vet ./solutions/...
+
+      - name: Run solutions
+        run: sh check.sh solutions --run-all
+
+      - name: Run solutions with race detector
+        run: sh check.sh solutions --run-all --race
