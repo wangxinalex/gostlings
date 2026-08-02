@@ -342,9 +342,10 @@ Run:
 tmp_dir="$(mktemp -d)"
 git clone . "$tmp_dir/repo"
 git -C "$tmp_dir/repo" switch -c main
+git -C "$tmp_dir/repo" remote set-url origin https://github.com/wangxinalex/gostlings.git
 git -C "$tmp_dir/repo" tag v0.1.0
 git -C "$tmp_dir/repo" commit --allow-empty -m "fix: verify patch release"
-(cd "$tmp_dir/repo" && npm ci && npm run release:dry-run)
+(cd "$tmp_dir/repo" && npm ci && GITHUB_TOKEN="${GITHUB_TOKEN}" npm run release:dry-run)
 ~~~
 
 Expected: semantic-release recognizes main, reads v0.1.0, reports next version 0.1.1, and does not create a tag, GitHub Release, or committed file change in the temporary clone.
