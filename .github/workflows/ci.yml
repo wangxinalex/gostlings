@@ -73,3 +73,38 @@ jobs:
 
       - name: Run solutions with race detector
         run: sh check.sh solutions --run-all --race
+
+  release:
+    name: Release
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs:
+      - format-and-layout
+      - solutions
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install release tooling
+        run: npm ci
+
+      - name: Verify the release baseline tag
+        shell: bash
+        run: git show-ref --tags --verify --quiet refs/tags/v0.1.0
+
+      - name: Publish release
+        run: npm run release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
