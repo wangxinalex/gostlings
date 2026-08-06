@@ -20,14 +20,18 @@ Go 1.23+ (check with `go version`)
    ```
 
    (For the 14_testing topic, use `go test ./exercises/14_testing/testing1`.)
+   (For the 26_files topic, the exercises read files next to `main.go`, so run
+   them from their own directory: `cd exercises/26_files/files1 && go run .`.)
 5. Output matches the expected output → done. Stuck? Peek at the matching path
    under `solutions/`.
 
 ## Topic order, levels, and Go Tour mapping
 
-The first 23 topics form the core and applied tracks. The final two topics are
-intermediate scenarios: each combines multiple standard-library contracts and
-uses focused tests instead of relying only on stdout.
+Topics 00–22 form the core and applied tracks. Topics 23–24 are intermediate
+scenarios: each combines multiple standard-library contracts and uses focused
+tests instead of relying only on stdout. Topics 25–26 are applied additions
+(closures and file I/O) that can be done any time after `02_functions` and
+`05_slices`.
 
 | Level | What it verifies |
 |---|---|
@@ -36,21 +40,21 @@ uses focused tests instead of relying only on stdout.
 | Intermediate | HTTP behavior, channel ownership, cancellation, error paths, and race-safe state |
 
 Recommended progression: Core (`00_intro`–`11_generics`) → Applied
-(`12_goroutines`–`22_strconv`) → Intermediate (`23_http`–
-`24_concurrency_patterns`).
+(`12_goroutines`–`22_strconv`, plus `25_closures`–`26_files`) → Intermediate
+(`23_http`–`24_concurrency_patterns`).
 
 | Topic | # | Go Tour section |
 |---|---|---|
 | 00_intro | 2 | Basics 1 |
 | 01_variables | 4 | Basics 8-12 |
 | 02_functions | 4 | Basics 4-7 |
-| 03_control_flow | 4 | Flowcontrol 1-13 |
+| 03_control_flow | 5 | Flowcontrol 1-13 |
 | 04_pointers | 3 | Moretypes 1; Methods 5 |
 | 05_slices | 5 | Moretypes 7-15; [sort](https://pkg.go.dev/sort) |
 | 06_maps | 3 | Moretypes 19-22 |
 | 07_structs | 3 | Moretypes 2-5 |
 | 08_methods | 3 | Methods 1-6 |
-| 09_interfaces | 4 | Methods 9-17 |
+| 09_interfaces | 5 | Methods 9-17 |
 | 10_errors | 4 | Methods 19-20 |
 | 11_generics | 3 | Generics 1-2 |
 | 12_goroutines | 3 | Concurrency 1 |
@@ -66,19 +70,24 @@ Recommended progression: Core (`00_intro`–`11_generics`) → Applied
 | 22_strconv | 2 | [strconv](https://pkg.go.dev/strconv) |
 | 23_http | 3 | [net/http](https://pkg.go.dev/net/http), [httptest](https://pkg.go.dev/net/http/httptest) |
 | 24_concurrency_patterns | 3 | [context](https://pkg.go.dev/context), [sync/atomic](https://pkg.go.dev/sync/atomic) |
+| 25_closures | 2 | builds on [Go Tour: Basics 4-7](https://go.dev/tour/basics/4); closures are not in the Tour |
+| 26_files | 3 | [os](https://pkg.go.dev/os), [bufio](https://pkg.go.dev/bufio) |
 
 ## Checking your work
 
 ```sh
 sh check.sh                      # run exercises/ in order, stop at the first failure and show its output
 sh check.sh --run-all            # run every exercise and report all PASS/FAIL
-sh check.sh solutions --run-all  # verify all 79 reference solutions pass
+sh check.sh solutions --run-all  # verify all 86 reference solutions pass
 sh check.sh solutions --run-all --race # verify reference solutions with the race detector
 ```
 
-Exercises that ship in a runnable-but-wrong state (so you can experiment before
-fixing them) come with a `main_test.go` that asserts stdout against the header's
-Expected output. `check.sh` uses `go test` for those, `go run` for the rest.
+Every exercise ships with a `main_test.go` that asserts the program's stdout
+against the header's Expected output (order-insensitively where the header says
+"any order"). Exercises that do not compile or that deadlock when unmodified
+simply fail their test until fixed, so a solution that merely exits 0 cannot
+pass. `check.sh` uses `go test` whenever a `_test.go` is present and falls back
+to `go run` for any directory without tests.
 
 For intermediate exercises, stdout is only part of the contract. Run the focused
 package tests to check response status and headers, error paths, channel closure,
