@@ -47,7 +47,7 @@ Recommended progression: Core (`00_intro`–`11_generics`) → Applied
 |---|---|---|
 | 00_intro | 2 | Basics 1 |
 | 01_variables | 4 | Basics 8-12 |
-| 02_functions | 5 | Basics 4-7 |
+| 02_functions | 6 | Basics 4-7 |
 | 03_control_flow | 5 | Flowcontrol 1-13 |
 | 04_pointers | 3 | Moretypes 1; Methods 5 |
 | 05_slices | 5 | Moretypes 7-15; [sort](https://pkg.go.dev/sort) |
@@ -78,7 +78,7 @@ Recommended progression: Core (`00_intro`–`11_generics`) → Applied
 ```sh
 sh check.sh                      # run exercises/ in order, stop at the first failure and show its output
 sh check.sh --run-all            # run every exercise and report all PASS/FAIL
-sh check.sh solutions --run-all  # verify all 87 reference solutions pass
+sh check.sh solutions --run-all  # verify all 88 reference solutions pass
 sh check.sh solutions --run-all --race # verify reference solutions with the race detector
 ```
 

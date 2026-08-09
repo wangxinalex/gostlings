@@ -1,7 +1,8 @@
 // Concept: recover catches a panic inside a deferred function
 // Task: add a deferred recover so the program prints the recovered message instead of crashing
 // Expected output: recovered: something went wrong
-// Hint: recover() returns the panic value; you must call it inside a deferred function (Go doc: builtin)
+// Hint: functions6 introduced function literals. recover() returns the panic
+//       value; call it inside a deferred function (Go doc: builtin)
 
 package main
 
