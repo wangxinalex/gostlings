@@ -1,7 +1,8 @@
-// Concept: slices share an underlying array; copy for independence
-// Task: fix this program so mutating b leaves a untouched and it prints [1 2 3]
+// Concept: copying slices with make and copy
+// Task: use make and copy so mutating b leaves a untouched and it prints [1 2 3]
 // Expected output: [1 2 3]
-// Hint: assigning a slice copies only the view, not the data; use make and copy to duplicate it (Go Tour: Moretypes 8)
+// Hint: make([]int, len(a)) allocates a slice with its own backing array;
+//       copy(dst, src) copies values between slices (Go Tour: Moretypes 8)
 
 package main
 
@@ -9,8 +10,8 @@ import "fmt"
 
 func main() {
 	a := []int{1, 2, 3}
-	// TODO: Give b its own backing array so the next line cannot change a.
-	b := a
+	b := make([]int, len(a))
+	copy(b, nil) // TODO: Replace nil with a.
 	b[0] = 100
 	fmt.Println(a)
 }
