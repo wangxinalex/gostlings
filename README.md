@@ -5,7 +5,7 @@ program per concept. Fix it, run it, and you have learned the topic.
 
 ## Prerequisites
 
-Go 1.23+ (check with `go version`)
+Go 1.26.5+ (check with `go version`)
 
 ## How to solve
 
