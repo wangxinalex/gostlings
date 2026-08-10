@@ -9,7 +9,8 @@ import "fmt"
 
 func complete() <-chan struct{} {
 	done := make(chan struct{})
-	// 思路：done 只表示“结束了”，不承载结果；关闭它可以同时唤醒所有等待者。
+	// Thought: done carries only completion, not a result. Closing it wakes all
+	// receivers waiting on it.
 	return done // TODO: start work and close done when it finishes
 }
 

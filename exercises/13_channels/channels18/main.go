@@ -13,8 +13,9 @@ type job struct {
 }
 
 func run(workers int, jobs []job) error {
-	// 思路：错误路径也必须走完整生命周期：报告错误、广播取消、停止生产、
-	// 等待 worker，再由调用者拿到最终 error。
+	// Thought: an error path still needs the full lifecycle: report the error,
+	// broadcast cancellation, stop production, wait for workers, and return the
+	// final error to the caller.
 	return nil // TODO: add error reporting and cancellation to the worker pool
 }
 

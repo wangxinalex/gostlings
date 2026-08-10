@@ -8,8 +8,8 @@ package main
 import "fmt"
 
 func read(ch <-chan int) (int, bool) {
-	// 思路：接收 int 时，零值 0 可能是真实数据，也可能是关闭后的默认值；
-	// comma-ok 的第二个返回值才是判断 channel 生命周期的依据。
+	// Thought: when receiving an int, zero may be real data or the value returned
+	// after closure; the comma-ok result is what identifies the channel state.
 	value := <-ch
 	return value, true // TODO: receive with comma-ok and return the real status
 }

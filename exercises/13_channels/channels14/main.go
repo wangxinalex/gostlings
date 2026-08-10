@@ -8,7 +8,8 @@ package main
 import "fmt"
 
 func merge(inputs ...<-chan int) <-chan int {
-	// 思路：forwarder 只负责发送，不能各自关闭 out；协调者等待全部 forwarder 后统一关闭。
+	// Thought: forwarders only send and must not close out independently. A
+	// coordinator waits for all forwarders, then closes out once.
 	return nil // TODO: start forwarders, wait for all, and close out once
 }
 

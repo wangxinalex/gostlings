@@ -9,9 +9,10 @@ package main
 import "fmt"
 
 func receiveFast(fast, slow <-chan string) string {
-	// 思路：select 会同时等待多个 channel 操作；不要先接收 slow，
-	// 也不要假设 fast 一定先到，因为 slow 可能先 ready，或者两个都 ready。
-	// 当多个 case 同时 ready 时，select 的选择是不确定的。
+	// Thought: select waits for multiple channel operations at once; do not
+	// receive from slow first because it may never have a sender.
+	// If both channels are ready, select chooses one without guaranteeing
+	// which one wins.
 	return <-fast // TODO: wait for whichever input is ready first
 }
 

@@ -8,8 +8,8 @@ package main
 import "fmt"
 
 func runOrdered(workers int, jobs []int) []int {
-	// 思路：channel 收到的顺序是完成顺序，不是业务顺序；把 index 一起传递，
-	// 消费结果时按 index 放回去，才能恢复输入顺序。
+	// Thought: channel receive order is completion order, not business order.
+	// Carry the index and place results back by index to restore input order.
 	return nil // TODO: add indexes to jobs/results and restore order
 }
 

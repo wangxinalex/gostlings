@@ -8,7 +8,8 @@ package main
 import "fmt"
 
 func square(in <-chan int) <-chan int {
-	// 思路：每个 stage 只关闭自己的输出；它从不关闭调用方提供的输入。
+	// Thought: each stage closes only its own output. It never closes an input
+	// channel supplied by its caller.
 	return nil // TODO: transform values in a goroutine and close the output
 }
 

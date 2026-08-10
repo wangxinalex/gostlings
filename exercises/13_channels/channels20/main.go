@@ -12,8 +12,8 @@ func transform(in <-chan int, fn func(int) int) <-chan int {
 }
 
 func pipeline(in <-chan int) <-chan int {
-	// 思路：上游关闭自己的 output 后，下游的 range 才能结束；
-	// 每个 stage 都要独立负责“读到结束、关闭输出”的协议。
+	// Thought: downstream range can finish only after upstream closes its output.
+	// Every stage owns the protocol of reading to completion and closing its output.
 	return nil // TODO: compose double and add-one stages
 }
 

@@ -8,8 +8,9 @@ package main
 import "fmt"
 
 func drain(first, second <-chan int) []int {
-	// 思路：closed channel 永远可读，会不断产生零值；把对应变量设为 nil，
-	// select 就会永久禁用这个 case，直到另一个输入也结束。
+	// Thought: a closed channel is always readable and keeps producing zero
+	// values. Set the corresponding variable to nil to disable that select case
+	// permanently after the input is drained.
 	return nil // TODO: disable each input after its close and collect values
 }
 

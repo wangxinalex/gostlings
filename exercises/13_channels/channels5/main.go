@@ -8,8 +8,8 @@ package main
 import "fmt"
 
 func generate(values ...int) <-chan int {
-	// 思路：返回只读 channel，把发送和关闭责任留在生产者内部；
-	// 调用方只需要 range，不需要猜测何时关闭，也不能误关闭它。
+	// Thought: return a receive-only channel and keep sending and closing inside
+	// the producer; callers only range over it and cannot close it accidentally.
 	return nil // TODO: create the output, send values in a goroutine, and close it
 }
 
