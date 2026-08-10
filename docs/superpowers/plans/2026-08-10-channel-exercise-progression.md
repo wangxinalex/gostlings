@@ -61,7 +61,7 @@
 - `channels8`: `func tryReceive(ch <-chan int) string`; test covers an empty channel returning `no value` and a ready channel returning its value.
 - `channels9`: `func complete() <-chan struct{}`; test requires the returned done channel to close promptly.
 - `channels10`: `func produce(stop <-chan struct{}) <-chan int`; test closes `stop` without receiving and requires the output to close, then separately checks normal values.
-- `channels11`: `func run() string`; test expects `timed out` quickly and exercises the producer's cancellation and completion wait.
+- `channels11`: `func run(done chan struct{}) string`; test expects `timed out` quickly and verifies that `done` is already closed when `run` returns. The bidirectional parameter is intentional because the caller supplies the join signal while `run` waits for it.
 - `channels12`: `func startWorkers(count int, stop <-chan struct{}) <-chan struct{}`; test starts three workers, closes one stop channel, and requires the group-done channel to close.
 
 - [ ] Add starter implementations that compile but fail their lifecycle assertions without revealing the complete pattern.
