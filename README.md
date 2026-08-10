@@ -55,11 +55,11 @@ Recommended progression: Core (`00_intro`–`11_generics`) → Applied
 | 07_structs | 3 | Moretypes 2-5 |
 | 08_methods | 3 | Methods 1-6 |
 | 09_interfaces | 5 | Methods 9-17 |
-| 10_errors | 4 | Methods 19-20 |
+| 10_errors | 10 | [Errors progression](exercises/10_errors/README.md) |
 | 11_generics | 3 | Generics 1-2 |
 | 12_goroutines | 3 | Concurrency 1 |
 | 13_channels | 24 | [Channel patterns guide](exercises/13_channels/README.md) |
-| 14_testing | 3 | [Testing tutorial](https://go.dev/doc/tutorial/add-a-test) |
+| 14_testing | 11 | [Testing progression](exercises/14_testing/README.md) |
 | 15_context | 3 | [context](https://pkg.go.dev/context) |
 | 16_sync | 3 | [sync](https://pkg.go.dev/sync) |
 | 17_panic_recover | 2 | [builtin](https://pkg.go.dev/builtin) |
@@ -78,7 +78,7 @@ Recommended progression: Core (`00_intro`–`11_generics`) → Applied
 ```sh
 sh check.sh                      # run exercises/ in order, stop at the first failure and show its output
 sh check.sh --run-all            # run every exercise and report all PASS/FAIL
-sh check.sh solutions --run-all  # verify all 88 reference solutions pass
+sh check.sh solutions --run-all  # verify all 120 reference solutions pass
 sh check.sh solutions --run-all --race # verify reference solutions with the race detector
 ```
 
