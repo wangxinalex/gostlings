@@ -13,7 +13,25 @@ for arg in "$@"; do
   esac
 done
 fail=0; total=0
-for dir in "$target"/*/*/; do
+dirs=$(
+  find "$target" -mindepth 2 -maxdepth 2 -type d -print |
+    awk -F/ '
+      {
+        topic = $(NF - 1)
+        exercise = $NF
+        if (match(exercise, /[0-9]+$/) == 0) {
+          next
+        }
+        number = substr(exercise, RSTART, RLENGTH)
+        printf "%s\t%09d\t%s/\n", topic, number, $0
+      }
+    ' |
+    sort -k1,1 -k2,2n |
+    cut -f3-
+)
+
+while IFS= read -r dir; do
+  [ -n "$dir" ] || continue
   [ -d "$dir" ] || continue
   d="./${dir%/}"
   if ls "$d"/*_test.go >/dev/null 2>&1; then
@@ -41,7 +59,9 @@ for dir in "$target"/*/*/; do
       exit 1
     fi
   fi
-done
+done <<EOF
+$dirs
+EOF
 echo "----"
 echo "$((total - fail))/$total passed"
 [ "$fail" -eq 0 ] && echo "All $target pass ✓" || exit 1
