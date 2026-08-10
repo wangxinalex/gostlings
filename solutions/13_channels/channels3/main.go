@@ -1,25 +1,17 @@
-// Concept: closing a channel tells range loops to stop
-// Task: this program deadlocks because range never stops; close the channel after sending
-// Expected output: 1
-// 2
-// 3
-// Hint: close(ch) after the sends so the range loop knows there are no more values (Go Tour: Concurrency 4)
-
 package main
 
 import "fmt"
 
 func main() {
 	ch := make(chan int)
-
 	go func() {
+		defer close(ch)
 		ch <- 1
 		ch <- 2
 		ch <- 3
-		close(ch)
 	}()
 
-	for v := range ch {
-		fmt.Println(v)
+	for value := range ch {
+		fmt.Println(value)
 	}
 }

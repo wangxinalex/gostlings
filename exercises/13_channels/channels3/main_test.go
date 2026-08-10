@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func TestOutput(t *testing.T) {
+func TestMainRangesUntilProducerCloses(t *testing.T) {
 	gotCh := make(chan string, 1)
 	go func() { gotCh <- testutil.CaptureStdout(t, main) }()
 	select {
@@ -16,6 +16,6 @@ func TestOutput(t *testing.T) {
 			t.Errorf("got %q, want %q", got, want)
 		}
 	case <-time.After(3 * time.Second):
-		t.Fatal("main() did not finish; the exercise is still broken (deadlock)")
+		t.Fatal("main() did not finish; the range loop is still waiting for a close")
 	}
 }

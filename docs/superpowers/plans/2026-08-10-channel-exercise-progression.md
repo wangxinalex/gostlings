@@ -37,13 +37,14 @@
 - `channels1` keeps a `main()` output test for `hi`; starter performs the send synchronously, while the solution moves it into a goroutine.
 - `channels2` keeps a `main()` output test for `1\n2\n`; starter uses an unbuffered channel, while the solution gives it capacity two.
 - `channels3` keeps a `main()` output test for `1\n2\n3\n`; starter sends values but does not close the channel, while the solution closes after the last send.
-- `channels4` defines `func readClosed() (int, bool)`; the test closes an `int` channel and requires `(0, false)`, proving that a closed receive is not a real zero value.
+- `channels4` defines `func read(ch <-chan int) (int, bool)`; tests require a closed channel to return `(0, false)` and a buffered zero value to return `(0, true)`, proving that a closed receive is not a real zero value.
 - `channels5` defines `func generate(values ...int) <-chan int`; tests verify all values, output closure, and an empty input returning promptly. The solution owns and closes the output.
 
 - [ ] Write all five starter files and tests with the signatures above.
 - [ ] Write runnable solutions for all five packages.
 - [ ] Run `gofmt -w exercises/13_channels solutions/13_channels` and focused tests for `channels1..5`.
-- [ ] Run `go test -race ./exercises/13_channels/...` and `go test -race ./solutions/13_channels/...` to verify the complete channel tree.
+- [ ] Run `go test -run '^$' ./exercises/13_channels/...` to compile every learner starter without executing intentionally incomplete tests.
+- [ ] Run `go test -race ./solutions/13_channels/...` to verify every completed reference package.
 - [ ] Commit `feat: rebuild foundational channel exercises`.
 
 ### Task 2: Add select, timeout, completion, and cancellation exercises 6–12
@@ -66,7 +67,7 @@
 - [ ] Add starter implementations that compile but fail their lifecycle assertions without revealing the complete pattern.
 - [ ] Add deterministic tests with completion channels and maximum 500ms deadlock guards.
 - [ ] Implement solutions using `select`, `close(done)`, cancellation-aware sends, and a `WaitGroup` coordinator.
-- [ ] Run focused normal and race tests for exercises and solutions 6–12.
+- [ ] Compile learner packages with `go test -run '^$'` and run normal plus race checks for solutions 6–12.
 - [ ] Commit `feat: add channel lifecycle and cancellation exercises`.
 
 ### Task 3: Implement fan-out, fan-in, and worker-pool exercises 13–18
@@ -88,7 +89,7 @@
 - [ ] Write tests first for output closure, empty input, cancellation, order, and first-error behavior.
 - [ ] Implement fan-out with one output closer, fan-in with one `WaitGroup` closer, and cancellable forwarding on both receive and send.
 - [ ] Implement worker-pool order restoration by carrying an index and worker-pool error cancellation with `sync.Once` or a single coordinator-owned close.
-- [ ] Run focused tests under `-race` and run each new solution with `check.sh`.
+- [ ] Compile learner packages with `go test -run '^$'`, run solutions 13–18 under `-race`, and run each new solution with `check.sh`.
 - [ ] Commit `feat: add channel composition exercises`.
 
 ### Task 4: Implement pipeline and bounded-concurrency exercises 19–24
@@ -109,7 +110,7 @@
 
 - [ ] Add tests that make pipeline and bounded-concurrency lifecycle failures observable without goroutine-count heuristics.
 - [ ] Implement close propagation for each pipeline stage, cancellation on both receive and send, semaphore tokens via a buffered channel, ticker gating, and nil assignment after a selected input closes.
-- [ ] Run all focused tests with `-race` and inspect for blocked goroutines with `go test -timeout 5s`.
+- [ ] Compile learner packages with `go test -run '^$'`, run solutions 19–24 with `-race`, and inspect solution lifecycles with `go test -timeout 5s`.
 - [ ] Commit `feat: add pipeline and bounded concurrency exercises`.
 
 ### Task 5: Rewrite chapter documentation and root index
@@ -133,7 +134,7 @@
 - [ ] Run `git diff --check` and `gofmt -d $(git ls-files '*.go')`.
 - [ ] Run `go test ./solutions/...` and `go vet ./solutions/...` with Go 1.26.5.
 - [ ] Run `sh check.sh solutions --run-all` and `sh check.sh solutions --run-all --race`.
-- [ ] Run `go test -race ./exercises/13_channels/...` and `go test -race ./solutions/13_channels/...`.
+- [ ] Run `go test -run '^$' ./exercises/13_channels/...` and `go test -race ./solutions/13_channels/...`.
 - [ ] Verify directory parity with the CI `find`/`diff` command.
 - [ ] Review the complete diff for accidental changes outside channel exercises, docs, and root README.
 - [ ] Push `agent/expand-channel-practice` and create a draft PR with a summary, testing evidence, and note that `working-progress` was left untouched.
