@@ -78,6 +78,7 @@ Recommended progression: Core (`00_intro`–`11_generics`) → Applied
 ```sh
 sh check.sh                      # run exercises/ in order, stop at the first failure and show its output
 sh check.sh --run-all            # run every exercise and report all PASS/FAIL
+sh check.sh exercises/13_channels/channels6 # check one exercise directly
 sh check.sh solutions --run-all  # verify all 120 reference solutions pass
 sh check.sh solutions --run-all --race # verify reference solutions with the race detector
 ```
@@ -86,8 +87,10 @@ Every exercise ships with a `main_test.go` that asserts the program's stdout
 against the header's Expected output (order-insensitively where the header says
 "any order"). Exercises that do not compile or that deadlock when unmodified
 simply fail their test until fixed, so a solution that merely exits 0 cannot
-pass. `check.sh` uses `go test` whenever a `_test.go` is present and falls back
-to `go run` for any directory without tests.
+pass. `check.sh` uses `go test` whenever a `_test.go` is present, runs packages
+with `Benchmark` functions using `-bench=.`, and falls back to `go run` for any
+directory without tests. It also accepts an individual exercise directory as
+the target.
 
 For intermediate exercises, stdout is only part of the contract. Run the focused
 package tests to check response status and headers, error paths, channel closure,
