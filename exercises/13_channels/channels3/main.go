@@ -16,8 +16,9 @@ func main() {
 		ch <- 1
 		ch <- 2
 		ch <- 3
-		// 思路：range 需要知道“不会再有值”。只有发送方发送完最后一个值后关闭，
-		// 接收方才会先读完已有值，再让 range 正常结束。
+		// Thought: range needs to know that no more values will arrive. The sender
+		// closes the channel after the final send, so range drains existing values
+		// before it exits.
 		// TODO: Close the channel so the range below does not deadlock.
 	}()
 

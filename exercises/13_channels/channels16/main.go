@@ -8,8 +8,9 @@ package main
 import "fmt"
 
 func run(workers int, jobs []int) []int {
-	// 思路：生产者关闭 jobs，worker 因 range 结束；只有确认所有 worker 退出后，
-	// 协调者才能关闭 results，调用者的 range 才能返回完整结果。
+	// Thought: the producer closes jobs, which ends each worker's range. Only
+	// after every worker exits may the coordinator close results, allowing the
+	// caller's range to return the complete result set.
 	return nil // TODO: build the jobs/results lifecycle
 }
 

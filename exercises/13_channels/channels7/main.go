@@ -11,8 +11,8 @@ import (
 )
 
 func await(ch <-chan string) string {
-	// 思路：超时是 select 的一个竞争分支；它只结束当前等待，
-	// 不会自动停止仍在运行的生产者，后面还要学习取消。
+	// Thought: a timeout is one competing select branch. It ends only the current
+	// wait; it does not automatically stop a producer that is still running.
 	timeout := time.After(50 * time.Millisecond)
 	_ = timeout
 	return <-ch // TODO: add the timeout branch

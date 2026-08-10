@@ -9,7 +9,8 @@ package main
 import "fmt"
 
 func main() {
-	// 思路：容量为 2 的缓冲区可以暂存两个值，让发送先完成；容量耗尽后仍然会阻塞。
+	// Thought: a buffer of two can hold two values so sends can complete first;
+	// once the buffer is full, another send still blocks.
 	ch := make(chan int) // TODO: Make this buffered so the sends don't block.
 
 	ch <- 1

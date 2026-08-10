@@ -8,8 +8,9 @@ package main
 import "fmt"
 
 func parallel(limit int, jobs []int, work func(int) int) []int {
-	// 思路：channel 容量表达“同时允许多少个工作”；它不是任务结果队列，
-	// 每个 goroutine 必须在 work 前取得 token，并在结束后归还。
+	// Thought: channel capacity expresses how many jobs may run concurrently; it
+	// is not a result queue. Each goroutine acquires a token before work and
+	// returns it afterward.
 	return nil // TODO: add a buffered token channel and wait for all results
 }
 

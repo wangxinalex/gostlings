@@ -8,8 +8,8 @@ package main
 import "fmt"
 
 func squareWorkers(workers int, jobs <-chan int) <-chan int {
-	// 思路：jobs 的关闭告诉所有 worker 没有新任务；results 的关闭必须晚于所有 worker，
-	// 否则仍在发送结果的 worker 会向已关闭 channel 发送而 panic。
+	// Thought: closing jobs tells every worker that no new work remains. results
+	// must be closed after all workers exit, or a worker may send to a closed channel.
 	return nil // TODO: start workers and coordinate result closure
 }
 

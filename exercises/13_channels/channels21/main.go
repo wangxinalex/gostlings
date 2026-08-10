@@ -8,8 +8,9 @@ package main
 import "fmt"
 
 func pipeline(stop <-chan struct{}, in <-chan int) <-chan int {
-	// 思路：pipeline 是多个 goroutine 的链条；只取消最后一层会让上游继续卡住，
-	// 所以同一个 stop 必须传到每个 stage 的接收和发送位置。
+	// Thought: a pipeline is a chain of goroutines. Cancelling only the final
+	// stage can leave upstream stages blocked, so the same stop signal must reach
+	// every stage's receive and send operations.
 	return nil // TODO: compose cancellable stages
 }
 

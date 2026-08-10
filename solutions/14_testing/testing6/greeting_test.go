@@ -1,8 +1,8 @@
 // Concept: deterministic environment-dependent tests with t.Setenv
 // Task: set the environment only for this test and verify Greeting reads it
 // Expected output: PASS (run with `go test ./exercises/14_testing/testing6`)
-// Hint: t.Setenv("GOSTLINGS_GREETING", "你好") changes the variable for this
-//       test and restores it automatically. Then assert Greeting() returns "你好".
+// Hint: use t.Setenv to set a test-only greeting; it restores the environment
+//       automatically. Then assert Greeting returns the configured value.
 
 package greeting
 

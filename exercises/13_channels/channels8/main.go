@@ -8,8 +8,8 @@ package main
 import "fmt"
 
 func tryReceive(ch <-chan int) string {
-	// 思路：default 让 select 立即返回；它表达“现在试一次”，
-	// 而不是“保证最终一定收到”。
+	// Thought: default makes select return immediately. It means “try now,” not
+	// “guarantee that a value will eventually arrive.”
 	return "" // TODO: add receive and default cases
 }
 

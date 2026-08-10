@@ -11,8 +11,8 @@ import (
 )
 
 func rateLimit(ticks <-chan time.Time, in <-chan int) <-chan int {
-	// 思路：把“允许开始下一次工作”的事件建模成 channel，
-	// 生产速度就受 ticker 节奏约束，而不是靠固定 Sleep。
+	// Thought: model “permission to start the next job” as a channel event, so
+	// production follows the ticker cadence instead of a fixed Sleep.
 	return nil // TODO: wait for a tick before forwarding each input
 }
 
