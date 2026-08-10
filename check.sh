@@ -1,6 +1,6 @@
 #!/bin/sh
 # Run exercises in order; report PASS/FAIL per exercise.
-# Usage: ./check.sh [exercises|solutions] [--run-all] [--race]
+# Usage: ./check.sh [exercises|solutions|path/to/exercise] [--run-all] [--race]
 # Default: stop at first FAIL and show its output. --run-all: continue and print a summary.
 target="exercises"
 run_all=0
@@ -13,32 +13,49 @@ for arg in "$@"; do
   esac
 done
 fail=0; total=0
-dirs=$(
-  find "$target" -mindepth 2 -maxdepth 2 -type d -print |
-    awk -F/ '
-      {
-        topic = $(NF - 1)
-        exercise = $NF
-        if (match(exercise, /[0-9]+$/) == 0) {
-          next
+if [ ! -d "$target" ]; then
+  printf "target directory does not exist: %s\n" "$target" >&2
+  exit 2
+fi
+
+if [ -f "$target/main.go" ] || ls "$target"/*_test.go >/dev/null 2>&1; then
+  dirs="${target%/}/"
+else
+  dirs=$(
+    find "$target" -mindepth 2 -maxdepth 2 -type d -print |
+      awk -F/ '
+        {
+          topic = $(NF - 1)
+          exercise = $NF
+          if (match(exercise, /[0-9]+$/) == 0) {
+            next
+          }
+          number = substr(exercise, RSTART, RLENGTH)
+          printf "%s\t%09d\t%s/\n", topic, number, $0
         }
-        number = substr(exercise, RSTART, RLENGTH)
-        printf "%s\t%09d\t%s/\n", topic, number, $0
-      }
-    ' |
-    sort -k1,1 -k2,2n |
-    cut -f3-
-)
+      ' |
+      sort -k1,1 -k2,2n |
+      cut -f3-
+  )
+fi
 
 while IFS= read -r dir; do
   [ -n "$dir" ] || continue
   [ -d "$dir" ] || continue
   d="./${dir%/}"
   if ls "$d"/*_test.go >/dev/null 2>&1; then
-    if [ "$race" -eq 1 ]; then
-      cmd="go test -race -timeout 5s"
+    if grep -q '^[[:space:]]*func Benchmark' "$d"/*_test.go 2>/dev/null; then
+      if [ "$race" -eq 1 ]; then
+        cmd="go test -race -bench=. -timeout 5s"
+      else
+        cmd="go test -bench=. -timeout 5s"
+      fi
     else
-      cmd="go test -timeout 5s"
+      if [ "$race" -eq 1 ]; then
+        cmd="go test -race -timeout 5s"
+      else
+        cmd="go test -timeout 5s"
+      fi
     fi
   else
     if [ "$race" -eq 1 ]; then
