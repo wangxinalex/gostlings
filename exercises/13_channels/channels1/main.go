@@ -10,6 +10,7 @@ import "fmt"
 func main() {
 	ch := make(chan string)
 
+	// 思路：无缓冲 channel 的发送必须等到接收者同时出现。
 	// TODO: Move the send into a goroutine so this doesn't deadlock.
 	ch <- "hi"
 

@@ -1,47 +1,20 @@
-// Concept: timeout plus cancellation — stop slow producers after the caller gives up
-// Task: add a timeout branch, signal the slow producer to stop, and wait for it before returning
-// Expected output: timed out
-// Hint: select on time.After(100 * time.Millisecond); close stop exactly once and wait on done so no goroutine is left behind
+// Concept: generator — the producer owns and closes its output channel
+// Task: send every input value from a goroutine, then close the returned channel
+// Expected behavior: callers can range over the result, including for empty input
+// Hint: defer close(out) inside the producer goroutine; the caller only receives
 
 package main
 
-import (
-	"fmt"
-	"time"
-)
+import "fmt"
 
-func run() string {
-	ch := make(chan string)
-	stop := make(chan struct{})
-	done := make(chan struct{})
-
-	go func() {
-		defer close(done)
-		timer := time.NewTimer(2 * time.Second)
-		defer timer.Stop()
-
-		select {
-		case <-timer.C:
-		case <-stop:
-			return
-		}
-
-		select {
-		case ch <- "late result":
-		case <-stop:
-		}
-	}()
-
-	// TODO: Add a 100ms timeout case. On timeout, close stop, wait for done,
-	//       and return "timed out". Also clean up the producer if ch wins.
-	select {
-	case msg := <-ch:
-		close(stop)
-		<-done
-		return msg
-	}
+func generate(values ...int) <-chan int {
+	// 思路：返回只读 channel，把发送和关闭责任留在生产者内部；
+	// 调用方只需要 range，不需要猜测何时关闭，也不能误关闭它。
+	return nil // TODO: create the output, send values in a goroutine, and close it
 }
 
 func main() {
-	fmt.Println(run())
+	for value := range generate(1, 2, 3) {
+		fmt.Println(value)
+	}
 }

@@ -1,19 +1,21 @@
-// Concept: select with a default case — non-blocking channel operations
-// Task: the channel is empty (no goroutine ever sends); add a default case so we don't block forever
-// Expected output: no value available, doing other work
-// Hint: select { case v := <-ch: ... default: ... } — the default branch runs immediately when no channel is ready (Go Tour: Concurrency 5-6)
+// Concept: select multiplexes channel operations
+// Task: receive from the input that becomes ready first
+// Expected behavior: the ready fast input wins while the silent input does not block the call
+// Hint: put one receive from each input in a select
 
 package main
 
 import "fmt"
 
+func receiveFast(fast, slow <-chan string) string {
+	// 思路：select 会同时等待多个 channel 操作；不要先接收 slow，
+	// 因为 slow 可能永远没有发送者。
+	return <-fast // TODO: wait for whichever input is ready first
+}
+
 func main() {
-	ch := make(chan int)
-
-	// No one ever sends into ch, so <-ch would block forever.
-	// TODO: Use a select with a default case to handle the empty channel gracefully.
-
-	// The line below blocks — replace it with the select.
-	val := <-ch
-	fmt.Println("received:", val)
+	fast := make(chan string, 1)
+	slow := make(chan string)
+	fast <- "fast lane"
+	fmt.Println(receiveFast(fast, slow))
 }

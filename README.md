@@ -58,7 +58,7 @@ Recommended progression: Core (`00_intro`–`11_generics`) → Applied
 | 10_errors | 4 | Methods 19-20 |
 | 11_generics | 3 | Generics 1-2 |
 | 12_goroutines | 3 | Concurrency 1 |
-| 13_channels | 6 | Concurrency 2-6 |
+| 13_channels | 24 | [Channel patterns guide](exercises/13_channels/README.md) |
 | 14_testing | 3 | [Testing tutorial](https://go.dev/doc/tutorial/add-a-test) |
 | 15_context | 3 | [context](https://pkg.go.dev/context) |
 | 16_sync | 3 | [sync](https://pkg.go.dev/sync) |
