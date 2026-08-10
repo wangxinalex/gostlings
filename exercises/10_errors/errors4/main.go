@@ -25,5 +25,10 @@ func findUser(id int) error {
 func main() {
 	err := findUser(42)
 	// TODO: Use errors.As to check if err is a *NotFoundError, then print "missing user ID: <id>".
+	var nfe *NotFoundError
+	if errors.As(err, &nfe) {
+		fmt.Println("missing user")
+		return
+	}
 	fmt.Println("no error found")
 }

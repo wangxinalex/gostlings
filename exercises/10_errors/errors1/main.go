@@ -13,6 +13,7 @@ import (
 func divide(a, b int) (int, error) {
 	if b == 0 {
 		// TODO: Return an error with the text "divisor must not be 0".
+		return 0, errors.New("divisor must not be 0")
 	}
 	return a / b, nil
 }
@@ -20,5 +21,9 @@ func divide(a, b int) (int, error) {
 func main() {
 	_, err := divide(6, 0)
 	// TODO: Check if err is not nil, then print the error and return.
+	if err != nil {
+		fmt.Println("error:", err)
+		return
+	}
 	fmt.Println("no error")
 }
