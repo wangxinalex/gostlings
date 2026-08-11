@@ -11,6 +11,14 @@ import (
 
 var withDeadline = context.WithDeadline
 var workGate = make(chan struct{})
+var runWork = func(ctx context.Context) string {
+	select {
+	case <-ctx.Done():
+		return "work: deadline exceeded"
+	case <-workGate:
+		return "work: completed"
+	}
+}
 
 func runUntil(ctx context.Context, deadline time.Time) string {
 	// TODO: Use withDeadline(ctx, deadline), defer cancel, and select on Done.

@@ -17,11 +17,13 @@ func startChildren(ctx context.Context, count int) <-chan struct{} {
 	for range count {
 		go func() {
 			child, cancel := withCancel(ctx)
-			defer cancel()
+			defer func() {
+				cancel()
+				exited <- struct{}{}
+			}()
 			childStarted()
 			<-child.Done()
 			childStopped()
-			exited <- struct{}{}
 		}()
 	}
 

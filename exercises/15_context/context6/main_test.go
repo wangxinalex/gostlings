@@ -16,11 +16,20 @@ func TestStartChildrenPropagatesParentCancellationToEveryChild(t *testing.T) {
 	childStarted = func() { started <- struct{}{} }
 	previousWithCancel := withCancel
 	canceled := make(chan struct{}, count)
+	release := make(chan struct{})
+	released := false
+	releaseCallbacks := func() {
+		if !released {
+			close(release)
+			released = true
+		}
+	}
 	withCancel = func(parent context.Context) (context.Context, context.CancelFunc) {
 		ctx, cancel := context.WithCancel(parent)
 		return ctx, func() {
-			cancel()
 			canceled <- struct{}{}
+			<-release
+			cancel()
 		}
 	}
 	t.Cleanup(func() {
@@ -30,6 +39,10 @@ func TestStartChildrenPropagatesParentCancellationToEveryChild(t *testing.T) {
 	})
 
 	parent, cancel := context.WithCancel(context.Background())
+	t.Cleanup(func() {
+		cancel()
+		releaseCallbacks()
+	})
 	done := startChildren(parent, count)
 	for child := 0; child < count; child++ {
 		select {
@@ -47,17 +60,24 @@ func TestStartChildrenPropagatesParentCancellationToEveryChild(t *testing.T) {
 			t.Fatalf("child %d did not observe parent cancellation", child)
 		}
 	}
-	select {
-	case <-done:
-	case <-time.After(500 * time.Millisecond):
-		t.Fatal("startChildren() did not close done after every child stopped")
-	}
 	for child := 0; child < count; child++ {
 		select {
 		case <-canceled:
 		case <-time.After(500 * time.Millisecond):
 			t.Fatalf("child %d did not call its cancel function", child)
 		}
+	}
+	select {
+	case <-done:
+		t.Fatal("startChildren() closed done before child cancel functions returned")
+	default:
+	}
+
+	releaseCallbacks()
+	select {
+	case <-done:
+	case <-time.After(500 * time.Millisecond):
+		t.Fatal("startChildren() did not close done after every child stopped")
 	}
 }
 

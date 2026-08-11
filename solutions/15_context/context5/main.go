@@ -11,17 +11,22 @@ import (
 
 var withDeadline = context.WithDeadline
 var workGate = make(chan struct{})
+var runWork = func(ctx context.Context) string {
+	select {
+	case <-ctx.Done():
+		return "work: deadline exceeded"
+	case <-workGate:
+		return "work: completed"
+	}
+}
 
 func runUntil(ctx context.Context, deadline time.Time) string {
 	workCtx, cancel := withDeadline(ctx, deadline)
 	defer cancel()
 
-	select {
-	case <-workCtx.Done():
-		return "work: deadline exceeded"
-	case <-workGate:
-		return "work: completed"
-	}
+	result := make(chan string, 1)
+	go func() { result <- runWork(workCtx) }()
+	return <-result
 }
 
 func main() {

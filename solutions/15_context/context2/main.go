@@ -13,6 +13,7 @@ import (
 
 var withTimeout = context.WithTimeout
 var workGate = make(chan struct{})
+var runWorker = worker
 
 func worker(ctx context.Context) string {
 	select {
@@ -28,7 +29,7 @@ func run() string {
 	defer cancel()
 
 	result := make(chan string, 1)
-	go func() { result <- worker(ctx) }()
+	go func() { result <- runWorker(ctx) }()
 	return <-result
 }
 

@@ -13,6 +13,7 @@ import (
 
 var withTimeout = context.WithTimeout
 var workGate = make(chan struct{})
+var runWorker = worker
 
 func worker(ctx context.Context) string {
 	select {
