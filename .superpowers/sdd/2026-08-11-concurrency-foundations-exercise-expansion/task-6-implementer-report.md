@@ -89,3 +89,16 @@ Focused solution-backed tests passed twice for 31, 38, and 39. Direct learner
 tests fail at the intentional TODO seams. The starter verifier, Go 1.26.5
 `go vet` across learner and solution packages 31–40, and `git diff --check`
 all passed.
+
+## Final review fix
+
+Moved `onCommandApplied` in `channels39` until after the pause/resume state
+transition in both solution branches. Removed the pre-state pause gate from
+the test; it now waits for the post-transition pause signal, starts a ready
+job sender, uses a bounded liveness guard to prove the sender remains blocked
+while paused, then resumes and requires both sender and output progress.
+
+Re-ran the solution-backed channels31–40 suite twice, the starter verifier,
+Go 1.26.5 `go vet` across learner and solution packages 31–40, and
+`git diff --check`. Direct learner tests continue to fail at their intentional
+TODO seams.

@@ -25,10 +25,10 @@ func serveCommands(stop <-chan struct{}, commands <-chan command, jobs <-chan in
 					if !ok {
 						return
 					}
-					onCommandApplied(current)
 					if current == resume {
 						paused = false
 					}
+					onCommandApplied(current)
 				}
 				continue
 			}
@@ -39,10 +39,10 @@ func serveCommands(stop <-chan struct{}, commands <-chan command, jobs <-chan in
 				if !ok {
 					return
 				}
-				onCommandApplied(current)
 				if current == pause {
 					paused = true
 				}
+				onCommandApplied(current)
 			case job, ok := <-jobs:
 				if !ok {
 					return
