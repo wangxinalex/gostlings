@@ -15,6 +15,12 @@ func worker(ctx context.Context) string {
 	select {
 	case <-ctx.Done():
 		return "worker: canceled"
+	default:
+	}
+
+	select {
+	case <-ctx.Done():
+		return "worker: canceled"
 	case <-workGate:
 		return "worker: completed"
 	}

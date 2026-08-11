@@ -11,6 +11,9 @@ func TestStartChildrenPropagatesParentCancellationToEveryChild(t *testing.T) {
 	previous := childStopped
 	stopped := make(chan struct{}, count)
 	childStopped = func() { stopped <- struct{}{} }
+	previousChildStarted := childStarted
+	started := make(chan struct{}, count)
+	childStarted = func() { started <- struct{}{} }
 	previousWithCancel := withCancel
 	canceled := make(chan struct{}, count)
 	withCancel = func(parent context.Context) (context.Context, context.CancelFunc) {
@@ -22,11 +25,19 @@ func TestStartChildrenPropagatesParentCancellationToEveryChild(t *testing.T) {
 	}
 	t.Cleanup(func() {
 		childStopped = previous
+		childStarted = previousChildStarted
 		withCancel = previousWithCancel
 	})
 
 	parent, cancel := context.WithCancel(context.Background())
 	done := startChildren(parent, count)
+	for child := 0; child < count; child++ {
+		select {
+		case <-started:
+		case <-time.After(500 * time.Millisecond):
+			t.Fatalf("child %d was not created before parent cancellation", child)
+		}
+	}
 	cancel()
 
 	for child := 0; child < count; child++ {

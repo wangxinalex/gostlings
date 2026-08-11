@@ -4,30 +4,32 @@
 // and wait for child.Done().
 package main
 
-import (
-	"context"
-	"sync"
-)
+import "context"
 
 var childStopped = func() {}
+var childStarted = func() {}
 var withCancel = context.WithCancel
 
 func startChildren(ctx context.Context, count int) <-chan struct{} {
 	done := make(chan struct{})
+	exited := make(chan struct{})
+
+	for range count {
+		go func() {
+			child, cancel := withCancel(ctx)
+			defer cancel()
+			childStarted()
+			<-child.Done()
+			childStopped()
+			exited <- struct{}{}
+		}()
+	}
+
 	go func() {
 		defer close(done)
-		var children sync.WaitGroup
 		for range count {
-			children.Add(1)
-			go func() {
-				defer children.Done()
-				child, cancel := withCancel(ctx)
-				defer cancel()
-				<-child.Done()
-				childStopped()
-			}()
+			<-exited
 		}
-		children.Wait()
 	}()
 	return done
 }

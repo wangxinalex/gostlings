@@ -8,14 +8,21 @@ import (
 
 func TestRunUntilUsesAbsoluteDeadlineAndCallsCancel(t *testing.T) {
 	previous := withDeadline
+	previousWorkGate := workGate
+	workGate = make(chan struct{})
+	t.Cleanup(func() { workGate = previousWorkGate })
+
+	created := make(chan struct{}, 1)
 	called := make(chan struct{}, 1)
 	var gotParent context.Context
 	var gotDeadline time.Time
+	var trigger context.CancelFunc
 	withDeadline = func(parent context.Context, deadline time.Time) (context.Context, context.CancelFunc) {
 		gotParent = parent
 		gotDeadline = deadline
 		ctx, cancel := context.WithCancel(parent)
-		cancel()
+		trigger = cancel
+		created <- struct{}{}
 		return ctx, func() {
 			cancel()
 			called <- struct{}{}
@@ -25,12 +32,33 @@ func TestRunUntilUsesAbsoluteDeadlineAndCallsCancel(t *testing.T) {
 
 	parent := context.Background()
 	deadline := time.Now().Add(time.Hour)
-	if got := runUntil(parent, deadline); got != "work: deadline exceeded" {
-		t.Fatalf("runUntil() = %q, want deadline result", got)
+	result := make(chan string, 1)
+	go func() { result <- runUntil(parent, deadline) }()
+
+	select {
+	case <-created:
+	case <-time.After(500 * time.Millisecond):
+		t.Fatal("runUntil() did not create its deadline context")
 	}
 	if gotParent != parent || !gotDeadline.Equal(deadline) {
 		t.Fatalf("withDeadline() = (%v, %v), want supplied parent and deadline", gotParent, gotDeadline)
 	}
+	select {
+	case got := <-result:
+		t.Fatalf("runUntil() returned %q before deadline cancellation", got)
+	default:
+	}
+
+	trigger()
+	select {
+	case got := <-result:
+		if got != "work: deadline exceeded" {
+			t.Fatalf("runUntil() = %q, want deadline result", got)
+		}
+	case <-time.After(500 * time.Millisecond):
+		t.Fatal("runUntil() did not return after deadline cancellation")
+	}
+
 	select {
 	case <-called:
 	case <-time.After(500 * time.Millisecond):

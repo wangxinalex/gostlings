@@ -7,10 +7,15 @@ import (
 )
 
 func TestWorkerStopsWhenContextIsCanceled(t *testing.T) {
+	previous := workGate
+	workGate = make(chan struct{})
+	close(workGate)
+	t.Cleanup(func() { workGate = previous })
+
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 	if got := worker(ctx); got != "worker: canceled" {
-		t.Fatalf("worker() = %q, want cancellation result", got)
+		t.Fatalf("worker() = %q, want cancellation result when work is also ready", got)
 	}
 }
 

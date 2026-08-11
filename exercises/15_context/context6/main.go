@@ -7,6 +7,7 @@ package main
 import "context"
 
 var childStopped = func() {}
+var childStarted = func() {}
 var withCancel = context.WithCancel
 
 func startChildren(ctx context.Context, count int) <-chan struct{} {
