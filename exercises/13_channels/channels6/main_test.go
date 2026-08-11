@@ -7,7 +7,7 @@ import (
 )
 
 func TestGenerateForwardsValuesAndCloses(t *testing.T) {
-	out := generate(1, 2, 3)
+	out := generateWithWatchdog(t, 1, 2, 3)
 	var got []int
 	deadline := time.After(500 * time.Millisecond)
 
@@ -29,7 +29,7 @@ func TestGenerateForwardsValuesAndCloses(t *testing.T) {
 }
 
 func TestGenerateWithNoValuesClosesPromptly(t *testing.T) {
-	out := generate()
+	out := generateWithWatchdog(t)
 	select {
 	case _, ok := <-out:
 		if ok {
@@ -37,5 +37,22 @@ func TestGenerateWithNoValuesClosesPromptly(t *testing.T) {
 		}
 	case <-time.After(500 * time.Millisecond):
 		t.Fatal("generate() did not close an empty output")
+	}
+}
+
+func generateWithWatchdog(t *testing.T, values ...int) <-chan int {
+	t.Helper()
+
+	returned := make(chan (<-chan int), 1)
+	go func() {
+		returned <- generate(values...)
+	}()
+
+	select {
+	case out := <-returned:
+		return out
+	case <-time.After(500 * time.Millisecond):
+		t.Fatal("generate() did not return its output channel")
+		return nil
 	}
 }
