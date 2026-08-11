@@ -1,21 +1,56 @@
 #!/bin/sh
 # Run exercises in order; report PASS/FAIL per exercise.
-# Usage: ./check.sh [exercises|solutions|path/to/exercise] [--run-all] [--race]
+# Usage: ./check.sh [exercises|solutions|path/to/exercise] [--run-all] [--race] [--race-all] [--verify-starter]
 # Default: stop at first FAIL and show its output. --run-all: continue and print a summary.
 target="exercises"
 run_all=0
 race=0
+race_all=0
+verify_starter=0
+
+usage() {
+  printf "Usage: sh check.sh <target> [--run-all] [--race] [--race-all] [--verify-starter]\n" >&2
+}
+
 for arg in "$@"; do
   case "$arg" in
     --run-all) run_all=1 ;;
     --race) race=1 ;;
+    --race-all) race_all=1 ;;
+    --verify-starter) verify_starter=1 ;;
     *) target="$arg" ;;
   esac
 done
+
+if [ "$race" -eq 1 ] && [ "$race_all" -eq 1 ]; then
+  usage
+  exit 2
+fi
+
 fail=0; total=0
 if [ ! -d "$target" ]; then
   printf "target directory does not exist: %s\n" "$target" >&2
   exit 2
+fi
+
+exercise_root=""
+if [ -d exercises ]; then
+  exercise_root=$(cd exercises && pwd -P)
+fi
+target_path=$(cd "$target" && pwd -P)
+
+if [ "$verify_starter" -eq 1 ]; then
+  if [ -z "$exercise_root" ]; then
+    usage
+    exit 2
+  fi
+  case "$target_path/" in
+    "$exercise_root/"*) ;;
+    *)
+      usage
+      exit 2
+      ;;
+  esac
 fi
 
 if [ -f "$target/main.go" ] || ls "$target"/*_test.go >/dev/null 2>&1; then
@@ -43,22 +78,51 @@ while IFS= read -r dir; do
   [ -n "$dir" ] || continue
   [ -d "$dir" ] || continue
   d="./${dir%/}"
+  dir_path=$(cd "$d" && pwd -P)
+  exercise_path=""
+  if [ -n "$exercise_root" ]; then
+    case "$dir_path/" in
+      "$exercise_root/"*) exercise_path=${dir_path#"$exercise_root"/} ;;
+    esac
+  fi
+
+  if [ -n "$exercise_path" ] && [ -f "$d/main.go" ] &&
+    grep -q 'TODO:' "$d/main.go"; then
+    if [ "$verify_starter" -eq 0 ]; then
+      total=$((total+1))
+      fail=$((fail+1))
+      printf "FAIL: %s (starter still contains TODO)\n" "$dir"
+      if [ "$run_all" -eq 0 ]; then
+        exit 1
+      fi
+      continue
+    fi
+  fi
+
+  run_race=0
+  if [ "$race_all" -eq 1 ]; then
+    run_race=1
+  elif [ "$race" -eq 1 ] && [ -n "$exercise_path" ] &&
+    [ -f race.list ] && grep -F -x "$exercise_path" race.list >/dev/null 2>&1; then
+    run_race=1
+  fi
+
   if ls "$d"/*_test.go >/dev/null 2>&1; then
     if grep -q '^[[:space:]]*func Benchmark' "$d"/*_test.go 2>/dev/null; then
-      if [ "$race" -eq 1 ]; then
+      if [ "$run_race" -eq 1 ]; then
         cmd="go test -race -bench=. -timeout 5s"
       else
         cmd="go test -bench=. -timeout 5s"
       fi
     else
-      if [ "$race" -eq 1 ]; then
+      if [ "$run_race" -eq 1 ]; then
         cmd="go test -race -timeout 5s"
       else
         cmd="go test -timeout 5s"
       fi
     fi
   else
-    if [ "$race" -eq 1 ]; then
+    if [ "$run_race" -eq 1 ]; then
       cmd="go run -race"
     else
       cmd="go run"

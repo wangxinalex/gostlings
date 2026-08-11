@@ -1,0 +1,15 @@
+# Shared-state exercises that receive selective race-detector coverage.
+16_sync/sync1
+16_sync/sync2
+16_sync/sync3
+16_sync/sync4
+16_sync/sync5
+16_sync/sync6
+16_sync/sync7
+16_sync/sync8
+16_sync/sync9
+16_sync/sync10
+16_sync/sync11
+16_sync/sync12
+16_sync/sync13
+16_sync/sync14
