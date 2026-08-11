@@ -1,20 +1,16 @@
 package main
 
 import (
-	"gostlings/internal/testutil"
 	"reflect"
 	"sort"
-	"strings"
 	"testing"
 )
 
-func TestOutput(t *testing.T) {
-	got := testutil.CaptureStdout(t, main)
-	gotLines := strings.Split(strings.TrimSpace(got), "\n")
-	wantLines := strings.Split(strings.TrimSpace("worker 0 done\nworker 1 done\nworker 2 done"), "\n")
-	sort.Strings(gotLines)
-	sort.Strings(wantLines)
-	if !reflect.DeepEqual(gotLines, wantLines) {
-		t.Errorf("got %q, want lines %q", got, wantLines)
+func TestRunLabelsKeepsEveryLoopValue(t *testing.T) {
+	got := runLabels([]string{"red", "green", "blue"})
+	want := []string{"blue", "green", "red"}
+	sort.Strings(got)
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("runLabels() = %v, want every label once", got)
 	}
 }
