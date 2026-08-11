@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"reflect"
+	"sync"
 	"testing"
 	"time"
 )
@@ -10,27 +11,28 @@ import (
 func TestRunBatchesJoinsBeforeStartingNextBatch(t *testing.T) {
 	firstStarted := make(chan struct{})
 	allowFirst := make(chan struct{})
-	firstReleased := make(chan struct{})
-	prematureSecondBatch := make(chan struct{}, 1)
+	var mu sync.Mutex
+	var events []string
+	record := func(event string) {
+		mu.Lock()
+		events = append(events, event)
+		mu.Unlock()
+	}
 	originalJob := runBatchJob
 	originalBatchStart := onBatchStart
 	runBatchJob = func(batch, job int) string {
 		if batch == 0 {
+			record("batch 0 job start")
 			close(firstStarted)
 			<-allowFirst
-			close(firstReleased)
+			record("batch 0 job finish")
+		} else {
+			record("batch 1 job finish")
 		}
 		return fmt.Sprintf("job %d done", job)
 	}
 	onBatchStart = func(batch int) {
-		if batch != 1 {
-			return
-		}
-		select {
-		case <-firstReleased:
-		default:
-			prematureSecondBatch <- struct{}{}
-		}
+		record(fmt.Sprintf("batch %d start", batch))
 	}
 	defer func() {
 		runBatchJob = originalJob
@@ -45,20 +47,36 @@ func TestRunBatchesJoinsBeforeStartingNextBatch(t *testing.T) {
 	case <-time.After(500 * time.Millisecond):
 		t.Fatal("first batch did not start")
 	}
-	select {
-	case <-prematureSecondBatch:
-		t.Fatal("second batch started before the first batch was joined")
-	case <-time.After(500 * time.Millisecond):
-	}
 
 	close(allowFirst)
+	var got [][]string
 	select {
-	case got := <-completed:
-		want := [][]string{{"job 1 done"}, {"job 2 done"}}
-		if !reflect.DeepEqual(got, want) {
-			t.Fatalf("runBatches() = %v, want %v", got, want)
-		}
+	case got = <-completed:
 	case <-time.After(500 * time.Millisecond):
 		t.Fatal("runBatches did not complete")
+	}
+
+	mu.Lock()
+	gotEvents := append([]string(nil), events...)
+	mu.Unlock()
+	finishFirst := -1
+	startSecond := -1
+	for index, event := range gotEvents {
+		switch event {
+		case "batch 0 job finish":
+			finishFirst = index
+		case "batch 1 start":
+			startSecond = index
+		}
+	}
+	if finishFirst == -1 || startSecond == -1 {
+		t.Fatalf("event trace = %v, want first-batch finish and second-batch start", gotEvents)
+	}
+	if finishFirst > startSecond {
+		t.Fatalf("event trace = %v, want batch 0 job finish before batch 1 start", gotEvents)
+	}
+	want := [][]string{{"job 1 done"}, {"job 2 done"}}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("runBatches() = %v, want %v", got, want)
 	}
 }
