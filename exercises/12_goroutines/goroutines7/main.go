@@ -13,6 +13,8 @@ var runBatchJob = func(_ int, job int) string {
 	return fmt.Sprintf("job %d done", job)
 }
 
+var onBatchStart = func(int) {}
+
 func runBatches(batches [][]int) [][]string {
 	// TODO: Run and join each batch in order, preserving its result boundary.
 	return nil

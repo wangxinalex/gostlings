@@ -10,18 +10,32 @@ import (
 func TestRunBatchesJoinsBeforeStartingNextBatch(t *testing.T) {
 	firstStarted := make(chan struct{})
 	allowFirst := make(chan struct{})
-	secondStarted := make(chan struct{}, 1)
-	original := runBatchJob
+	firstReleased := make(chan struct{})
+	prematureSecondBatch := make(chan struct{}, 1)
+	originalJob := runBatchJob
+	originalBatchStart := onBatchStart
 	runBatchJob = func(batch, job int) string {
 		if batch == 0 {
 			close(firstStarted)
 			<-allowFirst
-		} else {
-			secondStarted <- struct{}{}
+			close(firstReleased)
 		}
 		return fmt.Sprintf("job %d done", job)
 	}
-	defer func() { runBatchJob = original }()
+	onBatchStart = func(batch int) {
+		if batch != 1 {
+			return
+		}
+		select {
+		case <-firstReleased:
+		default:
+			prematureSecondBatch <- struct{}{}
+		}
+	}
+	defer func() {
+		runBatchJob = originalJob
+		onBatchStart = originalBatchStart
+	}()
 
 	completed := make(chan [][]string, 1)
 	go func() { completed <- runBatches([][]int{{1}, {2}}) }()
@@ -32,9 +46,9 @@ func TestRunBatchesJoinsBeforeStartingNextBatch(t *testing.T) {
 		t.Fatal("first batch did not start")
 	}
 	select {
-	case <-secondStarted:
+	case <-prematureSecondBatch:
 		t.Fatal("second batch started before the first batch was joined")
-	default:
+	case <-time.After(500 * time.Millisecond):
 	}
 
 	close(allowFirst)

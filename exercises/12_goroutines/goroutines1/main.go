@@ -5,6 +5,12 @@
 
 package main
 
+import "fmt"
+
+var greeting = func() {
+	fmt.Println("hello")
+}
+
 func main() {
 	// TODO: Start a greeting goroutine that prints "hello" and wait for it to finish.
 }
