@@ -1,52 +1,39 @@
 package main
 
 import (
-	"reflect"
-	"sort"
 	"testing"
 	"time"
 )
 
-func TestMergeForwardsValuesAndCloses(t *testing.T) {
-	left := make(chan int, 3)
-	right := make(chan int, 2)
-	for _, value := range []int{1, 3, 5} {
-		left <- value
-	}
-	for _, value := range []int{2, 4} {
-		right <- value
-	}
-	close(left)
-	close(right)
+func TestRunAsyncPublishesBeforeTheCallerReceives(t *testing.T) {
+	workStarted := make(chan struct{})
+	returned := make(chan (<-chan int), 1)
+	go func() {
+		returned <- runAsync(func() int {
+			close(workStarted)
+			return 42
+		})
+	}()
 
-	out := merge(left, right)
-	var got []int
-	deadline := time.After(500 * time.Millisecond)
-	for {
-		select {
-		case value, ok := <-out:
-			if !ok {
-				sort.Ints(got)
-				if want := []int{1, 2, 3, 4, 5}; !reflect.DeepEqual(got, want) {
-					t.Fatalf("merge() = %v, want %v", got, want)
-				}
-				return
-			}
-			got = append(got, value)
-		case <-deadline:
-			t.Fatal("merge() did not close its output")
-		}
-	}
-}
-
-func TestMergeWithNoInputsClosesOutput(t *testing.T) {
-	out := merge()
 	select {
-	case _, ok := <-out:
-		if ok {
-			t.Fatal("merge() returned an unexpected value")
+	case <-workStarted:
+	case <-time.After(500 * time.Millisecond):
+		t.Fatal("runAsync() did not start work")
+	}
+
+	var result <-chan int
+	select {
+	case result = <-returned:
+	case <-time.After(500 * time.Millisecond):
+		t.Fatal("runAsync() did not return after work published its result")
+	}
+
+	select {
+	case got := <-result:
+		if got != 42 {
+			t.Fatalf("runAsync() result = %d, want 42", got)
 		}
 	case <-time.After(500 * time.Millisecond):
-		t.Fatal("merge() did not close its empty output")
+		t.Fatal("runAsync() did not publish its result")
 	}
 }

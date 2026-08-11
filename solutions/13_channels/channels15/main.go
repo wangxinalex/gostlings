@@ -1,48 +1,21 @@
 package main
 
-import (
-	"fmt"
-	"sync"
-)
+import "fmt"
 
-func merge(stop <-chan struct{}, inputs ...<-chan int) <-chan int {
-	out := make(chan int)
-	var wg sync.WaitGroup
-
-	for _, input := range inputs {
-		in := input
-		wg.Go(func() {
-			for {
-				select {
-				case <-stop:
-					return
-				case value, ok := <-in:
-					if !ok {
-						return
-					}
-					select {
-					case out <- value:
-					case <-stop:
-						return
-					}
-				}
-			}
-		})
-	}
-
+func runWithDone(done chan struct{}) <-chan int {
+	out := make(chan int, 1)
 	go func() {
-		wg.Wait()
-		close(out)
+		defer close(done)
+		defer close(out)
+		out <- 42
 	}()
 	return out
 }
 
 func main() {
-	input := make(chan int, 2)
-	input <- 1
-	input <- 2
-	close(input)
-	for value := range merge(make(chan struct{}), input) {
+	done := make(chan struct{})
+	for value := range runWithDone(done) {
 		fmt.Println(value)
 	}
+	<-done
 }

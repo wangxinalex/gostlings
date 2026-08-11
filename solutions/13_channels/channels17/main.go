@@ -1,53 +1,39 @@
 package main
 
-import (
-	"fmt"
-	"sync"
-)
+import "fmt"
 
-type indexedJob struct {
-	index int
-	value int
-}
-
-type indexedResult struct {
-	index int
-	value int
-}
-
-func runOrdered(workers int, jobs []int) []int {
-	if workers < 1 {
-		workers = 1
-	}
-
-	jobsCh := make(chan indexedJob)
-	results := make(chan indexedResult)
-	var wg sync.WaitGroup
-
-	for i := 0; i < workers; i++ {
-		wg.Go(func() {
-			for job := range jobsCh {
-				results <- indexedResult{index: job.index, value: job.value * job.value}
-			}
-		})
-	}
-
+func forward(stop <-chan struct{}, in <-chan int) <-chan int {
+	out := make(chan int)
 	go func() {
-		for index, value := range jobs {
-			jobsCh <- indexedJob{index: index, value: value}
-		}
-		close(jobsCh)
-		wg.Wait()
-		close(results)
-	}()
+		defer close(out)
+		for {
+			var value int
+			select {
+			case <-stop:
+				return
+			case received, ok := <-in:
+				if !ok {
+					return
+				}
+				value = received
+			}
 
-	output := make([]int, len(jobs))
-	for result := range results {
-		output[result.index] = result.value
-	}
-	return output
+			select {
+			case <-stop:
+				return
+			case out <- value:
+			}
+		}
+	}()
+	return out
 }
 
 func main() {
-	fmt.Println(runOrdered(2, []int{1, 2, 3, 4}))
+	in := make(chan int, 2)
+	in <- 3
+	in <- 8
+	close(in)
+	for value := range forward(make(chan struct{}), in) {
+		fmt.Println(value)
+	}
 }

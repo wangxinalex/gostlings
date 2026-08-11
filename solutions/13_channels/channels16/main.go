@@ -1,46 +1,31 @@
 package main
 
-import (
-	"fmt"
-	"sort"
-	"sync"
-)
+import "fmt"
 
-func run(workers int, jobs []int) []int {
-	if workers < 1 {
-		workers = 1
-	}
-
-	jobsCh := make(chan int)
-	results := make(chan int)
-	var wg sync.WaitGroup
-
-	for i := 0; i < workers; i++ {
-		wg.Go(func() {
-			for job := range jobsCh {
-				results <- job * job
-			}
-		})
-	}
-
+func produce(stop <-chan struct{}) <-chan int {
+	out := make(chan int)
 	go func() {
-		for _, job := range jobs {
-			jobsCh <- job
-		}
-		close(jobsCh)
-		wg.Wait()
-		close(results)
-	}()
+		defer close(out)
+		for value := 1; ; value++ {
+			select {
+			case <-stop:
+				return
+			default:
+			}
 
-	var output []int
-	for result := range results {
-		output = append(output, result)
-	}
-	return output
+			select {
+			case out <- value:
+			case <-stop:
+				return
+			}
+		}
+	}()
+	return out
 }
 
 func main() {
-	output := run(2, []int{1, 2, 3, 4})
-	sort.Ints(output)
-	fmt.Println(output)
+	stop := make(chan struct{})
+	out := produce(stop)
+	fmt.Println(<-out)
+	close(stop)
 }

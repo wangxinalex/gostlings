@@ -1,25 +1,18 @@
-// Concept: fan-out — several workers consume one jobs channel
-// Task: square every job and close results after every worker exits
-// Expected behavior: one squared result per job, followed by a closed output
-// Hint: workers range over jobs; a coordinator waits for them before closing results
+// Concept: done signaling — a closed channel broadcasts completion without data
+// Task: return a done channel that closes when the asynchronous work finishes
+// Expected behavior: receiving from done reports a closed channel and no value
+// Hint: make done, start a goroutine, and write defer close(done) at the top of it.
+//       Do not send a value: closing is the completion signal.
 
 package main
 
 import "fmt"
 
-func squareWorkers(workers int, jobs <-chan int) <-chan int {
-	// Thought: closing jobs tells every worker that no new work remains. results
-	// must be closed after all workers exit, or a worker may send to a closed channel.
-	return nil // TODO: start workers and coordinate result closure
+func complete() <-chan struct{} {
+	return nil // TODO: close a done channel from the completing goroutine
 }
 
 func main() {
-	jobs := make(chan int, 3)
-	jobs <- 1
-	jobs <- 2
-	jobs <- 3
-	close(jobs)
-	for result := range squareWorkers(2, jobs) {
-		fmt.Println(result)
-	}
+	<-complete()
+	fmt.Println("complete")
 }

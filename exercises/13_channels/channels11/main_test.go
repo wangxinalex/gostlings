@@ -5,18 +5,25 @@ import (
 	"time"
 )
 
-func TestRunTimesOutAndReturnsPromptly(t *testing.T) {
-	start := time.Now()
-	done := make(chan struct{})
-	if got := run(done); got != "timed out" {
-		t.Fatalf("run() = %q, want %q", got, "timed out")
+func TestAwaitReturnsAReadyResult(t *testing.T) {
+	result := make(chan string, 1)
+	result <- "ready"
+
+	if got := await(result); got != "ready" {
+		t.Fatalf("await() = %q, want %q", got, "ready")
 	}
-	if elapsed := time.Since(start); elapsed > 500*time.Millisecond {
-		t.Fatalf("run() took %s; cancellation did not stop the slow producer", elapsed)
-	}
+}
+
+func TestAwaitTimesOutForASilentChannel(t *testing.T) {
+	returned := make(chan string, 1)
+	go func() { returned <- await(make(chan string)) }()
+
 	select {
-	case <-done:
-	default:
-		t.Fatal("run() returned before the producer closed done")
+	case got := <-returned:
+		if got != "timed out" {
+			t.Fatalf("await() = %q, want %q", got, "timed out")
+		}
+	case <-time.After(500 * time.Millisecond):
+		t.Fatal("await() did not time out for a silent channel")
 	}
 }
