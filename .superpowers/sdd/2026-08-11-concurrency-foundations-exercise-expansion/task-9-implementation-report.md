@@ -69,3 +69,47 @@ preserved.
 None. The selective race manifest intentionally has no entries for chapters
 12 and 13, so those chapter checks remain normal checks when invoked with
 `--race`.
+## Task 9 checker fix
+
+Before changing `check.sh`, both requested failures were reproduced with Go
+1.26.5. `sh -x check.sh solutions/16_sync/sync1 --race` selected plain
+`go run`, while an absolute solution target was rewritten as
+`.//Users/...` and failed before execution.
+
+The checker now defines `solution_root` and maps discovered solution
+directories to the same relative `exercise_path` used by `race.list`, with
+the existing exact whole-line `grep -F -x` matching preserved. Discovered
+absolute directories are used directly after trimming the trailing slash;
+relative directories retain the local `./` form needed by Go module package
+execution. Existing exercise behavior, TODO gates, starter verification,
+ordering, and `--race-all` behavior remain unchanged.
+
+## Task 9 verification
+
+Verified with:
+
+```sh
+PATH=/Users/wangxinalex/.goenv/versions/1.26.5/bin:$PATH
+GOCACHE=/tmp/gostlings-task9-final-cache
+```
+
+| Check | Result |
+| --- | --- |
+| Focused red-green regression probe | PASS; observed `go run -race` and relative/absolute `1/1 passed` after the fix |
+| `sh check.sh solutions/12_goroutines --run-all` | PASS — `10/10 passed` |
+| `sh check.sh solutions/13_channels --run-all` | PASS — `50/50 passed` |
+| `sh check.sh solutions --run-all` | PASS — `153/153 passed` |
+| Selective race checks for goroutines/channels | PASS — `10/10` and `50/50` |
+| Chapter `--race-all` checks | PASS — `10/10` and `50/50` |
+| Root `solutions --run-all --race-all` | PASS — `153/153 passed` |
+| Relative `solutions/16_sync/sync1 --race` | PASS; trace showed `go run -race ./solutions/16_sync/sync1` |
+| Absolute `solutions/16_sync/sync1 --race` | PASS — `1/1 passed` |
+| Exercise `16_sync/sync1 --race` | Expected TODO-gate rejection; trace still selected race coverage before the gate result |
+| Starter suite for chapters 12 and 13 | PASS — exit 0 |
+| Canonical starter verification | Expected focused build failure, no usage error |
+| `solutions/... --verify-starter` restriction | Expected usage exit 2 |
+| Chapter solution tests and vet | PASS — exit 0 |
+| Layout parity, `sh -n check.sh`, and `git diff --check` | PASS |
+
+No exercise or documentation content was changed. The intentional Task 3 and
+Task 5 report deletions remain preserved.

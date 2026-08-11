@@ -37,6 +37,10 @@ exercise_root=""
 if [ -d exercises ]; then
   exercise_root=$(cd exercises && pwd -P)
 fi
+solution_root=""
+if [ -d solutions ]; then
+  solution_root=$(cd solutions && pwd -P)
+fi
 target_path=$(cd "$target" && pwd -P)
 
 if [ "$verify_starter" -eq 1 ]; then
@@ -83,12 +87,20 @@ fi
 while IFS= read -r dir; do
   [ -n "$dir" ] || continue
   [ -d "$dir" ] || continue
-  d="./${dir%/}"
+  case "$dir" in
+    /*) d="${dir%/}" ;;
+    *) d="./${dir%/}" ;;
+  esac
   dir_path=$(cd "$d" && pwd -P)
   exercise_path=""
   if [ -n "$exercise_root" ]; then
     case "$dir_path/" in
       "$exercise_root/"*) exercise_path=${dir_path#"$exercise_root"/} ;;
+    esac
+  fi
+  if [ -z "$exercise_path" ] && [ -n "$solution_root" ]; then
+    case "$dir_path/" in
+      "$solution_root/"*) exercise_path=${dir_path#"$solution_root"/} ;;
     esac
   fi
 
