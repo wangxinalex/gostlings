@@ -60,16 +60,16 @@ Recommended progression: Core (`00_intro`–`11_generics`) → Applied
 | 12_goroutines | 10 | [Goroutines progression](exercises/12_goroutines/README.md) |
 | 13_channels | 50 | [Channel patterns guide](exercises/13_channels/README.md) |
 | 14_testing | 11 | [Testing progression](exercises/14_testing/README.md) |
-| 15_context | 3 | [context](https://pkg.go.dev/context) |
-| 16_sync | 3 | [sync](https://pkg.go.dev/sync) |
+| 15_context | 14 | [Context progression](exercises/15_context/README.md) |
+| 16_sync | 14 | [sync progression](exercises/16_sync/README.md) |
 | 17_panic_recover | 2 | [builtin](https://pkg.go.dev/builtin) |
 | 18_embedding | 2 | [Effective Go: Embedding](https://go.dev/doc/effective_go#embedding) |
 | 19_json | 3 | [encoding/json](https://pkg.go.dev/encoding/json) |
 | 20_io | 2 | [io](https://pkg.go.dev/io) |
-| 21_time | 2 | [time](https://pkg.go.dev/time) |
+| 21_time | 8 | [time progression](exercises/21_time/README.md) |
 | 22_strconv | 2 | [strconv](https://pkg.go.dev/strconv) |
 | 23_http | 3 | [net/http](https://pkg.go.dev/net/http), [httptest](https://pkg.go.dev/net/http/httptest) |
-| 24_concurrency_patterns | 3 | [context](https://pkg.go.dev/context), [sync/atomic](https://pkg.go.dev/sync/atomic) |
+| 24_concurrency_patterns | 18 | [Concurrency patterns progression](exercises/24_concurrency_patterns/README.md) |
 | 25_closures | 2 | builds on [Go Tour: Basics 4-7](https://go.dev/tour/basics/4); closures are not in the Tour |
 | 26_files | 3 | [os](https://pkg.go.dev/os), [bufio](https://pkg.go.dev/bufio) |
 
@@ -79,7 +79,7 @@ Recommended progression: Core (`00_intro`–`11_generics`) → Applied
 sh check.sh                      # run exercises/ in order, stop at the first failure and show its output
 sh check.sh --run-all            # run every exercise and report all PASS/FAIL
 sh check.sh exercises/13_channels/channels6 # check one exercise directly
-sh check.sh solutions --run-all  # verify all 153 reference solutions pass
+sh check.sh solutions --run-all  # verify all 185 reference solutions pass
 sh check.sh solutions --run-all --race # verify selectively listed reference solutions with the race detector
 sh check.sh solutions --run-all --race-all # audit every selected reference solution with the race detector
 ```

@@ -13,3 +13,11 @@
 16_sync/sync12
 16_sync/sync13
 16_sync/sync14
+
+# Integrated exercises with atomic/shared-state coverage.
+24_concurrency_patterns/concurrency3
+24_concurrency_patterns/concurrency5
+24_concurrency_patterns/concurrency13
+24_concurrency_patterns/concurrency14
+24_concurrency_patterns/concurrency15
+24_concurrency_patterns/concurrency18
