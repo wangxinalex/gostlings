@@ -6,6 +6,10 @@
 章节。完成本章后，把更完整的 pipeline 工作交给
 [`24_concurrency_patterns`](../24_concurrency_patterns)。
 
+本章不构造可复用的 timer/ticker 抽象；少数超时或取消测试/示例仍可能使用
+`time.After`。`21_time` 专门负责 `time.Timer`/`time.Ticker` 的构造、重置、
+生命周期管理和周期性设计。
+
 ## 所有权模型
 
 - 发送方通常负责关闭；只有知道“不会再发送”的一方才能 `close(ch)`。
@@ -134,7 +138,7 @@ sh scripts/verify_exercise_starters.sh exercises/13_channels
 后者是昂贵的全量审计：
 
 ```sh
-sh check.sh exercises/13_channels/channels1 --race
+sh check.sh solutions/16_sync/sync1 --race
 sh check.sh solutions --run-all --race
 sh check.sh solutions --run-all --race-all
 ```
