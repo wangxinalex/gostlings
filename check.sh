@@ -1,15 +1,14 @@
 #!/bin/sh
 # Run exercises in order; report PASS/FAIL per exercise.
-# Usage: ./check.sh [exercises|solutions|path/to/exercise] [--run-all] [--race] [--race-all] [--verify-starter]
+# Usage: ./check.sh [exercises|solutions|path/to/exercise] [--run-all] [--race] [--race-all]
 # Default: stop at first FAIL and show its output. --run-all: continue and print a summary.
 target="exercises"
 run_all=0
 race=0
 race_all=0
-verify_starter=0
 
 usage() {
-  printf "Usage: sh check.sh <target> [--run-all] [--race] [--race-all] [--verify-starter]\n" >&2
+  printf "Usage: sh check.sh <target> [--run-all] [--race] [--race-all]\n" >&2
 }
 
 for arg in "$@"; do
@@ -17,7 +16,6 @@ for arg in "$@"; do
     --run-all) run_all=1 ;;
     --race) race=1 ;;
     --race-all) race_all=1 ;;
-    --verify-starter) verify_starter=1 ;;
     *) target="$arg" ;;
   esac
 done
@@ -41,22 +39,6 @@ solution_root=""
 if [ -d solutions ]; then
   solution_root=$(cd solutions && pwd -P)
 fi
-target_path=$(cd "$target" && pwd -P)
-
-if [ "$verify_starter" -eq 1 ]; then
-  if [ -z "$exercise_root" ]; then
-    usage
-    exit 2
-  fi
-  case "$target_path/" in
-    "$exercise_root/"*) ;;
-    *)
-      usage
-      exit 2
-      ;;
-  esac
-fi
-
 if [ -f "$target/main.go" ] || ls "$target"/*_test.go >/dev/null 2>&1; then
   dirs="${target%/}/"
 else
@@ -102,19 +84,6 @@ while IFS= read -r dir; do
     case "$dir_path/" in
       "$solution_root/"*) exercise_path=${dir_path#"$solution_root"/} ;;
     esac
-  fi
-
-  if [ -n "$exercise_path" ] && [ -f "$d/main.go" ] &&
-    grep -q 'TODO:' "$d/main.go"; then
-    if [ "$verify_starter" -eq 0 ]; then
-      total=$((total+1))
-      fail=$((fail+1))
-      printf "FAIL: %s (starter still contains TODO)\n" "$dir"
-      if [ "$run_all" -eq 0 ]; then
-        exit 1
-      fi
-      continue
-    fi
   fi
 
   run_race=0

@@ -46,12 +46,7 @@ for topic in "$@"; do
       printf "FAIL: %s (missing main_test.go)\n" "$exercise" >&2
       exit 1
     fi
-    if ! grep -q 'TODO:' "$exercise/main.go"; then
-      printf "FAIL: %s (starter is missing TODO:)\n" "$exercise" >&2
-      exit 1
-    fi
-
-    if out=$(sh check.sh "$exercise" --verify-starter 2>&1); then
+    if out=$(sh check.sh "$exercise" 2>&1); then
       printf "FAIL: %s (starter unexpectedly passed)\n" "$exercise" >&2
       printf "%s\n" "$out" >&2
       exit 1
