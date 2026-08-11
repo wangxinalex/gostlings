@@ -116,6 +116,8 @@ An untouched learner starter must never be accepted as solved. Every new starter
 
 The implementation plan must also run a red-phase verifier over every new exercise before any solution is copied: each pristine starter must either fail to compile or fail its focused test, and the failure must identify the intended behavior. A test that passes against the untouched starter is a design failure and must be rewritten before implementation continues.
 
+The normal checker rejects the TODO marker before running the package. The verifier may use an internal `--verify-starter` mode that bypasses only this static rejection, runs the focused test, and requires a non-zero result; that mode is not valid for solutions or for normal learner validation.
+
 The focused tests must exercise the TODO seam directly and include at least one edge or lifecycle assertion. A solution is not accepted because its example `main` prints the expected text alone; the test must also prove closure, ordering, cancellation, bounded progress, or the relevant synchronization boundary.
 
 ## Testing and verification
