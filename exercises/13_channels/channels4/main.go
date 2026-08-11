@@ -10,6 +10,11 @@ import "fmt"
 func read(ch <-chan int) (int, bool) {
 	// Thought: when receiving an int, zero may be real data or the value returned
 	// after closure; the comma-ok result is what identifies the channel state.
+	// Pattern:
+	//   value, ok := <-ch
+	//   if !ok { // channel is closed and drained
+	//       stop consuming
+	//   }
 	value := <-ch
 	return value, true // TODO: receive with comma-ok and return the real status
 }

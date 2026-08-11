@@ -11,6 +11,10 @@ import "fmt"
 func main() {
 	// Thought: a buffer of two can hold two values so sends can complete first;
 	// once the buffer is full, another send still blocks.
+	// Pattern:
+	//   ch := make(chan T, capacity)
+	//   send up to capacity values without a receiver
+	//   receive values later; sending blocks when the buffer is full
 	ch := make(chan int) // TODO: Make this buffered so the sends don't block.
 
 	ch <- 1

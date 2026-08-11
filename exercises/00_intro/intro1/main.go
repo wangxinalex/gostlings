@@ -5,7 +5,9 @@
 
 package main
 
+import "fmt"
+
 func main() {
 	// TODO: Fix the line below; it does not compile.
-	Println("Hello, gostlings!")
+	fmt.PrintLn("Hello, gostlings!")
 }
