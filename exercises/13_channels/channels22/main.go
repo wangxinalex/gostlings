@@ -1,20 +1,25 @@
-// Concept: semaphore — a buffered channel can limit active work
-// Task: run work concurrently but never exceed limit active jobs
-// Expected behavior: results stay in input order and active work is bounded by limit
-// Hint: acquire a token with tokens <- struct{}{} and release it with <-tokens
+// Concept: fan-in combines any number of input streams.
+// Task: forward every input to one output and close that output only after every forwarder ends.
+// Expected behavior: merge() forwards all values; merge() with no inputs returns a closed stream.
+// Hint: start one goroutine per input and have each send one acknowledgement to a buffered exited channel.
+//       The coordinator receives len(inputs) acknowledgements before it calls close(out).
 
 package main
 
 import "fmt"
 
-func parallel(limit int, jobs []int, work func(int) int) []int {
-	// Thought: channel capacity expresses how many jobs may run concurrently; it
-	// is not a result queue. Each goroutine acquires a token before work and
-	// returns it afterward.
-	return nil // TODO: add a buffered token channel and wait for all results
+func merge(inputs ...<-chan int) <-chan int {
+	return nil // TODO: forward every input and close out from one coordinator
 }
 
 func main() {
-	results := parallel(2, []int{1, 2, 3, 4}, func(value int) int { return value * value })
-	fmt.Println(results)
+	first := make(chan int, 1)
+	second := make(chan int, 1)
+	first <- 1
+	second <- 2
+	close(first)
+	close(second)
+	for value := range merge(first, second) {
+		fmt.Println(value)
+	}
 }

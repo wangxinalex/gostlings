@@ -2,25 +2,26 @@ package main
 
 import "fmt"
 
-var onSquareWorkerStart = func() {}
-var onSquareWorkerExit = func() {}
+var onPoolWorkerStart = func() {}
+var onPoolWorkerExit = func() {}
 
-func squareWorkers(workers int, jobs <-chan int) <-chan int {
+func startPool(workers int) (chan<- int, <-chan int) {
 	if workers < 1 {
 		workers = 1
 	}
 
-	out := make(chan int)
+	jobs := make(chan int)
+	results := make(chan int)
 	exited := make(chan struct{}, workers)
 	for worker := 0; worker < workers; worker++ {
 		go func() {
-			onSquareWorkerStart()
+			onPoolWorkerStart()
 			defer func() {
-				onSquareWorkerExit()
+				onPoolWorkerExit()
 				exited <- struct{}{}
 			}()
 			for job := range jobs {
-				out <- job * job
+				results <- job * job
 			}
 		}()
 	}
@@ -28,17 +29,17 @@ func squareWorkers(workers int, jobs <-chan int) <-chan int {
 		for worker := 0; worker < workers; worker++ {
 			<-exited
 		}
-		close(out)
+		close(results)
 	}()
-	return out
+	return jobs, results
 }
 
 func main() {
-	jobs := make(chan int, 2)
+	jobs, results := startPool(2)
 	jobs <- 2
 	jobs <- 3
 	close(jobs)
-	for result := range squareWorkers(2, jobs) {
+	for result := range results {
 		fmt.Println(result)
 	}
 }

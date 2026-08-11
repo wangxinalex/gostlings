@@ -28,13 +28,11 @@ func merge(inputs ...<-chan int) <-chan int {
 }
 
 func main() {
-	first := make(chan int, 1)
-	second := make(chan int, 1)
-	first <- 1
-	second <- 2
-	close(first)
-	close(second)
-	for value := range merge(first, second) {
+	in := make(chan int, 2)
+	in <- 1
+	in <- 2
+	close(in)
+	for value := range merge(in) {
 		fmt.Println(value)
 	}
 }
