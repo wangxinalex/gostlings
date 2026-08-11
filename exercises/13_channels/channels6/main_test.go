@@ -44,6 +44,7 @@ func generateWithWatchdog(t *testing.T, values ...int) <-chan int {
 	t.Helper()
 
 	returned := make(chan (<-chan int), 1)
+	deadline := time.After(500 * time.Millisecond)
 	go func() {
 		returned <- generate(values...)
 	}()
@@ -51,7 +52,7 @@ func generateWithWatchdog(t *testing.T, values ...int) <-chan int {
 	select {
 	case out := <-returned:
 		return out
-	case <-time.After(500 * time.Millisecond):
+	case <-deadline:
 		t.Fatal("generate() did not return its output channel")
 		return nil
 	}
