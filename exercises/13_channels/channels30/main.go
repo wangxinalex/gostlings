@@ -10,6 +10,7 @@ import "fmt"
 
 var processBoundedJob = func(value int) int { return value * value }
 var onBoundedQueue = func(capacity int) {}
+var onBoundedProcessStart = func(value int) {}
 
 func runBounded(workers, buffer int, jobs []int) []int {
 	return nil // TODO: use a bounded jobs channel, worker acknowledgements, and coordinator-owned result close

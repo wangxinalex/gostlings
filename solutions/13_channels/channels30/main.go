@@ -4,6 +4,7 @@ import "fmt"
 
 var processBoundedJob = func(value int) int { return value * value }
 var onBoundedQueue = func(capacity int) {}
+var onBoundedProcessStart = func(value int) {}
 
 func runBounded(workers, buffer int, jobs []int) []int {
 	if workers < 1 {
@@ -27,6 +28,7 @@ func runBounded(workers, buffer int, jobs []int) []int {
 		go func() {
 			defer func() { exited <- struct{}{} }()
 			for job := range jobsCh {
+				onBoundedProcessStart(job)
 				results <- processBoundedJob(job)
 			}
 		}()

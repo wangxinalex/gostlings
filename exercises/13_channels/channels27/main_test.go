@@ -21,11 +21,17 @@ func TestRunOrderedWithNoJobsReturns(t *testing.T) {
 
 func TestRunOrderedUsesEveryRequestedWorker(t *testing.T) {
 	previous := processOrderedJob
-	started := make(chan struct{}, 3)
-	release := make(chan struct{})
+	started := make(chan int, 3)
+	completed := make(chan int, 3)
+	release := map[int]chan struct{}{
+		4: make(chan struct{}),
+		1: make(chan struct{}),
+		3: make(chan struct{}),
+	}
 	processOrderedJob = func(value int) int {
-		started <- struct{}{}
-		<-release
+		started <- value
+		<-release[value]
+		completed <- value
 		return value * value
 	}
 	t.Cleanup(func() { processOrderedJob = previous })
@@ -39,7 +45,17 @@ func TestRunOrderedUsesEveryRequestedWorker(t *testing.T) {
 			t.Fatal("runOrdered() did not start every requested worker")
 		}
 	}
-	close(release)
+	for _, value := range []int{3, 1, 4} {
+		close(release[value])
+		select {
+		case got := <-completed:
+			if got != value {
+				t.Fatalf("processOrderedJob() completed %d, want %d", got, value)
+			}
+		case <-time.After(500 * time.Millisecond):
+			t.Fatalf("processOrderedJob(%d) did not complete after release", value)
+		}
+	}
 	select {
 	case got := <-returned:
 		if want := []int{16, 1, 9}; !reflect.DeepEqual(got, want) {

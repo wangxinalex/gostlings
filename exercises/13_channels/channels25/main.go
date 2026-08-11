@@ -8,6 +8,8 @@ package main
 
 import "fmt"
 
+var onForwarderExit = func() {}
+
 func merge(inputs ...<-chan int) <-chan int {
 	return nil // TODO: handle empty, closed, buffered, and still-open input streams
 }

@@ -8,6 +8,8 @@ package main
 
 import "fmt"
 
+var onForwarderExit = func() {}
+
 func merge(inputs ...<-chan int) <-chan int {
 	return nil // TODO: forward every input and close out from one coordinator
 }

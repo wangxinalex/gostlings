@@ -47,6 +47,39 @@ func TestMergeDoesNotIgnoreABlockedInput(t *testing.T) {
 	}
 }
 
+func TestMergeClosesOnlyAfterEveryForwarderExits(t *testing.T) {
+	previous := onForwarderExit
+	exited := make(chan struct{}, 2)
+	release := make(chan struct{})
+	onForwarderExit = func() {
+		exited <- struct{}{}
+		<-release
+	}
+	t.Cleanup(func() { onForwarderExit = previous })
+
+	out := merge(buffered(), buffered())
+	for forwarder := 0; forwarder < 2; forwarder++ {
+		select {
+		case <-exited:
+		case <-time.After(500 * time.Millisecond):
+			t.Fatalf("forwarder %d did not reach its exit hook", forwarder+1)
+		}
+	}
+	select {
+	case _, ok := <-out:
+		if !ok {
+			t.Fatal("merge() closed before every forwarder exited")
+		}
+		t.Fatal("merge() produced an unexpected value")
+	default:
+	}
+
+	close(release)
+	if got := collectMerged(t, out); len(got) != 0 {
+		t.Fatalf("merge() = %v, want no values", got)
+	}
+}
+
 func buffered(values ...int) <-chan int {
 	in := make(chan int, len(values))
 	for _, value := range values {

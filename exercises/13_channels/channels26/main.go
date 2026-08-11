@@ -9,6 +9,7 @@ package main
 import "fmt"
 
 var processJob = func(value int) int { return value * value }
+var onWorkerExit = func() {}
 
 func run(workers int, jobs []int) []int {
 	return nil // TODO: produce jobs, fan out workers, and collect results after coordinator close

@@ -52,3 +52,40 @@ func TestRunUsesEveryRequestedWorker(t *testing.T) {
 		t.Fatal("run() did not finish after workers were released")
 	}
 }
+
+func TestRunWaitsForEveryWorkerExitBeforeReturning(t *testing.T) {
+	previous := onWorkerExit
+	exited := make(chan struct{}, 3)
+	release := make(chan struct{})
+	onWorkerExit = func() {
+		exited <- struct{}{}
+		<-release
+	}
+	t.Cleanup(func() { onWorkerExit = previous })
+
+	returned := make(chan []int, 1)
+	go func() { returned <- run(3, []int{1, 2, 3}) }()
+	for worker := 0; worker < 3; worker++ {
+		select {
+		case <-exited:
+		case <-time.After(500 * time.Millisecond):
+			t.Fatalf("worker %d did not reach its exit hook", worker+1)
+		}
+	}
+	select {
+	case got := <-returned:
+		t.Fatalf("run() returned %v before every worker exited", got)
+	default:
+	}
+
+	close(release)
+	select {
+	case got := <-returned:
+		sort.Ints(got)
+		if want := []int{1, 4, 9}; !reflect.DeepEqual(got, want) {
+			t.Fatalf("run() = %v, want %v", got, want)
+		}
+	case <-time.After(500 * time.Millisecond):
+		t.Fatal("run() did not return after every worker exited")
+	}
+}

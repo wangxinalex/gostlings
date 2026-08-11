@@ -3,6 +3,7 @@ package main
 import "fmt"
 
 var processJob = func(value int) int { return value * value }
+var onWorkerExit = func() {}
 
 func run(workers int, jobs []int) []int {
 	if workers < 1 {
@@ -20,7 +21,10 @@ func run(workers int, jobs []int) []int {
 	}()
 	for worker := 0; worker < workers; worker++ {
 		go func() {
-			defer func() { exited <- struct{}{} }()
+			defer func() {
+				onWorkerExit()
+				exited <- struct{}{}
+			}()
 			for job := range jobsCh {
 				results <- processJob(job)
 			}

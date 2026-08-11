@@ -13,6 +13,13 @@ func TestRunReturnsTheFirstObservedError(t *testing.T) {
 	}
 }
 
+func TestRunInspectsAnErrorAfterASuccessfulJob(t *testing.T) {
+	want := errors.New("later bad job")
+	if got := run(1, []job{{value: 1}, {value: 2, err: want}}); !errors.Is(got, want) {
+		t.Fatalf("run() error = %v, want %v", got, want)
+	}
+}
+
 func TestRunClosesStopOnceAndJoinsWorkersBeforeReturning(t *testing.T) {
 	want := errors.New("bad job")
 	previousStop := onStopClosed

@@ -24,18 +24,22 @@ func TestRunBoundedWithNoJobsReturns(t *testing.T) {
 func TestRunBoundedUsesTheRequestedWorkersAndQueueCapacity(t *testing.T) {
 	previousProcess := processBoundedJob
 	previousQueue := onBoundedQueue
-	started := make(chan struct{}, 2)
+	previousStart := onBoundedProcessStart
+	started := make(chan int, 3)
+	processing := make(chan int, 3)
 	queueCapacity := make(chan int, 1)
 	release := make(chan struct{})
 	processBoundedJob = func(value int) int {
-		started <- struct{}{}
+		started <- value
 		<-release
 		return value * value
 	}
 	onBoundedQueue = func(capacity int) { queueCapacity <- capacity }
+	onBoundedProcessStart = func(value int) { processing <- value }
 	t.Cleanup(func() {
 		processBoundedJob = previousProcess
 		onBoundedQueue = previousQueue
+		onBoundedProcessStart = previousStart
 	})
 
 	returned := make(chan []int, 1)
@@ -54,6 +58,23 @@ func TestRunBoundedUsesTheRequestedWorkersAndQueueCapacity(t *testing.T) {
 		case <-time.After(500 * time.Millisecond):
 			t.Fatal("runBounded() did not start every requested worker")
 		}
+	}
+	select {
+	case value := <-processing:
+		_ = value
+	case <-time.After(500 * time.Millisecond):
+		t.Fatal("runBounded() did not enter processing")
+	}
+	select {
+	case value := <-processing:
+		_ = value
+	case <-time.After(500 * time.Millisecond):
+		t.Fatal("runBounded() did not enter processing with both workers")
+	}
+	select {
+	case value := <-processing:
+		t.Fatalf("runBounded() started a third concurrent job (%d) before workers were released", value)
+	case <-time.After(100 * time.Millisecond):
 	}
 	close(release)
 	select {

@@ -2,6 +2,8 @@ package main
 
 import "fmt"
 
+var onForwarderExit = func() {}
+
 func merge(inputs ...<-chan int) <-chan int {
 	out := make(chan int)
 	if len(inputs) == 0 {
@@ -15,6 +17,7 @@ func merge(inputs ...<-chan int) <-chan int {
 			for value := range in {
 				out <- value
 			}
+			onForwarderExit()
 			exited <- struct{}{}
 		}(input)
 	}
