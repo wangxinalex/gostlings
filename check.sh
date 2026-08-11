@@ -57,19 +57,25 @@ if [ -f "$target/main.go" ] || ls "$target"/*_test.go >/dev/null 2>&1; then
   dirs="${target%/}/"
 else
   dirs=$(
-    find "$target" -mindepth 2 -maxdepth 2 -type d -print |
+    find "$target" -type f \( -name main.go -o -name '*_test.go' \) -print |
+      sed 's#/[^/]*$##' |
+      sort -u |
       awk -F/ '
         {
           topic = $(NF - 1)
           exercise = $NF
+          if (match(topic, /^[0-9]+/) == 0) {
+            next
+          }
+          topic_number = substr(topic, RSTART, RLENGTH)
           if (match(exercise, /[0-9]+$/) == 0) {
             next
           }
-          number = substr(exercise, RSTART, RLENGTH)
-          printf "%s\t%09d\t%s/\n", topic, number, $0
+          exercise_number = substr(exercise, RSTART, RLENGTH)
+          printf "%09d\t%09d\t%s/\n", topic_number, exercise_number, $0
         }
       ' |
-      sort -k1,1 -k2,2n |
+      sort -k1,1n -k2,2n -k3,3 |
       cut -f3-
   )
 fi
