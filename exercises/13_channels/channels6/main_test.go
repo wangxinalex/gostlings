@@ -1,41 +1,41 @@
 package main
 
 import (
+	"reflect"
 	"testing"
 	"time"
 )
 
-func TestReceiveFastChoosesReadyInput(t *testing.T) {
-	t.Run("fast is ready", func(t *testing.T) {
-		fast := make(chan string, 1)
-		slow := make(chan string)
-		fast <- "fast lane"
+func TestGenerateForwardsValuesAndCloses(t *testing.T) {
+	out := generate(1, 2, 3)
+	var got []int
+	deadline := time.After(500 * time.Millisecond)
 
-		if got := receiveFast(fast, slow); got != "fast lane" {
-			t.Fatalf("receiveFast() = %q, want %q", got, "fast lane")
-		}
-	})
-
-	t.Run("slow is ready", func(t *testing.T) {
-		fast := make(chan string)
-		slow := make(chan string, 1)
-		slow <- "slow lane"
-
-		result := make(chan string, 1)
-		go func() {
-			result <- receiveFast(fast, slow)
-		}()
-
+	for {
 		select {
-		case got := <-result:
-			if got != "slow lane" {
-				t.Fatalf("receiveFast() = %q, want %q", got, "slow lane")
+		case value, ok := <-out:
+			if !ok {
+				want := []int{1, 2, 3}
+				if !reflect.DeepEqual(got, want) {
+					t.Fatalf("generate() = %v, want %v", got, want)
+				}
+				return
 			}
-		case <-time.After(200 * time.Millisecond):
-			// Unblock an implementation that is incorrectly waiting only on fast,
-			// so the failing test does not leave a goroutine behind.
-			close(fast)
-			t.Fatal("receiveFast blocked even though slow was ready")
+			got = append(got, value)
+		case <-deadline:
+			t.Fatal("generate() did not close its output")
 		}
-	})
+	}
+}
+
+func TestGenerateWithNoValuesClosesPromptly(t *testing.T) {
+	out := generate()
+	select {
+	case _, ok := <-out:
+		if ok {
+			t.Fatal("generate() returned an unexpected value")
+		}
+	case <-time.After(500 * time.Millisecond):
+		t.Fatal("generate() did not close an empty output")
+	}
 }

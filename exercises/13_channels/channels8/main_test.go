@@ -1,18 +1,41 @@
 package main
 
-import "testing"
+import (
+	"testing"
+	"time"
+)
 
-func TestTryReceiveReportsReadyValue(t *testing.T) {
-	ch := make(chan int, 1)
-	ch <- 7
+func TestReceiveFastChoosesReadyInput(t *testing.T) {
+	t.Run("fast is ready", func(t *testing.T) {
+		fast := make(chan string, 1)
+		slow := make(chan string)
+		fast <- "fast lane"
 
-	if got := tryReceive(ch); got != "received: 7" {
-		t.Fatalf("tryReceive() = %q, want %q", got, "received: 7")
-	}
-}
+		if got := receiveFast(fast, slow); got != "fast lane" {
+			t.Fatalf("receiveFast() = %q, want %q", got, "fast lane")
+		}
+	})
 
-func TestTryReceiveDoesNotBlockOnEmptyInput(t *testing.T) {
-	if got := tryReceive(make(chan int)); got != "no value" {
-		t.Fatalf("tryReceive() = %q, want %q", got, "no value")
-	}
+	t.Run("slow is ready", func(t *testing.T) {
+		fast := make(chan string)
+		slow := make(chan string, 1)
+		slow <- "slow lane"
+
+		result := make(chan string, 1)
+		go func() {
+			result <- receiveFast(fast, slow)
+		}()
+
+		select {
+		case got := <-result:
+			if got != "slow lane" {
+				t.Fatalf("receiveFast() = %q, want %q", got, "slow lane")
+			}
+		case <-time.After(200 * time.Millisecond):
+			// Unblock an implementation that is incorrectly waiting only on fast,
+			// so the failing test does not leave a goroutine behind.
+			close(fast)
+			t.Fatal("receiveFast blocked even though slow was ready")
+		}
+	})
 }

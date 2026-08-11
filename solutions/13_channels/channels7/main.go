@@ -1,19 +1,28 @@
 package main
 
-import (
-	"fmt"
-	"time"
-)
+import "fmt"
 
-func await(ch <-chan string) string {
-	select {
-	case value := <-ch:
-		return value
-	case <-time.After(50 * time.Millisecond):
-		return "timed out"
+func receiveAll(ch <-chan int) []int {
+	var values []int
+	for value := range ch {
+		values = append(values, value)
 	}
+	return values
+}
+
+func generate(values ...int) <-chan int {
+	out := make(chan int)
+	go func() {
+		defer close(out)
+		for _, value := range values {
+			out <- value
+		}
+	}()
+	return out
 }
 
 func main() {
-	fmt.Println(await(make(chan string)))
+	for _, value := range receiveAll(generate(1, 2, 3)) {
+		fmt.Println(value)
+	}
 }

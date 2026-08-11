@@ -3,39 +3,18 @@ package main
 import (
 	"reflect"
 	"testing"
-	"time"
 )
 
-func TestGenerateForwardsValuesAndCloses(t *testing.T) {
-	out := generate(1, 2, 3)
-	var got []int
-	deadline := time.After(500 * time.Millisecond)
+func TestDrainClosedReturnsValuesBeforeClosedState(t *testing.T) {
+	ch := make(chan int, 3)
+	ch <- 4
+	ch <- 0
+	ch <- 9
+	close(ch)
 
-	for {
-		select {
-		case value, ok := <-out:
-			if !ok {
-				want := []int{1, 2, 3}
-				if !reflect.DeepEqual(got, want) {
-					t.Fatalf("generate() = %v, want %v", got, want)
-				}
-				return
-			}
-			got = append(got, value)
-		case <-deadline:
-			t.Fatal("generate() did not close its output")
-		}
-	}
-}
-
-func TestGenerateWithNoValuesClosesPromptly(t *testing.T) {
-	out := generate()
-	select {
-	case _, ok := <-out:
-		if ok {
-			t.Fatal("generate() returned an unexpected value")
-		}
-	case <-time.After(500 * time.Millisecond):
-		t.Fatal("generate() did not close an empty output")
+	got := drainClosed(ch)
+	want := []int{4, 0, 9}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("drainClosed() = %v, want %v", got, want)
 	}
 }

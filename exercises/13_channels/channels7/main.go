@@ -1,23 +1,28 @@
-// Concept: select timeout — a caller should not wait forever for a result
-// Task: return the value if it arrives quickly, otherwise return a timeout message
-// Expected behavior: a silent input returns "timed out" promptly
-// Hint: add a case for <-time.After(50 * time.Millisecond)
+// Concept: directional channels keep generator ownership clear
+// Task: return a receive-only stream while the producer sends every value and closes its own output
+// Expected behavior: callers can receive every value but cannot send to or close the returned channel
+// Hint: make a bidirectional out channel inside generate, start a goroutine with defer close(out), and return it as <-chan int
 
 package main
 
-import (
-	"fmt"
-	"time"
-)
+import "fmt"
 
-func await(ch <-chan string) string {
-	// Thought: a timeout is one competing select branch. It ends only the current
-	// wait; it does not automatically stop a producer that is still running.
-	timeout := time.After(50 * time.Millisecond)
-	_ = timeout
-	return <-ch // TODO: add the timeout branch
+func receiveAll(ch <-chan int) []int {
+	var values []int
+	for value := range ch {
+		values = append(values, value)
+	}
+	return values
+}
+
+func generate(values ...int) <-chan int {
+	// Thought: callers receive through the returned <-chan int, so only this
+	// producer can send values and decide when the stream is complete.
+	return nil // TODO: create out, send values in a goroutine, close it, and return it
 }
 
 func main() {
-	fmt.Println(await(make(chan string)))
+	for _, value := range receiveAll(generate(1, 2, 3)) {
+		fmt.Println(value)
+	}
 }
