@@ -8,19 +8,32 @@ import (
 func TestServeCommandsPausesThenResumesJobs(t *testing.T) {
 	previous := onCommandApplied
 	applied := make(chan command, 2)
-	onCommandApplied = func(c command) { applied <- c }
+	pauseGate := make(chan struct{})
+	pauseApplied := make(chan struct{})
+	onCommandApplied = func(c command) {
+		if c == pause {
+			close(pauseApplied)
+			<-pauseGate
+		}
+		applied <- c
+	}
 	t.Cleanup(func() { onCommandApplied = previous })
 	stop, commands, jobs := make(chan struct{}), make(chan command, 2), make(chan int)
 	out := serveCommands(stop, commands, jobs)
 	commands <- pause
-	wait39(t, applied, "serveCommands() did not apply pause")
+	wait39Signal(t, pauseApplied, "serveCommands() did not begin applying pause")
 	sent := make(chan struct{})
-	go func() { jobs <- 7; close(sent) }()
+	ready := make(chan struct{})
+	go func() { close(ready); jobs <- 7; close(sent) }()
+	wait39Signal(t, ready, "job sender did not become ready")
 	select {
 	case v := <-out:
 		t.Fatalf("serveCommands() forwarded paused job %d", v)
-	case <-time.After(100 * time.Millisecond):
+	case <-sent:
+		t.Fatal("serveCommands() consumed a job while pause transition was gated")
+	default:
 	}
+	close(pauseGate)
 	commands <- resume
 	wait39(t, applied, "serveCommands() did not apply resume")
 	select {
@@ -67,6 +80,16 @@ func wait39(t *testing.T, ch <-chan command, message string) {
 		t.Fatal(message)
 	}
 }
+
+func wait39Signal(t *testing.T, ch <-chan struct{}, message string) {
+	t.Helper()
+	select {
+	case <-ch:
+	case <-time.After(500 * time.Millisecond):
+		t.Fatal(message)
+	}
+}
+
 func closed39(t *testing.T, out <-chan int) {
 	t.Helper()
 	select {

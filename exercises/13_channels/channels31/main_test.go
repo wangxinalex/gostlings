@@ -8,6 +8,7 @@ import (
 func TestFirstResultCancelsRemainingTasksBeforeReturning(t *testing.T) {
 	started := make(chan struct{}, 3)
 	releaseWinner := make(chan struct{})
+	releaseCanceled := make(chan struct{})
 	cancelled := make(chan struct{}, 2)
 	tasks := []func(<-chan struct{}) string{
 		func(stop <-chan struct{}) string { started <- struct{}{}; <-releaseWinner; return "winner" },
@@ -15,6 +16,7 @@ func TestFirstResultCancelsRemainingTasksBeforeReturning(t *testing.T) {
 			started <- struct{}{}
 			<-stop
 			cancelled <- struct{}{}
+			<-releaseCanceled
 			return "late"
 		},
 		func(stop <-chan struct{}) string {
@@ -30,16 +32,22 @@ func TestFirstResultCancelsRemainingTasksBeforeReturning(t *testing.T) {
 		wait31(t, started, "firstResult() did not start every task")
 	}
 	close(releaseWinner)
+	for range tasks[1:] {
+		wait31(t, cancelled, "firstResult() returned before cancellation reached every remaining task")
+	}
+	select {
+	case got := <-returned:
+		t.Fatalf("firstResult() returned %q before canceled tasks exited", got)
+	default:
+	}
+	close(releaseCanceled)
 	select {
 	case got := <-returned:
 		if got != "winner" {
 			t.Fatalf("firstResult() = %q, want %q", got, "winner")
 		}
 	case <-time.After(500 * time.Millisecond):
-		t.Fatal("firstResult() did not return the winner")
-	}
-	for range tasks[1:] {
-		wait31(t, cancelled, "firstResult() returned before cancellation reached every remaining task")
+		t.Fatal("firstResult() did not return after canceled tasks exited")
 	}
 }
 

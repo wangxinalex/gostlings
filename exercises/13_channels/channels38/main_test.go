@@ -8,6 +8,13 @@ import (
 func TestWatchBroadcastsDoneToEveryObserver(t *testing.T) {
 	done := make(chan struct{})
 	first, second := watch(done), watch(done)
+	for _, out := range []<-chan string{first, second} {
+		select {
+		case got, ok := <-out:
+			t.Fatalf("watch() received before done closed: (%q,%v)", got, ok)
+		default:
+		}
+	}
 	close(done)
 	for _, out := range []<-chan string{first, second} {
 		select {
