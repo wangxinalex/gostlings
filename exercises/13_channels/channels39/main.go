@@ -2,7 +2,8 @@
 // Task: forward jobs unless pause is active; resume accepts jobs again; stop closes output.
 // Expected behavior: paused jobs wait for resume, and stop wins even while jobs are blocked.
 // Hint: while paused, select only stop and commands. While active, select stop, commands, and jobs;
-//       when forwarding a job, select between sending it and stop. This service owns close(out).
+//
+//	when forwarding a job, select between sending it and stop. This service owns close(out).
 package main
 
 import "fmt"

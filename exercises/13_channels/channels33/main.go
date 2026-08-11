@@ -2,7 +2,8 @@
 // Task: collect all source values into one output stream.
 // Expected behavior: all sources drain; output closes only after every forwarder exits.
 // Hint: give each forwarder an exit acknowledgement. A coordinator receives every acknowledgement,
-//       then closes out; no forwarder owns the shared output close.
+//
+//	then closes out; no forwarder owns the shared output close.
 package main
 
 import "fmt"

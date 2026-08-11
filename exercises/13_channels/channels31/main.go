@@ -2,7 +2,8 @@
 // Task: return the first task result, broadcast stop, and wait for every task to exit.
 // Expected behavior: a task that completes first wins; tasks still running observe stop before return.
 // Hint: give every task the same stop channel. Send results through a capacity-one channel, then
-//       close stop once and receive one exit acknowledgement for each task before returning.
+//
+//	close stop once and receive one exit acknowledgement for each task before returning.
 package main
 
 import "fmt"

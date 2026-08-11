@@ -2,7 +2,8 @@
 // Task: forward values from in until in or stop closes.
 // Expected behavior: normal values preserve order; stop closes output from either blocked direction.
 // Hint: defer close(out). Select between stop and receiving in, check comma-ok, then select between
-//       stop and sending the received value to out.
+//
+//	stop and sending the received value to out.
 package main
 
 import "fmt"

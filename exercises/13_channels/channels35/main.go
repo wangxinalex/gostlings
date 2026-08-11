@@ -2,7 +2,8 @@
 // Task: square jobs with workers workers until jobs or stop closes.
 // Expected behavior: cancellation releases blocked workers; a coordinator closes output after every worker exits.
 // Hint: select on stop while receiving jobs and again while sending results. Workers acknowledge exit;
-//       the coordinator receives every acknowledgement before close(out).
+//
+//	the coordinator receives every acknowledgement before close(out).
 package main
 
 import "fmt"

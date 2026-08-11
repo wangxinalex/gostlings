@@ -2,7 +2,8 @@
 // Task: merge result streams without changing either field of any envelope.
 // Expected behavior: values and errors both arrive unchanged; empty input closes output.
 // Hint: start one forwarder per input, have each send its complete result value, then use raw exit
-//       acknowledgements so one coordinator closes out after every forwarder has returned.
+//
+//	acknowledgements so one coordinator closes out after every forwarder has returned.
 package main
 
 import "fmt"
