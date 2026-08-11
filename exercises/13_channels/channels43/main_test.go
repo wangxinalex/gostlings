@@ -7,12 +7,25 @@ import (
 )
 
 func TestParallelBoundsActiveWorkAndRestoresOrder(t *testing.T) {
-	started := make(chan int, 3)
+	started := make(chan int, 2)
+	activeSlots := make(chan struct{}, 2)
+	activeSlots <- struct{}{}
+	activeSlots <- struct{}{}
+	overflow := make(chan int, 1)
 	release := make(chan struct{})
 	returned := make(chan []int, 1)
 	go func() {
 		returned <- parallel(2, []int{3, 1, 2}, func(value int) int {
-			started <- value
+			select {
+			case <-activeSlots:
+				started <- value
+			default:
+				select {
+				case <-release:
+				default:
+					overflow <- value
+				}
+			}
 			<-release
 			return value * value
 		})
@@ -25,12 +38,6 @@ func TestParallelBoundsActiveWorkAndRestoresOrder(t *testing.T) {
 			t.Fatal("parallel() did not start work up to its limit")
 		}
 	}
-	select {
-	case value := <-started:
-		t.Fatalf("parallel() started a third active job (%d) with limit 2", value)
-	case <-time.After(100 * time.Millisecond):
-	}
-
 	close(release)
 	select {
 	case got := <-returned:
@@ -39,5 +46,10 @@ func TestParallelBoundsActiveWorkAndRestoresOrder(t *testing.T) {
 		}
 	case <-time.After(500 * time.Millisecond):
 		t.Fatal("parallel() did not finish after work was released")
+	}
+	select {
+	case value := <-overflow:
+		t.Fatalf("parallel() started a third active job (%d) with limit 2", value)
+	default:
 	}
 }

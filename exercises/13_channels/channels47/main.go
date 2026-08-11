@@ -21,6 +21,8 @@ type request struct {
 
 var onServeBeforeResult = func() {}
 
+var serveWorkerCount = 2
+
 func serve(stop <-chan struct{}, jobs <-chan request) (<-chan response, <-chan struct{}) {
 	return nil, nil // TODO: stop accepting work, join workers, close results, then close done
 }

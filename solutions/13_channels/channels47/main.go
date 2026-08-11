@@ -17,11 +17,17 @@ const serveWorkers = 2
 
 var onServeBeforeResult = func() {}
 
+var serveWorkerCount = serveWorkers
+
 func serve(stop <-chan struct{}, jobs <-chan request) (<-chan response, <-chan struct{}) {
 	results := make(chan response)
 	done := make(chan struct{})
-	exited := make(chan struct{}, serveWorkers)
-	for range serveWorkers {
+	workers := serveWorkerCount
+	if workers < 1 {
+		workers = 1
+	}
+	exited := make(chan struct{}, workers)
+	for range workers {
 		go func() {
 			defer func() { exited <- struct{}{} }()
 			for {
@@ -63,7 +69,7 @@ func serve(stop <-chan struct{}, jobs <-chan request) (<-chan response, <-chan s
 		}()
 	}
 	go func() {
-		for range serveWorkers {
+		for range workers {
 			<-exited
 		}
 		close(results)

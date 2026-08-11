@@ -61,26 +61,42 @@ func TestServeClosesResultsAndDoneForEmptyJobs(t *testing.T) {
 
 func TestServeStopsBlockedResultPublicationAndJoinsBeforeDone(t *testing.T) {
 	previous := onServeBeforeResult
+	previousWorkers := serveWorkerCount
 	beforeResult := make(chan struct{}, 1)
-	onServeBeforeResult = func() { beforeResult <- struct{}{} }
-	t.Cleanup(func() { onServeBeforeResult = previous })
-
-	stop, jobs := make(chan struct{}), make(chan request)
-	results, done := serve(stop, jobs)
-	sent := make(chan struct{})
-	go func() { jobs <- request{value: 3}; close(sent) }()
-	select {
-	case <-sent:
-	case <-time.After(500 * time.Millisecond):
-		t.Fatal("serve() did not accept its active request")
+	release := make(chan struct{})
+	onServeBeforeResult = func() {
+		beforeResult <- struct{}{}
+		<-release
 	}
+	serveWorkerCount = 1
+	t.Cleanup(func() {
+		onServeBeforeResult = previous
+		serveWorkerCount = previousWorkers
+	})
+
+	stop, jobs := make(chan struct{}), make(chan request, 2)
+	pendingReply := make(chan response, 1)
+	jobs <- request{value: 3}
+	jobs <- request{value: 5, reply: pendingReply}
+	results, done := serve(stop, jobs)
 	select {
 	case <-beforeResult:
 	case <-time.After(500 * time.Millisecond):
 		t.Fatal("serve() did not begin publishing its result")
 	}
 	close(stop)
-	collect47(t, results)
+	close(release)
+	got := collect47(t, results)
+	for _, result := range got {
+		if result.value == 10 {
+			t.Fatalf("serve() published a result for a pending request after stop: %#v", result)
+		}
+	}
+	select {
+	case reply := <-pendingReply:
+		t.Fatalf("serve() replied to a pending request after stop: %#v", reply)
+	default:
+	}
 	select {
 	case <-done:
 	case <-time.After(500 * time.Millisecond):

@@ -44,10 +44,23 @@ func TestRunServiceHandlesEmptyRequestsAndPreStartCancellation(t *testing.T) {
 
 func TestRunServiceBoundsWorkersUnderBackpressure(t *testing.T) {
 	previous := processServiceRequest
-	started := make(chan int, 3)
+	started := make(chan int, 2)
+	activeSlots := make(chan struct{}, 2)
+	activeSlots <- struct{}{}
+	activeSlots <- struct{}{}
+	overflow := make(chan int, 1)
 	release := make(chan struct{})
 	processServiceRequest = func(current request) response {
-		started <- current.value
+		select {
+		case <-activeSlots:
+			started <- current.value
+		default:
+			select {
+			case <-release:
+			default:
+				overflow <- current.value
+			}
+		}
 		<-release
 		return response{value: current.value * 2}
 	}
@@ -71,11 +84,6 @@ func TestRunServiceBoundsWorkersUnderBackpressure(t *testing.T) {
 			t.Fatal("runService() did not start its bounded workers")
 		}
 	}
-	select {
-	case value := <-started:
-		t.Fatalf("runService() started third request %d before capacity released", value)
-	case <-time.After(100 * time.Millisecond):
-	}
 	close(release)
 	select {
 	case got := <-returned:
@@ -84,6 +92,11 @@ func TestRunServiceBoundsWorkersUnderBackpressure(t *testing.T) {
 		}
 	case <-time.After(500 * time.Millisecond):
 		t.Fatal("runService() did not finish after workers were released")
+	}
+	select {
+	case value := <-overflow:
+		t.Fatalf("runService() started third request %d before capacity released", value)
+	default:
 	}
 }
 

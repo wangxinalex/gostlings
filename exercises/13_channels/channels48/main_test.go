@@ -19,10 +19,23 @@ func TestRunOrderedBoundedRestoresOrderAndHandlesEmptyJobs(t *testing.T) {
 
 func TestRunOrderedBoundedLimitsWorkersAndCancelsBeforeLaterJobsStart(t *testing.T) {
 	previous := processOrderedBounded
-	started := make(chan int, 3)
+	started := make(chan int, 2)
+	activeSlots := make(chan struct{}, 2)
+	activeSlots <- struct{}{}
+	activeSlots <- struct{}{}
+	overflow := make(chan int, 1)
 	release := make(chan struct{})
 	processOrderedBounded = func(value int) int {
-		started <- value
+		select {
+		case <-activeSlots:
+			started <- value
+		default:
+			select {
+			case <-release:
+			default:
+				overflow <- value
+			}
+		}
 		<-release
 		return value * value
 	}
@@ -47,11 +60,6 @@ func TestRunOrderedBoundedLimitsWorkersAndCancelsBeforeLaterJobsStart(t *testing
 			t.Fatal("runOrderedBounded() did not start its bounded workers")
 		}
 	}
-	select {
-	case value := <-started:
-		t.Fatalf("runOrderedBounded() started later job %d before a worker was released", value)
-	case <-time.After(100 * time.Millisecond):
-	}
 	close(stop)
 	close(release)
 	select {
@@ -61,5 +69,10 @@ func TestRunOrderedBoundedLimitsWorkersAndCancelsBeforeLaterJobsStart(t *testing
 		}
 	case <-time.After(500 * time.Millisecond):
 		t.Fatal("runOrderedBounded() did not join canceled workers")
+	}
+	select {
+	case value := <-overflow:
+		t.Fatalf("runOrderedBounded() started later job %d before a worker was released", value)
+	default:
 	}
 }
