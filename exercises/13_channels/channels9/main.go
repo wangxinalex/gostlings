@@ -1,20 +1,18 @@
-// Concept: a done channel reports completion without carrying data
-// Task: close the done channel when the background operation finishes
-// Expected behavior: complete() returns a channel that closes promptly
-// Hint: the goroutine should defer close(done); a close is a broadcast notification
+// Concept: select with default — a non-blocking channel operation
+// Task: try to receive once and continue immediately when no value is ready
+// Expected behavior: an empty input returns "no value"
+// Hint: default runs when no channel case is ready; it must not be used in a hot loop without work or backoff
 
 package main
 
 import "fmt"
 
-func complete() <-chan struct{} {
-	done := make(chan struct{})
-	// Thought: done carries only completion, not a result. Closing it wakes all
-	// receivers waiting on it.
-	return done // TODO: start work and close done when it finishes
+func tryReceive(ch <-chan int) string {
+	// Thought: default makes select return immediately. It means “try now,” not
+	// “guarantee that a value will eventually arrive.”
+	return "" // TODO: add receive and default cases
 }
 
 func main() {
-	<-complete()
-	fmt.Println("completed")
+	fmt.Println(tryReceive(make(chan int)))
 }

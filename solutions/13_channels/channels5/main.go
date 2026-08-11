@@ -2,19 +2,22 @@ package main
 
 import "fmt"
 
-func generate(values ...int) <-chan int {
-	out := make(chan int)
-	go func() {
-		defer close(out)
-		for _, value := range values {
-			out <- value
+func drainClosed(ch <-chan int) []int {
+	var values []int
+	for {
+		value, ok := <-ch
+		if !ok {
+			return values
 		}
-	}()
-	return out
+		values = append(values, value)
+	}
 }
 
 func main() {
-	for value := range generate(1, 2, 3) {
-		fmt.Println(value)
-	}
+	ch := make(chan int, 3)
+	ch <- 1
+	ch <- 2
+	ch <- 3
+	close(ch)
+	fmt.Println(drainClosed(ch))
 }

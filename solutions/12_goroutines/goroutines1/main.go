@@ -1,22 +1,23 @@
-// Concept: launching goroutines with the go keyword
-// Task: run say as a goroutine so the message actually prints before main exits
-// Expected output: hello
-// Hint: use go before the function call, then sleep briefly in main so the
-//       goroutine has time to finish. The sleep is only a placeholder — the
-//       proper way to wait (sync.WaitGroup) is the next exercise (Go Tour: Concurrency 1)
+// Concept: launching and joining one goroutine
+// Task: start the greeting task in a goroutine and wait for it before main returns
 
 package main
 
 import (
 	"fmt"
-	"time"
+	"sync"
 )
 
-func say(s string) {
-	fmt.Println(s)
+var greeting = func() {
+	fmt.Println("hello")
 }
 
 func main() {
-	go say("hello")
-	time.Sleep(100 * time.Millisecond)
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		greeting()
+	}()
+	wg.Wait()
 }

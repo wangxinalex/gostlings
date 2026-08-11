@@ -1,32 +1,43 @@
 package main
 
-import (
-	"fmt"
-	"sync"
-)
+import "fmt"
 
-func parallel(limit int, jobs []int, work func(int) int) []int {
-	if limit < 1 {
-		limit = 1
+var onForwarderExit = func() {}
+
+func merge(inputs ...<-chan int) <-chan int {
+	out := make(chan int)
+	if len(inputs) == 0 {
+		close(out)
+		return out
 	}
 
-	tokens := make(chan struct{}, limit)
-	results := make([]int, len(jobs))
-	var wg sync.WaitGroup
-
-	for index, job := range jobs {
-		index, job := index, job
-		wg.Go(func() {
-			tokens <- struct{}{}
-			defer func() { <-tokens }()
-			results[index] = work(job)
-		})
+	exited := make(chan struct{}, len(inputs))
+	for _, input := range inputs {
+		go func(in <-chan int) {
+			for value := range in {
+				out <- value
+			}
+			onForwarderExit()
+			exited <- struct{}{}
+		}(input)
 	}
-	wg.Wait()
-	return results
+	go func() {
+		for input := 0; input < len(inputs); input++ {
+			<-exited
+		}
+		close(out)
+	}()
+	return out
 }
 
 func main() {
-	results := parallel(2, []int{1, 2, 3, 4}, func(value int) int { return value * value })
-	fmt.Println(results)
+	first := make(chan int, 1)
+	second := make(chan int, 1)
+	first <- 1
+	second <- 2
+	close(first)
+	close(second)
+	for value := range merge(first, second) {
+		fmt.Println(value)
+	}
 }

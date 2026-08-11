@@ -2,18 +2,19 @@ package main
 
 import "fmt"
 
-func receiveFast(fast, slow <-chan string) string {
-	select {
-	case value := <-fast:
-		return value
-	case value := <-slow:
-		return value
-	}
+func generate(values ...int) <-chan int {
+	out := make(chan int)
+	go func() {
+		defer close(out)
+		for _, value := range values {
+			out <- value
+		}
+	}()
+	return out
 }
 
 func main() {
-	fast := make(chan string, 1)
-	slow := make(chan string)
-	fast <- "fast lane"
-	fmt.Println(receiveFast(fast, slow))
+	for value := range generate(1, 2, 3) {
+		fmt.Println(value)
+	}
 }

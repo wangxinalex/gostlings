@@ -2,15 +2,18 @@ package main
 
 import "fmt"
 
-func tryReceive(ch <-chan int) string {
+func receiveFast(fast, slow <-chan string) string {
 	select {
-	case value := <-ch:
-		return fmt.Sprintf("received: %d", value)
-	default:
-		return "no value"
+	case value := <-fast:
+		return value
+	case value := <-slow:
+		return value
 	}
 }
 
 func main() {
-	fmt.Println(tryReceive(make(chan int)))
+	fast := make(chan string, 1)
+	slow := make(chan string)
+	fast <- "fast lane"
+	fmt.Println(receiveFast(fast, slow))
 }

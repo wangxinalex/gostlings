@@ -1,24 +1,20 @@
-// Concept: select multiplexes channel operations
-// Task: receive from whichever input is ready without blocking on a silent input
-// Expected behavior: a ready input is returned; if multiple inputs are ready, either may be selected
-// Hint: put one receive from each input in a select. select does not give earlier
-//       cases priority when multiple cases are ready.
+// Concept: generator — the producer owns and closes its output channel
+// Task: send every input value from a goroutine, then close the returned channel
+// Expected behavior: callers can range over the result, including for empty input
+// Hint: defer close(out) inside the producer goroutine; the caller only receives
 
 package main
 
 import "fmt"
 
-func receiveFast(fast, slow <-chan string) string {
-	// Thought: select waits for multiple channel operations at once; do not
-	// receive from slow first because it may never have a sender.
-	// If both channels are ready, select chooses one without guaranteeing
-	// which one wins.
-	return <-fast // TODO: wait for whichever input is ready first
+func generate(values ...int) <-chan int {
+	// Thought: return a receive-only channel and keep sending and closing inside
+	// the producer; callers only range over it and cannot close it accidentally.
+	return nil // TODO: create the output, send values in a goroutine, and close it
 }
 
 func main() {
-	fast := make(chan string, 1)
-	slow := make(chan string)
-	fast <- "fast lane"
-	fmt.Println(receiveFast(fast, slow))
+	for value := range generate(1, 2, 3) {
+		fmt.Println(value)
+	}
 }

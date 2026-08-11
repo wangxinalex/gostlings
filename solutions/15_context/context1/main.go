@@ -1,31 +1,34 @@
-// Concept: context.WithCancel for cancellation signals
-// Task: call cancel when the work is done so the goroutine receives the cancellation signal
-// Expected output: worker: received cancel signal
-// Hint: context.WithCancel returns a context and a cancel function; call cancel when you want the goroutine to stop (Go doc: context)
-
+// Concept: context.WithCancel stops cooperative work.
+// Task: return the cancellation result as soon as ctx.Done() is closed.
+// Hint: select on ctx.Done() and the work gate; a canceled context must win
+// without waiting for work to be released.
 package main
 
 import (
 	"context"
 	"fmt"
-	"time"
 )
 
-func worker(ctx context.Context) {
+var workGate = make(chan struct{})
+
+func worker(ctx context.Context) string {
 	select {
 	case <-ctx.Done():
-		fmt.Println("worker: received cancel signal")
-	case <-time.After(2 * time.Second):
-		fmt.Println("worker: work completed")
+		return "worker: canceled"
+	default:
+	}
+
+	select {
+	case <-ctx.Done():
+		return "worker: canceled"
+	case <-workGate:
+		return "worker: completed"
 	}
 }
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
-
-	go worker(ctx)
-
-	time.Sleep(100 * time.Millisecond)
+	defer cancel()
 	cancel()
-	time.Sleep(100 * time.Millisecond)
+	fmt.Println(worker(ctx))
 }

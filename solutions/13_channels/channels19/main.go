@@ -1,25 +1,44 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
-func square(in <-chan int) <-chan int {
-	out := make(chan int)
+var runProducer = func(stop <-chan struct{}, result chan<- string) {
+	select {
+	case <-time.After(100 * time.Millisecond):
+	case <-stop:
+		return
+	}
+
+	select {
+	case result <- "finished":
+	case <-stop:
+	}
+}
+
+func run(done chan struct{}) string {
+	result := make(chan string)
+	stop := make(chan struct{})
 	go func() {
-		defer close(out)
-		for value := range in {
-			out <- value * value
-		}
+		defer close(done)
+		runProducer(stop, result)
 	}()
-	return out
+
+	select {
+	case value := <-result:
+		close(stop)
+		<-done
+		return value
+	case <-time.After(25 * time.Millisecond):
+		close(stop)
+		<-done
+		return "timed out"
+	}
 }
 
 func main() {
-	in := make(chan int, 3)
-	in <- 1
-	in <- 2
-	in <- 3
-	close(in)
-	for value := range square(in) {
-		fmt.Println(value)
-	}
+	done := make(chan struct{})
+	fmt.Println(run(done))
 }

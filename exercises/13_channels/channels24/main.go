@@ -1,27 +1,26 @@
-// Concept: nil channels disable select cases
-// Task: drain two inputs and set each one to nil after it closes
-// Expected behavior: all values arrive once, with no repeated zero values after close
-// Hint: in a select loop, assign a closed input variable to nil to remove that case
+// Concept: worker pools need cancellation around both jobs receives and result sends.
+// Task: square jobs with workers workers until jobs closes or stop closes.
+// Expected behavior: stop releases workers blocked waiting for a job or waiting for a result receiver.
+// Hint: select on stop when receiving jobs, and select on stop again when sending each square to out.
+//       Workers send exit acknowledgements; a coordinator waits for all of them before close(out).
 
 package main
 
 import "fmt"
 
-func drain(first, second <-chan int) []int {
-	// Thought: a closed channel is always readable and keeps producing zero
-	// values. Set the corresponding variable to nil to disable that select case
-	// permanently after the input is drained.
-	return nil // TODO: disable each input after its close and collect values
+var onSquareWorkerStart = func() {}
+var onSquareWorkerBeforeSend = func() {}
+
+func squareWorkers(stop <-chan struct{}, workers int, jobs <-chan int) <-chan int {
+	return nil // TODO: use cancellable worker receives, sends, and coordinator-owned close(out)
 }
 
 func main() {
-	first := make(chan int, 2)
-	second := make(chan int, 2)
-	first <- 1
-	first <- 3
-	second <- 2
-	second <- 4
-	close(first)
-	close(second)
-	fmt.Println(drain(first, second))
+	jobs := make(chan int, 2)
+	jobs <- 2
+	jobs <- 3
+	close(jobs)
+	for result := range squareWorkers(make(chan struct{}), 2, jobs) {
+		fmt.Println(result)
+	}
 }

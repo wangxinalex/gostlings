@@ -2,23 +2,16 @@ package main
 
 import "fmt"
 
-func produce(stop <-chan struct{}) <-chan int {
-	out := make(chan int)
-	go func() {
-		defer close(out)
-		for value := 1; value <= 3; value++ {
-			select {
-			case out <- value:
-			case <-stop:
-				return
-			}
-		}
-	}()
-	return out
+func trySend(ch chan<- int, value int) bool {
+	select {
+	case ch <- value:
+		return true
+	default:
+		return false
+	}
 }
 
 func main() {
-	for value := range produce(make(chan struct{})) {
-		fmt.Println(value)
-	}
+	ch := make(chan int, 1)
+	fmt.Println(trySend(ch, 7))
 }

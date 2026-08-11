@@ -1,31 +1,39 @@
 package main
 
-import (
-	"fmt"
-	"sync"
-)
+import "fmt"
 
-func startWorkers(count int, stop <-chan struct{}) <-chan struct{} {
-	done := make(chan struct{})
-	var wg sync.WaitGroup
-
-	for i := 0; i < count; i++ {
-		wg.Go(func() {
-			<-stop
-		})
-	}
-
+func relay(stop <-chan struct{}, in <-chan int) <-chan int {
+	out := make(chan int)
 	go func() {
-		wg.Wait()
-		close(done)
+		defer close(out)
+		for {
+			var value int
+			select {
+			case <-stop:
+				return
+			case received, ok := <-in:
+				if !ok {
+					return
+				}
+				value = received
+			}
+
+			select {
+			case <-stop:
+				return
+			case out <- value:
+			}
+		}
 	}()
-	return done
+	return out
 }
 
 func main() {
-	stop := make(chan struct{})
-	done := startWorkers(3, stop)
-	close(stop)
-	<-done
-	fmt.Println("workers stopped")
+	in := make(chan int, 2)
+	in <- 4
+	in <- 9
+	close(in)
+	for value := range relay(make(chan struct{}), in) {
+		fmt.Println(value)
+	}
 }

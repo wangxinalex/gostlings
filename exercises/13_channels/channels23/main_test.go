@@ -1,39 +1,89 @@
 package main
 
 import (
+	"reflect"
+	"sort"
 	"testing"
 	"time"
 )
 
-func TestRateLimitWaitsForTickBeforeForwarding(t *testing.T) {
-	ticks := make(chan time.Time)
-	in := make(chan int, 1)
-	in <- 7
-	close(in)
-	out := rateLimit(ticks, in)
-
-	select {
-	case value := <-out:
-		t.Fatalf("rateLimit() forwarded %d before a tick", value)
-	case <-time.After(20 * time.Millisecond):
+func TestMergeForwardsInputsBeforeTheyClose(t *testing.T) {
+	got := collectCancellableMerge(t, merge(make(chan struct{}), cancellableBuffered(1, 4), cancellableBuffered(2, 3)))
+	sort.Ints(got)
+	if want := []int{1, 2, 3, 4}; !reflect.DeepEqual(got, want) {
+		t.Fatalf("merge() = %v, want %v", got, want)
 	}
+}
 
-	ticks <- time.Time{}
+func TestMergeStopsWhileWaitingForInput(t *testing.T) {
+	stop := make(chan struct{})
+	out := merge(stop, make(chan int))
+	close(stop)
+	waitForCancellableMergeClose(t, out)
+}
+
+func TestMergeStopsWhileItsOutputSendIsBlocked(t *testing.T) {
+	previous := onMergeBeforeSend
+	beforeSend := make(chan struct{}, 1)
+	onMergeBeforeSend = func() { beforeSend <- struct{}{} }
+	t.Cleanup(func() { onMergeBeforeSend = previous })
+
+	stop := make(chan struct{})
+	in := make(chan int)
+	out := merge(stop, in)
+	sent := make(chan struct{})
+	go func() {
+		in <- 6
+		close(sent)
+	}()
 	select {
-	case value, ok := <-out:
-		if !ok || value != 7 {
-			t.Fatalf("rateLimit() returned (%d, %v), want (7, true)", value, ok)
-		}
+	case <-sent:
 	case <-time.After(500 * time.Millisecond):
-		t.Fatal("rateLimit() did not forward after a tick")
+		t.Fatal("merge() did not receive its input")
+	}
+	select {
+	case <-beforeSend:
+	case <-time.After(500 * time.Millisecond):
+		t.Fatal("merge() did not begin its output send")
 	}
 
+	close(stop)
+	waitForCancellableMergeClose(t, out)
+}
+
+func cancellableBuffered(values ...int) <-chan int {
+	in := make(chan int, len(values))
+	for _, value := range values {
+		in <- value
+	}
+	close(in)
+	return in
+}
+
+func collectCancellableMerge(t *testing.T, out <-chan int) []int {
+	t.Helper()
+	var got []int
+	for {
+		select {
+		case value, ok := <-out:
+			if !ok {
+				return got
+			}
+			got = append(got, value)
+		case <-time.After(500 * time.Millisecond):
+			t.Fatal("merge() did not close")
+		}
+	}
+}
+
+func waitForCancellableMergeClose(t *testing.T, out <-chan int) {
+	t.Helper()
 	select {
 	case _, ok := <-out:
 		if ok {
-			t.Fatal("rateLimit() returned an extra value")
+			t.Fatal("merge() sent a value after cancellation")
 		}
 	case <-time.After(500 * time.Millisecond):
-		t.Fatal("rateLimit() did not close after input drained")
+		t.Fatal("merge() did not close after cancellation")
 	}
 }

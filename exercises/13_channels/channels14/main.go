@@ -1,28 +1,17 @@
-// Concept: fan-in — merge multiple input channels into one output
-// Task: forward all values and close the merged output after every input finishes
-// Expected behavior: ranging over merge(...) terminates for normal and empty input
-// Hint: one forwarder per input, one WaitGroup, and one goroutine that closes out
+// Concept: asynchronous result — a one-shot buffered result lets a worker finish first
+// Task: run work in a goroutine and return its result channel immediately
+// Expected behavior: work can publish its one result before the caller receives it
+// Hint: make out with capacity 1, then start a goroutine that sends work() to out.
+//       A capacity of 1 prevents the worker from blocking just because the caller is late.
 
 package main
 
 import "fmt"
 
-func merge(inputs ...<-chan int) <-chan int {
-	// Thought: forwarders only send and must not close out independently. A
-	// coordinator waits for all forwarders, then closes out once.
-	return nil // TODO: start forwarders, wait for all, and close out once
+func runAsync(work func() int) <-chan int {
+	return nil // TODO: return a capacity-one result channel and run work in a goroutine
 }
 
 func main() {
-	left := make(chan int, 2)
-	right := make(chan int, 2)
-	left <- 1
-	left <- 3
-	right <- 2
-	right <- 4
-	close(left)
-	close(right)
-	for value := range merge(left, right) {
-		fmt.Println(value)
-	}
+	fmt.Println(<-runAsync(func() int { return 42 }))
 }

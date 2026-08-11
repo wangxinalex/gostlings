@@ -1,18 +1,24 @@
-// Concept: select with default — a non-blocking channel operation
-// Task: try to receive once and continue immediately when no value is ready
-// Expected behavior: an empty input returns "no value"
-// Hint: default runs when no channel case is ready; it must not be used in a hot loop without work or backoff
+// Concept: select multiplexes channel operations
+// Task: receive from whichever input is ready without blocking on a silent input
+// Expected behavior: a ready input is returned; if multiple inputs are ready, either may be selected
+// Hint: put one receive from each input in a select. select does not give earlier
+//       cases priority when multiple cases are ready.
 
 package main
 
 import "fmt"
 
-func tryReceive(ch <-chan int) string {
-	// Thought: default makes select return immediately. It means “try now,” not
-	// “guarantee that a value will eventually arrive.”
-	return "" // TODO: add receive and default cases
+func receiveFast(fast, slow <-chan string) string {
+	// Thought: select waits for multiple channel operations at once; do not
+	// receive from slow first because it may never have a sender.
+	// If both channels are ready, select chooses one without guaranteeing
+	// which one wins.
+	return <-fast // TODO: wait for whichever input is ready first
 }
 
 func main() {
-	fmt.Println(tryReceive(make(chan int)))
+	fast := make(chan string, 1)
+	slow := make(chan string)
+	fast <- "fast lane"
+	fmt.Println(receiveFast(fast, slow))
 }

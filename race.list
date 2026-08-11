@@ -1,0 +1,23 @@
+# Shared-state exercises that receive selective race-detector coverage.
+16_sync/sync1
+16_sync/sync2
+16_sync/sync3
+16_sync/sync4
+16_sync/sync5
+16_sync/sync6
+16_sync/sync7
+16_sync/sync8
+16_sync/sync9
+16_sync/sync10
+16_sync/sync11
+16_sync/sync12
+16_sync/sync13
+16_sync/sync14
+
+# Integrated exercises with atomic/shared-state coverage.
+24_concurrency_patterns/concurrency3
+24_concurrency_patterns/concurrency5
+24_concurrency_patterns/concurrency13
+24_concurrency_patterns/concurrency14
+24_concurrency_patterns/concurrency15
+24_concurrency_patterns/concurrency18

@@ -2,40 +2,43 @@ package main
 
 import "fmt"
 
-func transform(stop <-chan struct{}, in <-chan int, fn func(int) int) <-chan int {
+var onSquareWorkerStart = func() {}
+var onSquareWorkerExit = func() {}
+
+func squareWorkers(workers int, jobs <-chan int) <-chan int {
+	if workers < 1 {
+		workers = 1
+	}
+
 	out := make(chan int)
-	go func() {
-		defer close(out)
-		for {
-			select {
-			case <-stop:
-				return
-			case value, ok := <-in:
-				if !ok {
-					return
-				}
-				select {
-				case out <- fn(value):
-				case <-stop:
-					return
-				}
+	exited := make(chan struct{}, workers)
+	for worker := 0; worker < workers; worker++ {
+		go func() {
+			onSquareWorkerStart()
+			defer func() {
+				onSquareWorkerExit()
+				exited <- struct{}{}
+			}()
+			for job := range jobs {
+				out <- job * job
 			}
+		}()
+	}
+	go func() {
+		for worker := 0; worker < workers; worker++ {
+			<-exited
 		}
+		close(out)
 	}()
 	return out
 }
 
-func pipeline(stop <-chan struct{}, in <-chan int) <-chan int {
-	doubled := transform(stop, in, func(value int) int { return value * 2 })
-	return transform(stop, doubled, func(value int) int { return value + 1 })
-}
-
 func main() {
-	in := make(chan int, 2)
-	in <- 1
-	in <- 2
-	close(in)
-	for value := range pipeline(make(chan struct{}), in) {
-		fmt.Println(value)
+	jobs := make(chan int, 2)
+	jobs <- 2
+	jobs <- 3
+	close(jobs)
+	for result := range squareWorkers(2, jobs) {
+		fmt.Println(result)
 	}
 }

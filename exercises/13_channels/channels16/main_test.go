@@ -1,37 +1,45 @@
 package main
 
 import (
-	"reflect"
-	"sort"
 	"testing"
 	"time"
 )
 
-func TestRunProcessesEveryJob(t *testing.T) {
-	result := make(chan []int, 1)
-	go func() { result <- run(3, []int{1, 2, 3, 4, 5}) }()
+func TestProduceSendsValuesBeforeCancellation(t *testing.T) {
+	stop := make(chan struct{})
+	out := produce(stop)
 
-	select {
-	case got := <-result:
-		sort.Ints(got)
-		if want := []int{1, 4, 9, 16, 25}; !reflect.DeepEqual(got, want) {
-			t.Fatalf("run() = %v, want %v", got, want)
+	for want := 1; want <= 2; want++ {
+		select {
+		case got := <-out:
+			if got != want {
+				t.Fatalf("produce() value = %d, want %d", got, want)
+			}
+		case <-time.After(500 * time.Millisecond):
+			t.Fatalf("produce() did not send value %d", want)
 		}
-	case <-time.After(500 * time.Millisecond):
-		t.Fatal("run() did not finish processing all jobs")
 	}
+
+	close(stop)
+	waitForProduceClose(t, out)
 }
 
-func TestRunWithNoJobsReturns(t *testing.T) {
-	result := make(chan []int, 1)
-	go func() { result <- run(2, nil) }()
+func TestProduceStopsWhenNoReceiverIsAvailable(t *testing.T) {
+	stop := make(chan struct{})
+	out := produce(stop)
+	close(stop)
 
+	waitForProduceClose(t, out)
+}
+
+func waitForProduceClose(t *testing.T, out <-chan int) {
+	t.Helper()
 	select {
-	case got := <-result:
-		if len(got) != 0 {
-			t.Fatalf("run() with no jobs = %v, want no results", got)
+	case _, ok := <-out:
+		if ok {
+			t.Fatal("produce() sent a value after cancellation")
 		}
 	case <-time.After(500 * time.Millisecond):
-		t.Fatal("run() did not finish for empty input")
+		t.Fatal("produce() did not close after cancellation")
 	}
 }

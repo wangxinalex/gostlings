@@ -2,15 +2,15 @@ package main
 
 import "fmt"
 
-func complete() <-chan struct{} {
-	done := make(chan struct{})
-	go func() {
-		close(done)
-	}()
-	return done
+func tryReceive(ch <-chan int) string {
+	select {
+	case value := <-ch:
+		return fmt.Sprintf("received: %d", value)
+	default:
+		return "no value"
+	}
 }
 
 func main() {
-	<-complete()
-	fmt.Println("completed")
+	fmt.Println(tryReceive(make(chan int)))
 }

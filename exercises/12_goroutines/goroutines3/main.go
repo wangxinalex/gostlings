@@ -1,31 +1,25 @@
 // Concept: passing values into goroutines
-// Task: each goroutine should receive its own i as a parameter and print it
-// Expected output: 0
-// 1
-// 2
-// (any order)
-// Hint: go func(n int) { fmt.Println(n) }(i) passes i explicitly. In Go 1.22+
-//       loop variables are already per-iteration, but passing the value
-//       documents intent and keeps the code correct on older Go versions
-//       (Go Tour: Concurrency 1)
+// Task: pass each label as an explicit goroutine argument
+// Expected behavior: every label is returned, and empty input returns an empty slice.
+// Hint: use go func(index int, label string) { ... }(index, labels[index]) so the worker receives a value.
 
 package main
 
-import (
-	"fmt"
-	"sync"
-)
+import "sync"
 
-func main() {
+func runWithArgs(labels []string) []string {
+	results := make([]string, len(labels))
 	var wg sync.WaitGroup
-
-	for i := 0; i < 3; i++ {
+	for index := range labels {
 		wg.Add(1)
-		// TODO: Make the goroutine accept i as a parameter and print it.
-		go func() {
+		go func(index int) {
 			defer wg.Done()
-		}()
+			// TODO: Accept the label as an explicit goroutine argument and store it.
+			results[index] = ""
+		}(index)
 	}
-
 	wg.Wait()
+	return results
 }
+
+func main() {}

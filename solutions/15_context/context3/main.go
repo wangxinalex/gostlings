@@ -1,8 +1,6 @@
-// Concept: context.WithValue for request-scoped values
-// Task: insert a "user" key into the context and extract it in the handler
-// Expected output: user: Alice
-// Hint: context.WithValue(parent, key, val) stores; ctx.Value(key) retrieves (Go doc: context)
-
+// Concept: context.WithValue carries request-scoped values with typed keys.
+// Task: look up the user value and return the documented fallback when absent.
+// Hint: use a private key type, then use the comma-ok type assertion on ctx.Value.
 package main
 
 import (
@@ -10,18 +8,17 @@ import (
 	"fmt"
 )
 
-type contextKey string
+type userKey struct{}
 
-func handler(ctx context.Context) {
-	user, ok := ctx.Value(contextKey("user")).(string)
+func handler(ctx context.Context) string {
+	user, ok := ctx.Value(userKey{}).(string)
 	if !ok {
-		fmt.Println("no user")
-		return
+		return "user: guest"
 	}
-	fmt.Println("user:", user)
+	return "user: " + user
 }
 
 func main() {
-	ctx := context.WithValue(context.Background(), contextKey("user"), "Alice")
-	handler(ctx)
+	ctx := context.WithValue(context.Background(), userKey{}, "Alice")
+	fmt.Println(handler(ctx))
 }

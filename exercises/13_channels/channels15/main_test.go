@@ -1,40 +1,35 @@
 package main
 
 import (
-	"reflect"
 	"testing"
 	"time"
 )
 
-func TestCancellableMergeStopsBlockedInput(t *testing.T) {
-	stop := make(chan struct{})
-	blocked := make(chan int)
-	out := merge(stop, blocked)
-	close(stop)
+func TestRunWithDoneSeparatesResultFromCompletion(t *testing.T) {
+	done := make(chan struct{})
+	result := runWithDone(done)
 
 	select {
-	case _, ok := <-out:
-		if ok {
-			t.Fatal("merge() emitted a value after cancellation")
+	case got := <-result:
+		if got != 42 {
+			t.Fatalf("runWithDone() result = %d, want 42", got)
 		}
 	case <-time.After(500 * time.Millisecond):
-		t.Fatal("merge() left a forwarder blocked on input")
+		t.Fatal("runWithDone() did not publish its result")
 	}
-}
 
-func TestCancellableMergeForwardsNormalInputs(t *testing.T) {
-	stop := make(chan struct{})
-	input := make(chan int, 2)
-	input <- 4
-	input <- 5
-	close(input)
-
-	out := merge(stop, input)
-	var got []int
-	for value := range out {
-		got = append(got, value)
+	select {
+	case _, ok := <-result:
+		if ok {
+			t.Fatal("runWithDone() left an unexpected second result")
+		}
+	case <-time.After(500 * time.Millisecond):
+		t.Fatal("runWithDone() did not close its result channel")
 	}
-	if want := []int{4, 5}; !reflect.DeepEqual(got, want) {
-		t.Fatalf("merge() = %v, want %v", got, want)
+
+	select {
+	case <-done:
+	case <-time.After(500 * time.Millisecond):
+		t.Fatal("runWithDone() did not close done after completing")
 	}
 }

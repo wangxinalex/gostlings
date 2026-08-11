@@ -1,18 +1,23 @@
-// Concept: parallel workers finish in arbitrary order
-// Task: preserve the input order while still processing jobs concurrently
-// Expected behavior: runOrdered(4, []int{1,2,3}) returns []int{1,4,9}
-// Hint: send each job's index with its result, then write into a pre-sized output slice
+// Concept: cancellable forwarder — both sides of a relay can block
+// Task: forward input values until input closes or stop closes, then close the output
+// Expected behavior: stop releases a blocked receive and a blocked send
+// Hint: use a receive select with cases for in and stop. After receiving a value, use
+//       another select with cases for out <- value and stop. Defer close(out) once.
 
 package main
 
 import "fmt"
 
-func runOrdered(workers int, jobs []int) []int {
-	// Thought: channel receive order is completion order, not business order.
-	// Carry the index and place results back by index to restore input order.
-	return nil // TODO: add indexes to jobs/results and restore order
+func forward(stop <-chan struct{}, in <-chan int) <-chan int {
+	return nil // TODO: make both the receive and send cancellation-aware
 }
 
 func main() {
-	fmt.Println(runOrdered(2, []int{1, 2, 3, 4}))
+	in := make(chan int, 2)
+	in <- 3
+	in <- 8
+	close(in)
+	for value := range forward(make(chan struct{}), in) {
+		fmt.Println(value)
+	}
 }

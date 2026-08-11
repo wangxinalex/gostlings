@@ -1,28 +1,30 @@
-// Concept: synchronizing goroutines with sync.WaitGroup
-// Task: add the missing WaitGroup calls so all three workers finish before main exits
-// Expected output: worker 0 done
-// worker 1 done
-// worker 2 done
-// (any order)
-// Hint: call wg.Add before each go, wg.Done inside the goroutine, and wg.Wait at the end (Go Tour: Concurrency 1)
+// Concept: closure capture in goroutines
+// Task: make every goroutine keep the loop value it was created for
 
 package main
 
-import (
-	"fmt"
-	"sync"
-)
+import "sync"
 
-func main() {
-	var wg sync.WaitGroup
-
-	for i := 0; i < 3; i++ {
-		wg.Add(1)
-		go func(n int) {
-			defer wg.Done()
-			fmt.Println("worker", n, "done")
-		}(i)
+func runLabels(labels []string) []string {
+	results := make([]string, len(labels))
+	tasks := make([]func() string, len(labels))
+	for index := range labels {
+		label := labels[index]
+		tasks[index] = func() string {
+			return label
+		}
 	}
 
+	var wg sync.WaitGroup
+	for index, task := range tasks {
+		wg.Add(1)
+		go func(index int, task func() string) {
+			defer wg.Done()
+			results[index] = task()
+		}(index, task)
+	}
 	wg.Wait()
+	return results
 }
+
+func main() {}
