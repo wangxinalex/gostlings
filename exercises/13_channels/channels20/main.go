@@ -8,6 +8,8 @@ package main
 
 import "fmt"
 
+var onShutdownWorkerExit = func() {}
+
 func shutdown(stop chan struct{}, workers int) <-chan struct{} {
 	return nil // TODO: coordinate stop, worker exit signals, and one done close
 }

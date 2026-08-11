@@ -25,3 +25,24 @@ func TestRunCancelsAndJoinsTheSlowProducer(t *testing.T) {
 		t.Fatal("run() returned before its producer finished")
 	}
 }
+
+func TestRunJoinsTheSuccessfulProducerBeforeReturning(t *testing.T) {
+	previousProducer := runProducer
+	runProducer = func(stop <-chan struct{}, result chan<- string) {
+		select {
+		case result <- "finished":
+		case <-stop:
+		}
+	}
+	t.Cleanup(func() { runProducer = previousProducer })
+
+	done := make(chan struct{})
+	if got := run(done); got != "finished" {
+		t.Fatalf("run() = %q, want %q", got, "finished")
+	}
+	select {
+	case <-done:
+	default:
+		t.Fatal("run() returned before its successful producer finished")
+	}
+}

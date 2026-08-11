@@ -8,6 +8,8 @@ package main
 
 import "fmt"
 
+var runProducer = func(stop <-chan struct{}, result chan<- string) {}
+
 func run(done chan struct{}) string {
 	return "" // TODO: cancel the producer on timeout and join it before returning
 }

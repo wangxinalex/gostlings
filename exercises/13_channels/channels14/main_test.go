@@ -27,6 +27,9 @@ func TestRunAsyncPublishesBeforeTheCallerReceives(t *testing.T) {
 	case <-time.After(500 * time.Millisecond):
 		t.Fatal("runAsync() did not return after work published its result")
 	}
+	if got := cap(result); got != 1 {
+		t.Fatalf("cap(runAsync() result) = %d, want 1", got)
+	}
 
 	select {
 	case got := <-result:

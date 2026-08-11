@@ -8,6 +8,8 @@ package main
 
 import "fmt"
 
+var onWorkerExit = func() {}
+
 func startWorkers(count int, stop <-chan struct{}) <-chan struct{} {
 	return nil // TODO: start workers, collect their exit signals, and close done once
 }

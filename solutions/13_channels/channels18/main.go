@@ -2,6 +2,8 @@ package main
 
 import "fmt"
 
+var onWorkerExit = func() {}
+
 func startWorkers(count int, stop <-chan struct{}) <-chan struct{} {
 	done := make(chan struct{})
 	if count <= 0 {
@@ -13,6 +15,7 @@ func startWorkers(count int, stop <-chan struct{}) <-chan struct{} {
 	for worker := 0; worker < count; worker++ {
 		go func() {
 			<-stop
+			onWorkerExit()
 			exited <- struct{}{}
 		}()
 	}

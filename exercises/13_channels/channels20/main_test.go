@@ -27,6 +27,37 @@ func TestShutdownDoesNotCloseAnAlreadyClosedStopAgain(t *testing.T) {
 	waitForShutdownDone(t, second)
 }
 
+func TestShutdownWaitsForEveryWorkerExit(t *testing.T) {
+	const workers = 3
+	exited := make(chan struct{})
+	previousHook := onShutdownWorkerExit
+	onShutdownWorkerExit = func() { exited <- struct{}{} }
+	t.Cleanup(func() { onShutdownWorkerExit = previousHook })
+
+	stop := make(chan struct{})
+	done := shutdown(stop, workers)
+
+	for worker := 0; worker < workers-1; worker++ {
+		select {
+		case <-exited:
+		case <-time.After(500 * time.Millisecond):
+			t.Fatalf("worker %d did not exit", worker+1)
+		}
+		select {
+		case <-done:
+			t.Fatal("shutdown() completed before every worker exited")
+		default:
+		}
+	}
+
+	select {
+	case <-exited:
+	case <-time.After(500 * time.Millisecond):
+		t.Fatal("last worker did not exit")
+	}
+	waitForShutdownDone(t, done)
+}
+
 func waitForShutdownDone(t *testing.T, done <-chan struct{}) {
 	t.Helper()
 	select {

@@ -5,17 +5,19 @@ import (
 	"time"
 )
 
-func TestProduceSendsAValueBeforeCancellation(t *testing.T) {
+func TestProduceSendsValuesBeforeCancellation(t *testing.T) {
 	stop := make(chan struct{})
 	out := produce(stop)
 
-	select {
-	case got := <-out:
-		if got != 1 {
-			t.Fatalf("produce() first value = %d, want 1", got)
+	for want := 1; want <= 2; want++ {
+		select {
+		case got := <-out:
+			if got != want {
+				t.Fatalf("produce() value = %d, want %d", got, want)
+			}
+		case <-time.After(500 * time.Millisecond):
+			t.Fatalf("produce() did not send value %d", want)
 		}
-	case <-time.After(500 * time.Millisecond):
-		t.Fatal("produce() did not send its first value")
 	}
 
 	close(stop)

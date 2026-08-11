@@ -2,6 +2,8 @@ package main
 
 import "fmt"
 
+var onShutdownWorkerExit = func() {}
+
 func shutdown(stop chan struct{}, workers int) <-chan struct{} {
 	done := make(chan struct{})
 	if workers < 0 {
@@ -12,6 +14,7 @@ func shutdown(stop chan struct{}, workers int) <-chan struct{} {
 	for worker := 0; worker < workers; worker++ {
 		go func() {
 			<-stop
+			onShutdownWorkerExit()
 			exited <- struct{}{}
 		}()
 	}
