@@ -13,7 +13,7 @@ import (
 func checkAge(age int) error {
 	if age < 0 {
 		// TODO: Return an error instead of nil.
-		return errors.New("age must be non-negative")
+		return nil
 	}
 	return nil
 }
