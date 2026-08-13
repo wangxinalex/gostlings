@@ -14,15 +14,11 @@ var ErrNotFound = errors.New("record not found")
 
 func queryUser(id int) error {
 	// TODO: Return a wrapped error using fmt.Errorf with %w so errors.Is can detect ErrNotFound.
-	return fmt.Errorf("query user: %v", ErrNotFound)
+	return nil
 }
 
 func main() {
 	err := queryUser(42)
 	// TODO: Use errors.Is to check if err wraps ErrNotFound, then print "user not found".
-	if errors.Is(err, ErrNotFound) {
-		fmt.Println("user not found")
-		return
-	}
 	fmt.Println("everything is fine")
 }
