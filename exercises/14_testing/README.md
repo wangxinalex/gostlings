@@ -1,22 +1,25 @@
-# Testing 递进路线
+# Testing: progression path
 
-本章从最小可读测试开始，逐步练习真实项目中常见的 fixture、依赖替身、HTTP 测试、错误分类、fuzz 和 benchmark。每道题都应该先让测试失败，再修改测试或测试辅助代码使它通过。
+This chapter starts with the smallest readable test and progressively
+practices the fixtures, test doubles, HTTP testing, error classification,
+fuzzing, and benchmarks that appear in real projects. Every exercise should
+fail first, then pass after you fix the test or the test helper code.
 
-| 题目 | 重点 | 练习目标 |
+| Exercise | Focus | Goal |
 | --- | --- | --- |
-| testing1 | 单元测试 | 认识 `go test` 和基本断言 |
-| testing2 | 表格测试 | 用多个输入覆盖边界 |
-| testing3 | 子测试 | 用 `t.Run` 组织输出 |
-| testing4 | 测试辅助函数 | 使用 `t.Helper` 保持失败位置可读 |
-| testing5 | 文件 fixture | 用 `t.TempDir` 隔离临时文件 |
-| testing6 | 环境 fixture | 用 `t.Setenv` 自动恢复环境变量 |
-| testing7 | fake + 依赖注入 | 不连接数据库也能测试业务逻辑 |
-| testing8 | `httptest` | 不监听真实端口测试 handler |
-| testing9 | fuzz | 用不变量发现边界输入 |
-| testing10 | 错误分类断言 | 用 `errors.Is` 测试稳定语义 |
-| testing11 | benchmark | 用 `b.ResetTimer` 和 `b.ReportAllocs` 测量热路径 |
+| testing1 | Unit test | Meet `go test` and basic assertions |
+| testing2 | Table-driven test | Cover boundaries with multiple inputs |
+| testing3 | Subtests | Organize output with `t.Run` |
+| testing4 | Test helpers | Keep failure locations readable with `t.Helper` |
+| testing5 | File fixtures | Isolate temp files with `t.TempDir` |
+| testing6 | Environment fixtures | Auto-restore environment variables with `t.Setenv` |
+| testing7 | Fake + dependency injection | Test business logic without a database |
+| testing8 | `httptest` | Test handlers without listening on a real port |
+| testing9 | Fuzz | Discover boundary inputs with invariants |
+| testing10 | Error-classification assertions | Test stable semantics with `errors.Is` |
+| testing11 | Benchmark | Measure hot paths with `b.ResetTimer` and `b.ReportAllocs` |
 
-常用命令：
+Common commands:
 
 ```sh
 go test ./exercises/14_testing/testing4
@@ -25,4 +28,6 @@ go test -run=^$ -fuzz=FuzzReverse -fuzztime=2s ./exercises/14_testing/testing9
 go test -bench=. -benchmem ./exercises/14_testing/testing11
 ```
 
-参考： [Add a test](https://go.dev/doc/tutorial/add-a-test)、[Fuzzing](https://go.dev/doc/tutorial/fuzz)、[`testing` package](https://pkg.go.dev/testing)。
+Reference: [Add a test](https://go.dev/doc/tutorial/add-a-test),
+[Fuzzing](https://go.dev/doc/tutorial/fuzz),
+[`testing` package](https://pkg.go.dev/testing).

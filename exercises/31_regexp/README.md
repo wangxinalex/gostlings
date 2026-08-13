@@ -1,12 +1,13 @@
-# Regexp：正则匹配与提取
+# Regexp: matching and extraction
 
-按 1–3 顺序完成。这里只覆盖日常最常用的匹配、查找全部和提取分组；
-更复杂的正则留给实际场景，不要过度设计。
+Work through 1–3 in order. This covers only the most common daily operations:
+match, find all, and extract groups; leave more complex regexes to real
+scenarios and do not over-engineer.
 
-| 题目 | 重点 | 练习目标 |
+| Exercise | Focus | Goal |
 | --- | --- | --- |
-| regexp1 | `regexp.MatchString` | 判断是否匹配 |
-| regexp2 | `regexp.Compile` + `FindAllString` | 查找全部匹配 |
-| regexp3 | `FindStringSubmatch` | 提取捕获分组 |
+| regexp1 | `regexp.MatchString` | Check whether something matches |
+| regexp2 | `regexp.Compile` + `FindAllString` | Find all matches |
+| regexp3 | `FindStringSubmatch` | Extract capture groups |
 
-参考：[regexp package](https://pkg.go.dev/regexp)
+Reference: [regexp package](https://pkg.go.dev/regexp)

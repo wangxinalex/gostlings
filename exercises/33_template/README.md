@@ -1,10 +1,11 @@
-# Template：text/template 渲染
+# Template: text/template rendering
 
-按 1–2 顺序完成。练习用 `text/template` 渲染变量和遍历切片。
+Work through 1–2 in order. Practice rendering variables and iterating over
+slices with `text/template`.
 
-| 题目 | 重点 | 练习目标 |
+| Exercise | Focus | Goal |
 | --- | --- | --- |
-| template1 | `template.New().Parse()` + `Execute` | 变量渲染 |
-| template2 | `{{range}}` / `{{if}}` / index | 列表渲染与分隔 |
+| template1 | `template.New().Parse()` + `Execute` | Render variables |
+| template2 | `{{range}}` / `{{if}}` / index | List rendering and separators |
 
-参考：[text/template package](https://pkg.go.dev/text/template)
+Reference: [text/template package](https://pkg.go.dev/text/template)

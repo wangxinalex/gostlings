@@ -1,12 +1,13 @@
-# Fmt：格式化动词与输出
+# Fmt: format verbs and output
 
-按 1–3 顺序完成。这里练习 `fmt` 的格式化动词、宽度精度和向任意 `io.Writer`
-写格式化输出；字符串的拼接与清洗见 `27_strings`。
+Work through 1–3 in order. This practices `fmt` format verbs, width and
+precision, and writing formatted output to any `io.Writer`; string joining
+and cleaning live in `27_strings`.
 
-| 题目 | 重点 | 练习目标 |
+| Exercise | Focus | Goal |
 | --- | --- | --- |
-| fmt1 | `%v` / `%+v` / `%#v` | 打印结构体的三种层次 |
-| fmt2 | `%-10s` / `%.2f` | 宽度对齐与小数精度 |
-| fmt3 | `fmt.Fprintf` | 向 `io.Writer` 写格式化输出 |
+| fmt1 | `%v` / `%+v` / `%#v` | The three levels of printing a struct |
+| fmt2 | `%-10s` / `%.2f` | Width alignment and decimal precision |
+| fmt3 | `fmt.Fprintf` | Write formatted output to an `io.Writer` |
 
-参考：[fmt package](https://pkg.go.dev/fmt)
+Reference: [fmt package](https://pkg.go.dev/fmt)

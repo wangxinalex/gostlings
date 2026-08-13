@@ -1,21 +1,24 @@
-# Concurrency patterns：综合并发题单
+# Concurrency patterns: integrated concurrency problem set
 
-完成前面的 goroutine、channel、context、sync 和 time 章节后，按 1–18 顺序
-练习。本章每题至少组合两个已学原语，并新增一个生命周期或失败策略；不要
-把基础 channel 关闭题跳回本章重复做。
+After finishing the goroutine, channel, context, sync, and time chapters,
+practice 1–18 in order. Every exercise here combines at least two learned
+primitives and adds one new lifecycle or failure strategy; do not jump back
+to this chapter to repeat basic channel-closing exercises.
 
-| 题目 | 综合能力 |
+| Exercise | Integrated ability |
 | ---: | --- |
-| 1–3 | generator/reducer、可取消 stage、atomic counter + join |
-| 4–6 | 多 stage cancel、bounded pool、typed result/error pipeline |
-| 7–9 | size/time batch、token rate limit、graceful service shutdown |
-| 10–12 | fan-in coordinator、ordered results、cancellable retry/backoff |
-| 13–15 | context-aware Once、atomic metrics、bounded load shedding |
-| 16–18 | buffered cancellation、deadline shutdown、request/reply capstone |
+| 1–3 | Generator/reducer, cancellable stage, atomic counter + join |
+| 4–6 | Multi-stage cancel, bounded pool, typed result/error pipeline |
+| 7–9 | Size/time batching, token rate limit, graceful service shutdown |
+| 10–12 | Fan-in coordinator, ordered results, cancellable retry/backoff |
+| 13–15 | Context-aware Once, atomic metrics, bounded load shedding |
+| 16–18 | Buffered cancellation, deadline shutdown, request/reply capstone |
 
-共同检查顺序是：停止继续接收或投递 → 让阻塞操作退出 → join workers → 由
-唯一 coordinator 关闭输出。题目中的错误用 `errors.Is` 语义判断；结果要有
-顺序/数量/关闭断言，不能用空 slice、忽略错误或提前返回制造通过。
+The shared checking order is: stop receiving or delivering → let blocking
+operations exit → join workers → let the single coordinator close the output.
+Errors in the exercises use `errors.Is` semantics; results must have
+order/count/closure assertions, and you cannot pass with empty slices,
+ignored errors, or early returns.
 
 ```sh
 sh check.sh exercises/24_concurrency_patterns --run-all

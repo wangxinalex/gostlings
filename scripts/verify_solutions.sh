@@ -3,8 +3,11 @@
 #
 # The exercise tree owns the *_test.go files. This script overlays them into
 # the matching solution directories temporarily, runs `go test` against all
-# solutions, and then removes the overlay. No test files are committed under
-# solutions/, so the exercise tests stay the single source of truth.
+# solutions, and then removes the overlay. Solution directories that already
+# ship a *_test.go are skipped: the 14_testing chapter commits its tests
+# because the test file is the deliverable there, and a couple of other
+# directories commit copies so `check.sh solutions` also runs their tests.
+# Everywhere else, the exercise tests stay the single source of truth.
 
 set -eu
 

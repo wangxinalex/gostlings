@@ -16,7 +16,7 @@ import (
 
 func FuzzReverse(f *testing.F) {
 	f.Add("hello")
-	f.Add("你好")
+	f.Add("héllo")
 	// TODO: Add f.Fuzz(func(t *testing.T, input string) { ... }). Skip invalid
 	//       UTF-8, then check the reverse-twice invariant for valid text.
 	f.Fatal("TODO: add the fuzz callback")

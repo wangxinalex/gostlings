@@ -11,7 +11,10 @@ Go 1.26.5+ (check with `go version`)
 
 1. Work through the topics in the table below, in order.
 2. Open `exercises/<topic>/<exercise>/main.go` and read the header comment
-   (Concept / Task / Expected output / Hint).
+   (Concept / Task / Expected output / Hint). Intermediate exercises
+   (`23_http`, `24_concurrency_patterns`, and the focused-test chapters)
+   phrase the expected result as "Expected behavior" prose instead of a
+   literal output line; their focused tests are the contract.
 3. Edit the line marked `// TODO:`.
 4. Verify it:
 

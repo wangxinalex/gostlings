@@ -1,10 +1,11 @@
-# Os/exec：运行外部命令
+# Os/exec: running external commands
 
-按 1–2 顺序完成。练习读取命令输出，并区分"启动失败"与"退出码非零"。
+Work through 1–2 in order. Practice reading a command's output and
+distinguishing "failed to start" from "exited with a non-zero code".
 
-| 题目 | 重点 | 练习目标 |
+| Exercise | Focus | Goal |
 | --- | --- | --- |
-| exec1 | `exec.Command` + `Output` | 读取命令输出 |
-| exec2 | `*exec.ExitError` + `ExitCode` | 处理非零退出码 |
+| exec1 | `exec.Command` + `Output` | Read command output |
+| exec2 | `*exec.ExitError` + `ExitCode` | Handle non-zero exit codes |
 
-参考：[os/exec package](https://pkg.go.dev/os/exec)
+Reference: [os/exec package](https://pkg.go.dev/os/exec)

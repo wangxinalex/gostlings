@@ -16,7 +16,7 @@ import (
 
 func FuzzReverse(f *testing.F) {
 	f.Add("hello")
-	f.Add("你好")
+	f.Add("héllo")
 	f.Fuzz(func(t *testing.T, input string) {
 		if !utf8.ValidString(input) {
 			t.Skip()

@@ -9,8 +9,8 @@ package greeting
 import "testing"
 
 func TestGreetingFromEnvironment(t *testing.T) {
-	t.Setenv("GOSTLINGS_GREETING", "你好")
-	if got := Greeting(); got != "你好" {
-		t.Errorf("Greeting() = %q, want %q", got, "你好")
+	t.Setenv("GOSTLINGS_GREETING", "hello there")
+	if got := Greeting(); got != "hello there" {
+		t.Errorf("Greeting() = %q, want %q", got, "hello there")
 	}
 }
