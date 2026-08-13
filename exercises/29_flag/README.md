@@ -1,16 +1,17 @@
-# Flag：命令行参数解析
+# Flag: command-line flag parsing
 
-按 1–2 顺序完成。练习用 `flag.NewFlagSet` 解析 flag，避免依赖全局
-`flag.CommandLine`，方便测试和复用。验证用 `go test` 或 `check.sh`：
+Work through 1–2 in order. Practice parsing flags with `flag.NewFlagSet`
+instead of relying on the global `flag.CommandLine`, which keeps the code
+testable and reusable. Verify with `go test` or `check.sh`:
 
 ```sh
 sh check.sh exercises/29_flag/flag1
 go test ./exercises/29_flag/flag2
 ```
 
-| 题目 | 重点 | 练习目标 |
+| Exercise | Focus | Goal |
 | --- | --- | --- |
-| flag1 | `flag.NewFlagSet` + `String/Int/Bool` | 解析多个类型的 flag |
-| flag2 | `fs.Args()` | flag 与位置参数混用 |
+| flag1 | `flag.NewFlagSet` + `String/Int/Bool` | Parse flags of several types |
+| flag2 | `fs.Args()` | Mix flags and positional arguments |
 
-参考：[flag package](https://pkg.go.dev/flag)
+Reference: [flag package](https://pkg.go.dev/flag)

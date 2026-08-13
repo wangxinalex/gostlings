@@ -45,12 +45,13 @@ sh check.sh exercises/12_goroutines --run-all
 sh scripts/verify_exercise_starters.sh exercises/12_goroutines
 ```
 
-The normal checker rejects an exercise target whose `main.go` still contains a
-`TODO:`. The starter verifier is different: it temporarily checks that every
-starter fails its behavioral test, so a vacuous implementation cannot pass.
-For race coverage, `--race` adds `-race` only to exact paths listed in
-`race.list`; `--race-all` applies `-race` to every selected target and is the
-expensive full audit:
+The checker is behavior based: every exercise ships a `main_test.go`, so an
+untouched starter fails its focused behavioral test and a solution that merely
+exits 0 cannot pass. The starter verifier additionally checks that every
+unmodified starter really fails its behavioral test, so a vacuous
+implementation cannot pass. For race coverage, `--race` adds `-race` only to
+exact paths listed in `race.list`; `--race-all` applies `-race` to every
+selected target and is the expensive full audit:
 
 ```sh
 sh check.sh exercises/12_goroutines/goroutines1 --race

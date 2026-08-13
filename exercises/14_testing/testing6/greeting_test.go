@@ -10,7 +10,7 @@ import "testing"
 
 func TestGreetingFromEnvironment(t *testing.T) {
 	// TODO: Set GOSTLINGS_GREETING for this test, then check Greeting().
-	if got := Greeting(); got != "你好" {
-		t.Errorf("Greeting() = %q, want %q", got, "你好")
+	if got := Greeting(); got != "hello there" {
+		t.Errorf("Greeting() = %q, want %q", got, "hello there")
 	}
 }

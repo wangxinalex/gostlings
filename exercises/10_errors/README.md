@@ -1,20 +1,27 @@
-# Errors 递进路线
+# Errors: error handling progression
 
-本章按真实开发中错误处理的使用频率排列。先学会返回和检查错误，再学习如何在跨层调用时保留错误原因，最后练习验证、重试和应用边界转换。
+Work through the exercises in order. They are ordered by how often each
+error-handling technique appears in real code: first return and check errors,
+then preserve the cause across layers, and finally practice validation,
+retries, and application-boundary conversion.
 
-| 题目 | 重点 | 练习目标 |
+| Exercise | Focus | Goal |
 | --- | --- | --- |
-| errors1 | 返回并检查 error | 调用者必须处理失败分支 |
-| errors2 | 输入校验 | 用非 nil error 表示非法输入 |
-| errors3 | sentinel + `%w` + `errors.Is` | 包装错误但保留分类 |
-| errors4 | 自定义错误 + `errors.As` | 提取结构化错误信息 |
-| errors5 | 标准库错误类型 + `errors.As` | 保留底层 `strconv.NumError` |
-| errors6 | `errors.Join` | 同时报告多个独立校验错误 |
-| errors7 | 自定义 wrapper + `Unwrap` | 让业务错误参与 `errors.Is` |
-| errors8 | 应用边界转换 | 内部错误映射成稳定的用户语义 |
-| errors9 | 可重试错误 | 只重试明确允许重试的失败 |
-| errors10 | 错误组合综合题 | 跨层包装后仍可识别多个原因 |
+| errors1 | Return and check error | Callers must handle the failure branch |
+| errors2 | Input validation | Use a non-nil error for invalid input |
+| errors3 | sentinel + `%w` + `errors.Is` | Wrap an error while keeping its classification |
+| errors4 | Custom error + `errors.As` | Extract structured error information |
+| errors5 | Standard-library error types + `errors.As` | Preserve the underlying `strconv.NumError` |
+| errors6 | `errors.Join` | Report several independent validation errors at once |
+| errors7 | Custom wrapper + `Unwrap` | Let business errors participate in `errors.Is` |
+| errors8 | Application-boundary conversion | Map internal errors to stable user-facing semantics |
+| errors9 | Retryable errors | Retry only failures that explicitly allow it |
+| errors10 | Error composition capstone | Recognize multiple causes after cross-layer wrapping |
 
-解题时始终区分两件事：错误字符串用于日志和诊断，`errors.Is`/`errors.As` 用于程序逻辑。除非题目明确要求展示文本，不要通过比较 `err.Error()` 来判断错误类别。
+While solving, always keep two things separate: the error string is for logs
+and diagnostics, and `errors.Is`/`errors.As` is for program logic. Unless an
+exercise explicitly asks you to show text, do not classify errors by comparing
+`err.Error()`.
 
-参考： [Go Error Handling](https://go.dev/doc/effective_go#errors)、[`errors` package](https://pkg.go.dev/errors)。
+Reference: [Go Error Handling](https://go.dev/doc/effective_go#errors),
+[`errors` package](https://pkg.go.dev/errors).

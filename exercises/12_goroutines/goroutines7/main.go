@@ -36,6 +36,7 @@ func runBatches(batches [][]int) [][]string {
 	//   5. In each worker, defer wg.Done() and write batchResults[jobIndex]
 	//   6. After wg.Wait(), store batchResults in results[batchIndex]
 	// An empty batch needs no special case: wg.Wait() returns immediately.
+	// TODO: Implement runBatches per the contract above.
 	return nil
 }
 
