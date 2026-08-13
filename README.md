@@ -31,7 +31,9 @@ Topics 00–22 form the core and applied tracks. Topics 23–24 are intermediate
 scenarios: each combines multiple standard-library contracts and uses focused
 tests instead of relying only on stdout. Topics 25–26 are applied additions
 (closures and file I/O) that can be done any time after `02_functions` and
-`05_slices`.
+`05_slices`. Topics 27–33 are standard-library additions (strings, formatting,
+flags, sorting, regexp, subprocesses, and templating) that can be done any
+time after the Core topics; each chapter README notes its prerequisites.
 
 | Level | What it verifies |
 |---|---|
@@ -40,7 +42,8 @@ tests instead of relying only on stdout. Topics 25–26 are applied additions
 | Intermediate | HTTP behavior, channel ownership, cancellation, error paths, and race-safe state |
 
 Recommended progression: Core (`00_intro`–`11_generics`) → Applied
-(`12_goroutines`–`22_strconv`, plus `25_closures`–`26_files`) → Intermediate
+(`12_goroutines`–`22_strconv`, plus the stdlib additions `25_closures`–`26_files`
+and `27_strings`–`33_template`) → Intermediate
 (`23_http`–`24_concurrency_patterns`).
 
 | Topic | # | Go Tour section |
@@ -72,6 +75,13 @@ Recommended progression: Core (`00_intro`–`11_generics`) → Applied
 | 24_concurrency_patterns | 18 | [Concurrency patterns progression](exercises/24_concurrency_patterns/README.md) |
 | 25_closures | 2 | builds on [Go Tour: Basics 4-7](https://go.dev/tour/basics/4); closures are not in the Tour |
 | 26_files | 3 | [os](https://pkg.go.dev/os), [bufio](https://pkg.go.dev/bufio) |
+| 27_strings | 4 | [strings progression](exercises/27_strings/README.md) |
+| 28_fmt | 3 | [fmt progression](exercises/28_fmt/README.md) |
+| 29_flag | 2 | [flag progression](exercises/29_flag/README.md) |
+| 30_sort | 3 | [sort progression](exercises/30_sort/README.md) |
+| 31_regexp | 3 | [regexp progression](exercises/31_regexp/README.md) |
+| 32_os_exec | 2 | [os/exec progression](exercises/32_os_exec/README.md) |
+| 33_template | 2 | [text/template progression](exercises/33_template/README.md) |
 
 ## Checking your work
 
@@ -79,7 +89,8 @@ Recommended progression: Core (`00_intro`–`11_generics`) → Applied
 sh check.sh                      # run exercises/ in order, stop at the first failure and show its output
 sh check.sh --run-all            # run every exercise and report all PASS/FAIL
 sh check.sh exercises/13_channels/channels6 # check one exercise directly
-sh check.sh solutions --run-all  # verify all 185 reference solutions pass
+sh scripts/verify_solutions.sh   # overlay exercise tests and verify every reference solution passes
+sh check.sh solutions --run-all  # compile/run every reference solution as a stdout smoke
 sh check.sh solutions --run-all --race # verify selectively listed reference solutions with the race detector
 sh check.sh solutions --run-all --race-all # audit every selected reference solution with the race detector
 ```
@@ -93,19 +104,26 @@ with `Benchmark` functions using `-bench=.`, and falls back to `go run` for any
 directory without tests. It also accepts an individual exercise directory as
 the target.
 
+`scripts/verify_solutions.sh` temporarily copies each exercise's `*_test.go`
+into the matching solution directory, runs `go test ./solutions/...`, then
+removes the copies. The exercise tests therefore stay the single source of
+truth, and the reference answers are checked against the same behavioral
+contract without committing duplicate test files under `solutions/`.
+
 For intermediate exercises, stdout is only part of the contract. Run the focused
 package tests to check response status and headers, error paths, channel closure,
 and cancellation. Before considering a solution complete, also run:
 
 ~~~sh
 find exercises solutions -name '*.go' -print0 | xargs -0 gofmt -d
-GOCACHE=/tmp/gostlings-go-cache go test ./solutions/...
+GOCACHE=/tmp/gostlings-go-cache sh scripts/verify_solutions.sh
 GOCACHE=/tmp/gostlings-go-cache sh check.sh solutions --run-all --race
 GOCACHE=/tmp/gostlings-go-cache sh check.sh solutions --run-all --race-all
 ~~~
 
-The exercise tree is intentionally incomplete, so package-wide tests target
-`solutions/...`; the learner validates each exercise after fixing it.
+The exercise tree is intentionally incomplete; `verify_solutions.sh` checks the
+reference answers against the exercise tests, and the learner validates each
+exercise after fixing it.
 
 ## Release workflow
 

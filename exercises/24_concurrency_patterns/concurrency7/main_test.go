@@ -7,7 +7,7 @@ import (
 )
 
 func TestBatchFlushesBySizeAndExplicitEvent(t *testing.T) {
-	in := make(chan int, 3)
+	in := make(chan int)
 	flush := make(chan time.Time, 1)
 	out := batch(context.Background(), in, flush, 2)
 	in <- 1
