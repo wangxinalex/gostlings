@@ -10,8 +10,9 @@ func TestRunWithCausePreservesTheSentinelCause(t *testing.T) {
 	previous := withCancelCause
 	var derived context.Context
 	withCancelCause = func(parent context.Context) (context.Context, context.CancelCauseFunc) {
-		derived, cancel := context.WithCancelCause(parent)
-		return derived, cancel
+		d, cancel := context.WithCancelCause(parent)
+		derived = d
+		return d, cancel
 	}
 	t.Cleanup(func() { withCancelCause = previous })
 

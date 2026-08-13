@@ -37,8 +37,10 @@ func TestRunPipelineReturnsResultsAndCloses(t *testing.T) {
 		t.Fatalf("results = %v, want [4 8]", got)
 	}
 	select {
-	case err := <-failures:
-		t.Fatalf("unexpected failure: %v", err)
+	case err, ok := <-failures:
+		if ok {
+			t.Fatalf("unexpected failure: %v", err)
+		}
 	default:
 	}
 }

@@ -64,8 +64,8 @@ jobs:
           go-version-file: go.mod
           cache: true
 
-      - name: Test solutions
-        run: go test ./solutions/...
+      - name: Test solutions against exercise tests
+        run: sh scripts/verify_solutions.sh
 
       - name: Vet solutions
         run: go vet ./solutions/...
