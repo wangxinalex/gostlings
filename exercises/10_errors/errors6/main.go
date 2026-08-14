@@ -4,6 +4,8 @@
 // Hint: collect non-nil errors in a slice, then return errors.Join(errs...).
 //       errors.Is works through a joined error, so check ErrNameRequired and
 //       ErrPortRange separately instead of parsing the combined error string.
+// Version note: errors.Join was added in Go 1.20; use the repository's Go version
+// or replace it with an explicit aggregate error when working on older Go code.
 
 package main
 

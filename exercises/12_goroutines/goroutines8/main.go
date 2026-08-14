@@ -2,6 +2,8 @@
 // Task: pass each job value into its worker and return one result per job
 // Expected behavior: every job produces its matching received result.
 // Hint: pass job as an argument alongside the result index; do not make the worker look up a changing loop value.
+// Go 1.22 gives range variables per-iteration scope, but explicit parameters are
+// still the clearest and most portable worker-input pattern.
 
 package main
 

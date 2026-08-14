@@ -4,6 +4,7 @@
 // Hint: validateUser already returns errors.Join. In createUser, return
 //       fmt.Errorf("create user: %w", err) when validation fails. In main,
 //       use errors.Is twice; wrapping a joined error must still expose both causes.
+// Version note: errors.Join was added in Go 1.20, so this exercise assumes Go 1.20+.
 
 package main
 
