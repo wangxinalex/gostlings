@@ -2,6 +2,8 @@
 // Task: make every goroutine keep the loop value it was created for
 // Expected behavior: the returned slice contains every input label exactly once.
 // Hint: create a new loop-local label before creating the closure; each closure needs its own value.
+// Version note: label is deliberately declared outside the range loop and reused,
+// so Go 1.22's per-iteration range variables do not fix this particular capture.
 
 package main
 

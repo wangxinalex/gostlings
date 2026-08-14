@@ -1,7 +1,9 @@
 // Concept: reviewing a complete goroutine lifecycle
 // Task: dynamically launch parameterized workers, defer completion, and join before returning
 // Expected behavior: every input job produces one reviewed result, including dynamic and empty inputs.
-// Hint: pass both the result index and job value to the goroutine. Add before go, defer Done, then Wait after the loop.
+// Hint: pass both the result index and job value to the goroutine. Add before go,
+// defer Done, then Wait after the loop. Explicit parameters avoid depending on
+// Go 1.22's changed loop-variable capture semantics.
 
 package main
 

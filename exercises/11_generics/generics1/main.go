@@ -2,7 +2,8 @@
 // Task: define a generic Max function so this program compiles and runs
 // Expected output: 7
 // 2.5
-// Hint: use [T cmp.Ordered] as the type parameter list and compare with > (Go Tour: Generics 1)
+// Hint: use [T cmp.Ordered] as the type parameter list and compare with > (Go Tour: Generics 1).
+// Version note: the standard cmp package was added in Go 1.21; this repository targets Go 1.26.
 
 package main
 

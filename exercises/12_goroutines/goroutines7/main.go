@@ -5,6 +5,8 @@
 // Hint: use the outer loop for batch order and an inner loop for parallel jobs.
 //       Create a result slice and a WaitGroup for each batch. Add before each go,
 //       defer Done inside each worker, and Wait before the next outer-loop iteration.
+//       Pass batchIndex, jobIndex, and job into the worker explicitly; this keeps
+//       the exercise correct on Go versions before and after the Go 1.22 loop change.
 
 package main
 
