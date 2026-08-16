@@ -1,8 +1,13 @@
 // Concept: an error in one worker must stop new work and still join every worker.
 // Task: return the first observed job error, close stop once, and wait for all workers before returning.
 // Expected behavior: a job with err stops the pool; a run without errors returns nil.
-// Hint: workers send errors to a buffered failure channel and send a separate exit acknowledgement when they finish.
-//       One coordinator receives the first failure, closes stop once, then waits for every worker acknowledgement.
+// Hint: separate the three responsibilities: jobs production, failure notification, and worker joining.
+//       The producer sends jobs until the slice ends or stop closes, then closes its jobs channel.
+//       A worker checks job.err before doing work; on the first error, send it to a capacity-one
+//       buffered failure channel and exit. Successful workers continue until jobs closes or stop closes.
+//       One coordinator receives the first failure, closes stop exactly once, and then waits for
+//       every worker exit acknowledgement before returning the captured error. With no errors,
+//       wait for the producer and all workers, then return nil.
 
 package main
 

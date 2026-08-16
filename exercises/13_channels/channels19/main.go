@@ -1,8 +1,13 @@
 // Concept: timeout, cancellation, and join — returning is safe only after cleanup
 // Task: time out a slow producer, close stop, wait for done, and return "timed out"
 // Expected behavior: run returns after the producer has observed stop and closed done
-// Hint: the producer should defer close(done) and select on its slow delay or stop. The
-//       caller selects on result or time.After; in either branch close stop, then receive done.
+// Hint: keep result data and completion notification separate. The intended sequence is:
+//       stop := make(chan struct{}); result := make(chan string, 1)
+//       go func() { defer close(done); runProducer(stop, result) }()
+//       select on result or time.After(25 * time.Millisecond)
+//       in either branch: close(stop), then receive <-done before returning.
+//       The producer selects between its slow work and <-stop. close(stop) is the request
+//       to stop; <-done is the join that confirms the producer has actually stopped.
 
 package main
 
