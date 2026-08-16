@@ -34,12 +34,20 @@ func TestProduceStopsWhenNoReceiverIsAvailable(t *testing.T) {
 
 func waitForProduceClose(t *testing.T, out <-chan int) {
 	t.Helper()
-	select {
-	case _, ok := <-out:
-		if ok {
-			t.Fatal("produce() sent a value after cancellation")
+	timer := time.NewTimer(500 * time.Millisecond)
+	defer timer.Stop()
+
+	// Cancellation makes the stop case ready, but a concurrent send may also
+	// be ready. Select does not prioritize stop, so discard any in-flight
+	// values and assert that the producer eventually closes out.
+	for {
+		select {
+		case _, ok := <-out:
+			if !ok {
+				return
+			}
+		case <-timer.C:
+			t.Fatal("produce() did not close after cancellation")
 		}
-	case <-time.After(500 * time.Millisecond):
-		t.Fatal("produce() did not close after cancellation")
 	}
 }
