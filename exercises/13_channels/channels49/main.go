@@ -2,8 +2,14 @@
 // Task: process jobs with bounded workers and return the first job error after workers join.
 // job carries value and err; a non-nil job.err is propagated and prevents later jobs from starting. Returned values
 // are successful job results observed before cancellation.
-// Hint: workers send errors to a capacity-one channel with a stop case. The coordinator alone closes its internal
-// cancel channel once, stops the producer, drains worker exits, and only then returns the captured error.
+// Hint: keep caller stop and internal cancel as separate signals. The producer selects on both before
+//
+//	sending each job and closes jobs when it stops. Workers select on both before receiving work,
+//	before publishing a successful result, and while reporting an error.
+//	A non-nil job.err goes to the capacity-one failure channel and causes that worker to exit.
+//	The coordinator records the first observed error, closes internal cancel exactly once, drains
+//	every worker exit acknowledgement, and only then returns. Successful results already observed
+//	before cancellation may be kept; stop admitting later jobs once cancellation is observed.
 package main
 
 import "fmt"

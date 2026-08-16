@@ -7,6 +7,7 @@ import (
 )
 
 func TestOutput(t *testing.T) {
+	t.Chdir(t.TempDir())
 	t.Cleanup(func() { os.Remove("demo.txt") })
 	got := testutil.CaptureStdout(t, main)
 	const want = "hello, disk!\n"
