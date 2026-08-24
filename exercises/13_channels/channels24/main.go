@@ -1,8 +1,13 @@
-// Concept: worker pools need cancellation around both jobs receives and result sends.
-// Task: square jobs with workers workers until jobs closes or stop closes.
-// Expected behavior: stop releases workers blocked waiting for a job or waiting for a result receiver.
-// Hint: select on stop when receiving jobs, and select on stop again when sending each square to out.
-//       Workers send exit acknowledgements; a coordinator waits for all of them before close(out).
+// Problem: a worker pool can be blocked waiting for new jobs or blocked handing a
+// result to a downstream consumer when cancellation arrives.
+// Without this pattern: stopping the pool leaves workers alive and prevents the
+// shared output from ever closing.
+// Channels: jobs is receive-only input; stop requests cancellation; out carries
+// results and is closed by the coordinator; exited confirms worker termination.
+// Timeline: select jobs/stop -> compute -> select out/stop -> all exited -> close(out)
+// Hint: use a stop case around the jobs receive and another around every result
+// send. Each worker reports one exit acknowledgement, including cancellation;
+// the coordinator waits for all acknowledgements before closing out.
 
 package main
 

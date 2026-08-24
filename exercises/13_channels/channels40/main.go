@@ -1,9 +1,13 @@
-// Concept: relay cancellation must cover a blocked input receive and a blocked output send.
-// Task: forward values from in until in or stop closes.
-// Expected behavior: normal values preserve order; stop closes output from either blocked direction.
-// Hint: defer close(out). Select between stop and receiving in, check comma-ok, then select between
-//
-//	stop and sending the received value to out.
+// Problem: a relay is a reusable pipeline stage, so either its upstream or its
+// downstream may become unavailable first.
+// Without this pattern: a blocked receive or send leaves the stage running after
+// the rest of the pipeline has stopped.
+// Channels: in is receive-only upstream data; stop is cancellation; out is
+// producer-owned output and is closed by the relay.
+// Timeline: receive in/stop -> check ok -> send out/stop -> repeat -> close(out)
+// Hint: defer close(out). Select between stop and receiving in, check comma-ok,
+// then select between stop and sending the received value to out. This repeats
+// the two-sided cancellation protocol from the earlier relay exercises.
 package main
 
 import "fmt"

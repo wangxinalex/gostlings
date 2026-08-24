@@ -1,7 +1,11 @@
-// Concept: select with default can make a send non-blocking
-// Task: send value when ch is ready, otherwise return immediately without sending
-// Expected behavior: a ready send returns true; a full buffer or unready receiver returns false
-// Hint: use select with case ch <- value: return true and a default case that returns false
+// Problem: a producer wants to publish opportunistically without waiting for a
+// receiver or free buffer space.
+// Without this pattern: a send can block the producer indefinitely.
+// Channels: ch is a send-only data channel; default means this attempt will not
+// be queued when the send is not ready.
+// Timeline: try send -> ready: value enters ch; not ready: default -> return false
+// Hint: select between `ch <- value` and default. Return true only from the send
+// case and false from default.
 
 package main
 

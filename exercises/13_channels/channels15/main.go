@@ -1,8 +1,11 @@
-// Concept: result and done are different signals
-// Task: publish one result, close the result channel, then close the caller's done channel
-// Expected behavior: callers receive the result data separately from completion notification
-// Hint: make a capacity-one result channel. In one goroutine, defer close(done), send 42,
-//       and close the result channel before the goroutine returns. Never send data on done.
+// Problem: callers need both a business result and a reliable completion event.
+// Without this pattern: using the result channel as completion makes it hard to
+// distinguish “value is ready” from “the producer has fully exited”.
+// Channels: result carries 42 and is closed by its producer; done carries no
+// data and is closed by the completing goroutine.
+// Timeline: send result -> close(result) -> close(done) -> caller may wait on either meaning
+// Hint: make result capacity one. Send the value, close result, and defer close(done)
+// in one goroutine. Never send business data on done.
 
 package main
 

@@ -1,9 +1,14 @@
-// Concept: a closed channel stays ready forever, so a select must disable it after comma-ok says it is closed.
-// Task: drain both inputs until both close.
-// Expected behavior: buffered values arrive once; after closure, set that input variable to nil so it cannot
-// repeatedly supply its zero value.
-// Hint: loop while first != nil || second != nil. In each receive case, use value, ok := <-input; when !ok,
-// set only that local input variable to nil and continue. Append only values received with ok == true.
+// Advanced pattern: nil-channel switching disables a select case dynamically.
+// Problem: a closed channel is always ready, even after its buffered values are
+// drained.
+// Without this pattern: select repeatedly chooses the closed input and returns
+// its zero value, starving the other input or spinning forever.
+// Channels: first and second carry data; assigning a local input to nil removes
+// that case from select. No function here owns either input.
+// Timeline: receive until ok=false -> set that input to nil -> drain other input -> return
+// Hint: loop while first != nil || second != nil. Use comma-ok in each receive
+// case; when !ok, set only that local input variable to nil. Append only values
+// received with ok=true.
 package main
 
 import "fmt"

@@ -1,9 +1,13 @@
-// Concept: several forwarders need one coordinator to close their shared output.
-// Task: collect all source values into one output stream.
-// Expected behavior: all sources drain; output closes only after every forwarder exits.
-// Hint: give each forwarder an exit acknowledgement. A coordinator receives every acknowledgement,
-//
-//	then closes out; no forwarder owns the shared output close.
+// Problem: several forwarders share one output, so completion can happen in any
+// order but output closure must happen exactly once.
+// Without this pattern: allowing each forwarder to close out causes a double
+// close; closing out after one forwarder drops values from the others.
+// Channels: sources are receive-only inputs; out is shared data owned by the
+// collector; exited carries one acknowledgement per forwarder.
+// Timeline: sources drain independently -> each sends exited -> coordinator receives all -> close(out)
+// Hint: give each forwarder one exit acknowledgement. A coordinator receives
+// every acknowledgement and then closes out. No forwarder may close the shared
+// output.
 package main
 
 import "fmt"

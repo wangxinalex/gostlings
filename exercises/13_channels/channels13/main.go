@@ -1,8 +1,11 @@
-// Concept: done signaling — a closed channel broadcasts completion without data
-// Task: return a done channel that closes when the asynchronous work finishes
-// Expected behavior: receiving from done reports a closed channel and no value
-// Hint: make done, start a goroutine, and write defer close(done) at the top of it.
-//       Do not send a value: closing is the completion signal.
+// Problem: a caller needs to wait for asynchronous work without receiving a
+// meaningless payload.
+// Without this pattern: every waiter would need a separate result or a guessed
+// value, and multiple waiters could miss a one-time send.
+// Channels: done carries no data; the completing goroutine owns close(done).
+// Timeline: start work -> work finishes -> close(done) -> every waiter proceeds
+// Hint: make done, start one goroutine, and defer close(done) at the top of that
+// goroutine. Closing broadcasts completion to all receivers; do not send a value.
 
 package main
 

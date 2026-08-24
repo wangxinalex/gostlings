@@ -1,8 +1,14 @@
-// Concept: a fan-in must handle stream lifecycle edges as well as normal values.
-// Task: merge all supplied non-nil inputs, including already-closed and buffered streams.
-// Expected behavior: no inputs closes immediately; buffered values drain before output closes.
-// Hint: each forwarder ranges its own input so an already-closed input sends its acknowledgement immediately.
-//       Size exited to len(inputs), and make one coordinator receive every acknowledgement before close(out).
+// Problem: real fan-in inputs may be empty, already closed, buffered, or still
+// producing; these states must not change the close protocol.
+// Without this pattern: waiting for the wrong number of senders or forgetting a
+// closed input can leave the output open forever.
+// Channels: non-nil inputs carry data; out is coordinator-owned; exited has one
+// acknowledgement slot per input. A closed input still needs its acknowledgement.
+// Timeline: input drains (including buffered values) -> forwarder exits -> coordinator counts all -> close(out)
+// Hint: handle no inputs explicitly. Start one forwarder per supplied input and
+// range it so buffered values drain and already-closed inputs exit immediately.
+// Size exited to len(inputs); the coordinator receives every acknowledgement
+// before closing out. Do not let a forwarder close the shared output.
 
 package main
 

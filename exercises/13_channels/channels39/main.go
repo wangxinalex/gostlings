@@ -1,6 +1,10 @@
-// Concept: a service can select between control commands, work, and shutdown.
-// Task: forward jobs unless pause is active; resume accepts jobs again; stop closes output.
-// Expected behavior: paused jobs wait for resume, and stop wins even while jobs are blocked.
+// Problem: a long-lived service must handle control commands and work while
+// remaining cancellable.
+// Without this pattern: pause may still consume jobs, or a blocked downstream
+// send can prevent stop from taking effect.
+// Channels: commands carries control state changes; jobs carries data; stop is
+// cancellation; out is service-owned and closed by this goroutine.
+// Timeline: active select commands/jobs/stop -> pause disables jobs -> resume restores jobs -> stop -> close(out)
 // Hint: model the service as two states. Initially it is active:
 //
 //	select among stop, commands, and jobs; apply commands and forward jobs.

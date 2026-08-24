@@ -1,8 +1,9 @@
-// Concept: buffered channels decouple send and receive
-// Task: this program deadlocks because the channel is unbuffered; change only the make line to fix it
-// Expected output: 1
-// 2
-// Hint: make(chan int, 2) creates a buffered channel that holds 2 values without blocking (Go Tour: Concurrency 3)
+// Problem: a producer wants to publish two values before the consumer reads.
+// Without this pattern: an unbuffered send waits immediately for a receiver.
+// Channels: ch carries data; its buffer is the temporary handoff capacity.
+// Timeline: send 1 -> buffer; send 2 -> buffer; receive 1; receive 2
+// Hint: give ch capacity for exactly two values. A buffer delays blocking; it
+// does not make sends unlimited or remove the need for a receiver (Go Tour: Concurrency 3).
 
 package main
 

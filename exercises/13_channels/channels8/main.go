@@ -1,8 +1,11 @@
-// Concept: select multiplexes channel operations
-// Task: receive from whichever input is ready without blocking on a silent input
-// Expected behavior: a ready input is returned; if multiple inputs are ready, either may be selected
-// Hint: put one receive from each input in a select. select does not give earlier
-//       cases priority when multiple cases are ready.
+// Problem: one input may be ready while another input is silent forever.
+// Without this pattern: receiving from the silent input first can block even
+// though useful data is already available elsewhere.
+// Channels: fast and slow are receive-only data inputs; no channel is closed by
+// this function.
+// Timeline: select waits on fast and slow -> first ready receive wins
+// Hint: put one receive case per input in select. If several cases are ready,
+// select chooses among them without giving source order priority.
 
 package main
 

@@ -1,17 +1,19 @@
-// Concept: a raw-channel service owns a result stream and a done signal, but workers own neither close.
-// Task: serve requests until jobs closes or stop closes, then wait for active workers before closing results and done.
-// request carries value, a per-request reply channel, and an optional err. response carries value and err. Send
-// exactly one response on a non-nil reply channel for each request that is accepted before shutdown.
+// Problem: a raw-channel service must serve requests, route per-request replies,
+// publish a shared result stream, and shut down without abandoning workers.
+// Without this pattern: workers can outlive the service, callers can miss their
+// replies, or several workers can race to close shared channels.
+// Channels: jobs carries requests; each request.reply is a private destination;
+// stop cancels; results carries shared responses; exited joins workers; done is
+// the final completion signal. Workers close none of the shared channels.
+// Timeline: receive job/stop -> reply and publish result -> worker exits -> coordinator closes results -> close(done)
 // Hint: follow the lifecycle in this order:
 //
 //	workers select on stop before receiving a job; a closed jobs channel ends a worker normally.
-//	For an accepted request, compute a response and attempt exactly one send on its non-nil
-//	reply channel, with a stop case. If cancellation has not won, publish the same response
-//	to results, also with a stop case.
+//	For an accepted request, compute one response and attempt one reply send with a stop case.
+//	If cancellation has not won, publish the same response to results with another stop case.
 //	Each worker sends one exit acknowledgement on every return path.
 //	A coordinator receives one acknowledgement per worker, closes results, then closes done.
-//	Workers never close shared channels. stop can cancel a blocked reply or result send, and done
-//	must not close until all workers have joined.
+//	Workers never close shared channels; done cannot close until every worker has joined.
 package main
 
 import "fmt"

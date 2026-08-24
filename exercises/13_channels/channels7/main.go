@@ -1,7 +1,12 @@
-// Concept: directional channels keep generator ownership clear
-// Task: return a receive-only stream while the producer sends every value and closes its own output
-// Expected behavior: callers can receive every value but cannot send to or close the returned channel
-// Hint: make a bidirectional out channel inside generate, start a goroutine with defer close(out), and return it as <-chan int
+// Problem: a generator should prevent callers from accidentally sending to or
+// closing the producer's output.
+// Without this pattern: a bidirectional return type exposes operations that do
+// not belong to the caller and can cause a panic or protocol violation.
+// Channels: the producer uses bidirectional out internally; the caller receives
+// through the returned <-chan int. The producer owns close(out).
+// Timeline: producer sends -> caller receives -> producer closes -> range ends
+// Hint: make a bidirectional channel inside generate, start the producer with
+// defer close(out), and return the same channel as <-chan int.
 
 package main
 

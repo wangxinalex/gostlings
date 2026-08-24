@@ -1,9 +1,13 @@
-// Concept: a worker pool needs a defined behavior when there are no workers.
-// Task: square every job with the requested workers.
-// Expected behavior: empty jobs returns an empty slice; zero workers returns an empty slice without consuming jobs.
-// Hint: handle workers < 1 before starting the jobs producer. Otherwise use worker exit acknowledgements
-//
-//	and let one coordinator close results after every worker exits.
+// Problem: a pool API must define what zero workers means instead of leaving a
+// producer blocked forever.
+// Without this pattern: starting a jobs producer with no consumer deadlocks, and
+// the caller cannot distinguish “no capacity” from slow work.
+// Channels: jobs and results are internal; workers own job receives, and one
+// coordinator owns result closure. The zero-worker policy is an API decision.
+// Timeline: workers < 1 -> return empty result; otherwise produce -> workers -> close results
+// Hint: handle workers < 1 before starting the jobs producer. For positive
+// workers, reuse the pool protocol: close jobs after production, acknowledge
+// every worker exit, close results once, and collect results to completion.
 package main
 
 import "fmt"
