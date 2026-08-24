@@ -1,8 +1,15 @@
-// Concept: a basic worker pool has a jobs producer, workers, and one results closer.
-// Task: square every item in jobs with workers workers and return all results in completion order.
-// Expected behavior: every job is processed once; an empty jobs slice returns an empty result slice.
-// Hint: start a producer goroutine that sends jobs then closes jobsCh. Each worker ranges jobsCh and sends to results.
-//       Workers acknowledge exit to a coordinator; the coordinator closes results after every acknowledgement.
+// Problem: an application has many jobs but wants a fixed number of concurrent
+// workers and one collected result slice.
+// Without this pattern: one goroutine per job can consume too many resources;
+// returning before workers finish loses results.
+// Channels: jobsCh is owned by the producer and closes when the slice is sent;
+// results carries values; exited carries one acknowledgement per worker. A
+// coordinator owns close(results).
+// Timeline: producer sends jobs -> close(jobsCh) -> workers finish -> close(results) -> collector returns
+// Hint: start the jobs producer in a goroutine and close jobsCh after the last
+// send. Start workers that range jobsCh and send to results. Collect results
+// while the pool runs; a coordinator waits for every worker acknowledgement and
+// closes results, allowing the collector's range to end.
 
 package main
 

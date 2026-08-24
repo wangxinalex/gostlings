@@ -1,11 +1,14 @@
-// Concept: fan-out workers share one jobs channel, then fan in to one result stream.
-// Task: start workers workers that square every job, and close out only after all workers exit.
-// Expected behavior: every job produces one square; one coordinator owns close(out).
-// Hint: let every worker call onSquareWorkerStart, range over the shared jobs channel, send
-//       value*value to out, then call onSquareWorkerExit and send one buffered exit acknowledgement.
-//       jobs is owned by the caller and is what tells workers that no more work is coming.
-//       A separate coordinator receives exactly workers acknowledgements, then closes out once.
-//       Return out immediately; the caller ranges it while workers and the coordinator run.
+// Problem: one jobs stream needs concurrent processing, but callers still want
+// one result stream and one clear completion point.
+// Without this pattern: starting one goroutine per job has unbounded concurrency;
+// letting workers close out independently can panic when several workers exit.
+// Channels: jobs is caller-owned input and its close means no more work; out is
+// owned by this function and carries squares; exited carries one token per worker.
+// Timeline: jobs -> shared workers -> out -> caller; workers exit -> coordinator closes out
+// Hint: start exactly workers goroutines in a loop. Each calls the start hook,
+// ranges jobs, sends each square to out, calls the exit hook, and reports one
+// buffered exited token. A coordinator receives every token and closes out once.
+// Return out immediately so the caller can range it while workers run.
 
 package main
 

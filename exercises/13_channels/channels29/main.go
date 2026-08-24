@@ -1,8 +1,14 @@
-// Concept: a pool can expose only the channel direction each caller needs.
-// Task: return a send-only jobs handle and a receive-only results stream for a squaring pool.
-// Expected behavior: callers close their jobs handle when done, then range results until the coordinator closes it.
-// Hint: make jobs inside startPool, return it as chan<- int, and return results as <-chan int.
-//       Workers range jobs; their exit acknowledgements let one coordinator close results exactly once.
+// Problem: an API should prevent callers from performing channel operations that
+// violate ownership.
+// Without this pattern: returning bidirectional channels lets callers receive
+// from a jobs queue or close a result stream owned by the pool.
+// Channels: jobs is returned as chan<- int so callers can send and close it;
+// results is returned as <-chan int so callers can only receive and range it.
+// The pool owns worker exits and close(results).
+// Timeline: caller sends jobs -> caller closes jobs -> workers exit -> coordinator closes results -> caller ranges results
+// Hint: create both channels internally, return jobs as `chan<- int` and results
+// as `<-chan int`. Workers range jobs; one coordinator waits for all exit tokens
+// before closing results exactly once.
 
 package main
 

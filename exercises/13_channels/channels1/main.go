@@ -1,7 +1,11 @@
-// Concept: unbuffered channels — send and receive must happen in different goroutines
-// Task: this program deadlocks because it sends and receives in the same goroutine; move the send into a goroutine
-// Expected output: hi
-// Hint: an unbuffered channel blocks send until a receive is ready — do the send in a goroutine (Go Tour: Concurrency 2)
+// Problem: an unbuffered channel is a synchronous handoff, but this program
+// sends and receives in the same goroutine.
+// Without this pattern: the send waits for a receiver that this goroutine has
+// not reached yet, so the program deadlocks.
+// Channels: ch carries one string; main owns both sides for this exercise.
+// Timeline: sender -- waits for receiver --> ch --> receiver
+// Hint: move the send into a goroutine. The receiver in main can then rendezvous
+// with it (Go Tour: Concurrency 2).
 
 package main
 

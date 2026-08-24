@@ -1,18 +1,24 @@
-// Concept: a capstone service combines bounded workers, request/reply, backpressure, cancellation, ordered results,
-// error propagation, and coordinator-owned closure using raw channels only.
-// request carries value, a per-request reply channel, and err. response carries value and err. Send exactly one
-// response on a non-nil reply channel for every request accepted before stop; request.err becomes response.err and
-// the returned error. A closed stop is the caller-provided timeout/cancellation signal.
-// Hint: build the service in layers:
-//
-//	producer: send indexed requests through an unbuffered jobs channel, selecting on stop/internal cancel;
-//	workers: receive requests, process them, send one reply when reply != nil, and publish indexed
-//	responses, with stop/internal cancel around every potentially blocking send or receive;
-//	failure path: send the first error to a capacity-one channel, close internal cancel once, and stop
-//	producing new requests; join every worker before closing results and returning.
-//	The collector stores successful indexed responses by original index. After results closes, return
-//	them in request order. Return errStopped for caller cancellation, or the first request error.
-//	Only the coordinator closes shared channels; request reply channels are caller-owned destinations.
+// Capstone: combine only protocols already learned: bounded work, request/reply,
+// backpressure, cancellation, ordered results, error propagation, and one closer.
+// Problem: a service must preserve all of these contracts while shutting down
+// under either caller cancellation or the first request error.
+// Without this composition: each individual pattern may work, but their close
+// and join responsibilities can conflict and leak goroutines.
+// Channels: unbuffered indexed jobs provides backpressure; request.reply routes
+// one private response; stop/internal cancel request shutdown; results carries
+// indexed responses; failure reports the first error; worker exits prove cleanup.
+// Timeline: produce request -> worker reply/result -> error or stop -> cancel -> join -> close results/done -> return ordered values
+// Hint: build the service in layers. The producer sends indexed requests through
+// an unbuffered jobs channel, selecting on stop/internal cancel. Workers receive
+// requests, process them, send one reply when reply != nil, and publish indexed
+// responses with stop/internal cancel around every potentially blocking operation.
+// The failure path sends the first error to a capacity-one channel, closes
+// internal cancel once, and stops producing new requests. Join every worker
+// before closing results and returning. The collector stores successful indexed
+// responses by original index and returns them in request order after results
+// closes. Return errStopped for caller cancellation, or the first request error.
+// Only the coordinator closes shared channels; request reply channels are
+// caller-owned destinations.
 package main
 
 import (

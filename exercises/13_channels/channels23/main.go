@@ -1,8 +1,13 @@
-// Concept: a cancellable fan-in must stop on both sides of every forwarder.
-// Task: merge inputs until they close or stop closes, then close out after all forwarders exit.
-// Expected behavior: stop releases a forwarder blocked on either input receive or output send.
-// Hint: use select with <-stop beside each input receive, then another select with <-stop beside out <- value.
-//       Forwarders acknowledge exit; only the coordinator closes out.
+// Problem: a fan-in consumer may abandon out while one input remains silent or
+// while a forwarder is blocked sending to out.
+// Without this pattern: a forwarder leaks at whichever blocking operation is not
+// cancellation-aware, and the coordinator can never close out.
+// Channels: stop is a receive-only cancellation broadcast; inputs carry data;
+// out is shared and coordinator-owned; exited confirms forwarder termination.
+// Timeline: select input/stop -> select out/stop -> forwarder exits -> coordinator closes out
+// Hint: protect both sides. Use a select with `<-stop` beside each input receive,
+// then a second select with `<-stop` beside `out <- value`. Each forwarder sends
+// one exit token on every return path; only the coordinator closes out.
 
 package main
 

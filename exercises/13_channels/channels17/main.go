@@ -1,8 +1,12 @@
-// Concept: cancellable forwarder — both sides of a relay can block
-// Task: forward input values until input closes or stop closes, then close the output
-// Expected behavior: stop releases a blocked receive and a blocked send
-// Hint: use a receive select with cases for in and stop. After receiving a value, use
-//       another select with cases for out <- value and stop. Defer close(out) once.
+// Problem: a forwarder can be stuck before it has a value, or after it has a
+// value but no downstream receiver is ready.
+// Without this pattern: cancellation may release one wait while leaving the
+// goroutine blocked on the other side.
+// Channels: in carries caller-owned data; stop requests cancellation; out is
+// owned and closed by the forwarder.
+// Timeline: select receive in/stop -> select send out/stop -> repeat -> close(out)
+// Hint: use comma-ok for the input receive and two separate selects: one around
+// receiving, one around sending. Defer close(out) exactly once.
 
 package main
 

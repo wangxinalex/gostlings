@@ -1,13 +1,15 @@
-// Concept: an ordered pool needs bounded workers, indexed results, cancellation-aware handoff, and one closer.
-// Task: process jobs with at most workers active calls and return values in input order.
-// Expected behavior: stop returns false after every started worker exits; normal and empty input return true.
-// Hint: use an unbuffered indexed jobs channel: the producer cannot get ahead of available workers.
-//
-//	The producer selects between stop and sending each indexed job, then closes jobs when finished.
-//	Workers select between stop and receiving a job, call processOrderedBounded, and select again
-//	between stop and publishing the indexed result. Every worker sends one exit acknowledgement.
-//	A coordinator waits for all worker acknowledgements and closes results; collect results by index,
-//	join the coordinator, then return false if stop was closed and true only for a complete run.
+// Problem: a service needs bounded concurrency, input-order results, and
+// cancellation-safe handoff at both sides of its worker pool.
+// Without this pattern: jobs can build up without backpressure, results can be
+// returned out of order, and cancellation can leave a worker blocked.
+// Channels: unbuffered indexed jobs provides backpressure; results carries
+// indexed values; stop cancels; exited and coordinator closure prove cleanup.
+// Timeline: producer sends indexed job/stop -> worker processes -> result/stop -> join -> ordered return
+// Hint: use an unbuffered indexed jobs channel so the producer cannot get ahead
+// of available workers. Select on stop while sending jobs and receiving jobs, and
+// again while publishing each result. Every worker sends one exit acknowledgement.
+// A coordinator waits for all acknowledgements and closes results; collect by
+// index, join the coordinator, and return false only after cancellation cleanup.
 package main
 
 import "fmt"

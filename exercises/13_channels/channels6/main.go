@@ -1,7 +1,12 @@
-// Concept: generator — the producer owns and closes its output channel
-// Task: send every input value from a goroutine, then close the returned channel
-// Expected behavior: callers can range over the result, including for empty input
-// Hint: defer close(out) inside the producer goroutine; the caller only receives
+// Problem: callers should consume a stream without knowing how its producer is
+// implemented or when it will finish.
+// Without this pattern: the caller must coordinate the producer and may wait
+// forever because nobody closes the output.
+// Channels: out carries values; the producer owns sending and closing; callers
+// receive and range over it.
+// Timeline: create out -> producer sends values -> producer closes out -> caller's range ends
+// Hint: create out, start the producer goroutine, defer close(out) inside that
+// goroutine, and return out immediately. Empty input must close the stream too.
 
 package main
 

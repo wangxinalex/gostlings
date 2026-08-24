@@ -1,13 +1,15 @@
-// Concept: timeout, cancellation, and join — returning is safe only after cleanup
-// Task: time out a slow producer, close stop, wait for done, and return "timed out"
-// Expected behavior: run returns after the producer has observed stop and closed done
-// Hint: keep result data and completion notification separate. The intended sequence is:
-//       stop := make(chan struct{}); result := make(chan string, 1)
-//       go func() { defer close(done); runProducer(stop, result) }()
-//       select on result or time.After(25 * time.Millisecond)
-//       in either branch: close(stop), then receive <-done before returning.
-//       The producer selects between its slow work and <-stop. close(stop) is the request
-//       to stop; <-done is the join that confirms the producer has actually stopped.
+// Problem: a caller gives up after a deadline, but the producer may still be
+// sleeping or blocked on its result send.
+// Without this pattern: returning on timeout alone leaks the producer and may
+// leave it using resources after its caller has gone away.
+// Channels: result carries business data; stop carries the cancellation request;
+// done carries the producer's exit confirmation. run owns close(stop); the
+// wrapper goroutine owns close(done).
+// Timeline: start producer -> result or 25ms timeout -> close(stop) -> <-done -> return
+// Hint: create `stop` and a capacity-one `result`, then wrap runProducer in a
+// goroutine with `defer close(done)`. Select on result versus
+// `<-time.After(25*time.Millisecond)`. In both branches close stop, wait for
+// done, and only then return; the timeout branch returns exactly "timed out".
 
 package main
 

@@ -1,8 +1,15 @@
-// Concept: a rate limiter still needs cancellation around every potentially blocking channel operation.
-// Task: forward token-limited input until input closes or stop closes.
-// Expected behavior: stop releases a goroutine waiting for a token and one blocked sending to an abandoned output.
-// Hint: select between stop and receiving in; after a value, select between stop and receiving a token; finally
-// select between stop and out <- value. The output owner defers close(out).
+// Advanced reinforcement: every wait in a token-based rate limiter needs an
+// escape path.
+// Problem: cancellation may arrive while waiting for input, a rate token, or a
+// downstream receiver.
+// Without this pattern: the limiter leaks at whichever channel operation is left
+// as a plain blocking receive or send.
+// Channels: stop cancels; in carries data; tokens carries permits; out carries
+// forwarded data and is closed by the output owner.
+// Timeline: select in/stop -> select token/stop -> select out/stop -> repeat/close(out)
+// Hint: protect input, token, and output in separate selects. After a value,
+// select between stop and receiving a token; then select between stop and
+// `out <- value`. Defer close(out) in the owner goroutine.
 package main
 
 import "fmt"

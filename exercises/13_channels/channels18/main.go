@@ -1,8 +1,15 @@
-// Concept: worker start and join with raw channels
-// Task: start count workers, broadcast stop to them, and close done after every worker exits
-// Expected behavior: one close(stop) reaches every worker; zero workers complete immediately
-// Hint: each worker waits on <-stop then sends one signal to a buffered exited channel.
-//       A coordinator receives count exit signals and is the only goroutine that closes done.
+// Problem: a caller starts several workers and must know when all of them have
+// stopped after one cancellation broadcast.
+// Without this pattern: one worker's completion signal cannot prove that every
+// worker exited, so the caller may return while work is still running.
+// Channels: stop is caller-owned and receive-only here; closing it broadcasts
+// cancellation. Each worker sends one token on exited; the coordinator closes
+// done after it receives count tokens.
+// Timeline: start count workers -> close(stop) -> each worker exits -> count exited tokens -> close(done)
+// Hint: start each worker in the loop with `go func() { <-stop; onWorkerExit(); exited <- struct{}{} }()`.
+// Use a buffered exited channel so every worker can report without depending on
+// the coordinator's exact scheduling. A coordinator receives exactly count
+// tokens and closes done once. For count <= 0, return an already-closed done.
 
 package main
 

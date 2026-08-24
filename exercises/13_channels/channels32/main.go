@@ -1,7 +1,14 @@
-// Concept: a request can carry a private reply channel.
-// Task: double every request value and reply on that request's reply channel.
-// Expected behavior: each caller receives its own doubled value; done closes after requests closes.
-// Hint: range over requests in one server goroutine, send value*2 on request.reply, and defer close(done).
+// Problem: one server handles many requests, but every caller needs its own
+// response route.
+// Without this pattern: a shared result stream forces callers to coordinate
+// which response belongs to which request.
+// Channels: requests carries request data and a private reply channel; reply is
+// owned by the request sender as the destination; done is closed by the server
+// after requests closes.
+// Timeline: caller sends request+reply -> server computes -> server sends on private reply -> requests closes -> close(done)
+// Hint: range requests in one server goroutine, send value*2 on each
+// request.reply, and defer close(done). The reply channel is data routing, not a
+// global shutdown signal.
 package main
 
 import "fmt"
