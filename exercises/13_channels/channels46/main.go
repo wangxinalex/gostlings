@@ -6,10 +6,18 @@
 // as a plain blocking receive or send.
 // Channels: stop cancels; in carries data; tokens carries permits; out carries
 // forwarded data and is closed by the output owner.
-// Timeline: select in/stop -> select token/stop -> select out/stop -> repeat/close(out)
-// Hint: protect input, token, and output in separate selects. After a value,
-// select between stop and receiving a token; then select between stop and
-// `out <- value`. Defer close(out) in the owner goroutine.
+// Timeline:
+//   select on in or stop
+//   select on token or stop
+//   select on out or stop
+//   repeat or close(out)
+//
+// Hint:
+//   Protect input, token, and output in separate selects.
+//   After a value, select between stop and receiving a token.
+//   Then select between stop and `out <- value`.
+//   Defer close(out) in the owner goroutine.
+
 package main
 
 import "fmt"

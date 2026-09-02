@@ -4,10 +4,19 @@
 // receiver after the caller has abandoned the pool.
 // Channels: jobs carries work; stop is a receive-only cancellation broadcast;
 // out carries results; exited confirms every worker returned.
-// Timeline: select jobs/stop -> compute -> select out/stop -> all exited -> close(out)
-// Hint: protect both blocking operations with select. Workers acknowledge exit
-// on every return path; the coordinator receives every acknowledgement before
-// closing out. This is the worker-pool version of the two-select relay pattern.
+// Timeline:
+//   select on jobs or stop
+//   compute
+//   select on out or stop
+//   all workers exit
+//   coordinator closes out
+//
+// Hint:
+//   Protect both blocking operations with select.
+//   Workers acknowledge exit on every return path.
+//   The coordinator receives every acknowledgement before closing out.
+//   This is the worker-pool version of the two-select relay pattern.
+
 package main
 
 import "fmt"

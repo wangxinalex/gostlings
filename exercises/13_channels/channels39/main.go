@@ -4,16 +4,31 @@
 // send can prevent stop from taking effect.
 // Channels: commands carries control state changes; jobs carries data; stop is
 // cancellation; out is service-owned and closed by this goroutine.
-// Timeline: active select commands/jobs/stop -> pause disables jobs -> resume restores jobs -> stop -> close(out)
-// Hint: model the service as two states. Initially it is active:
+// Timeline:
+//   active select: commands, jobs, or stop
+//   pause disables jobs
+//   resume restores jobs
+//   stop ends the service
+//   service closes out
 //
-//	select among stop, commands, and jobs; apply commands and forward jobs.
-//	When pause is received, set paused=true and stop receiving jobs. While paused,
-//	select only stop and commands; resume sets paused=false. Do not use a default case,
-//	or the loop will busy-spin and may stop observing commands fairly.
-//	When forwarding a job, use a second select between out <- job and <-stop because
-//	the downstream send is another blocking point. A closed commands or jobs channel
-//	ends the service; this goroutine is the only owner that closes out.
+// Hint:
+//   Model the service as two states.
+//   Initially it is active:
+//
+//       select among stop, commands, and jobs
+//       apply commands and forward jobs
+//
+//   When pause is received, set paused=true and stop receiving jobs.
+//   While paused, select only stop and commands.
+//   Resume sets paused=false.
+//   Do not use a default case, or the loop will busy-spin and may stop
+//   observing commands fairly.
+//
+//   When forwarding a job, use a second select between out <- job and <-stop.
+//   The downstream send is another blocking point.
+//   A closed commands or jobs channel ends the service.
+//   This goroutine is the only owner that closes out.
+
 package main
 
 import "fmt"

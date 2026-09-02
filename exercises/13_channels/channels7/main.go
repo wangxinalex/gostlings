@@ -1,12 +1,19 @@
 // Problem: a generator should prevent callers from accidentally sending to or
 // closing the producer's output.
+//
 // Without this pattern: a bidirectional return type exposes operations that do
 // not belong to the caller and can cause a panic or protocol violation.
-// Channels: the producer uses bidirectional out internally; the caller receives
+//
+// Channels: the producer uses bidirectional out internally. The caller receives
 // through the returned <-chan int. The producer owns close(out).
-// Timeline: producer sends -> caller receives -> producer closes -> range ends
-// Hint: make a bidirectional channel inside generate, start the producer with
-// defer close(out), and return the same channel as <-chan int.
+//
+// Timeline:
+//   producer sends -> caller receives
+//   producer closes -> caller's range ends
+//
+// Hint:
+//   Make a bidirectional channel inside generate, start the producer with
+//   defer close(out), and return the same channel as <-chan int.
 
 package main
 

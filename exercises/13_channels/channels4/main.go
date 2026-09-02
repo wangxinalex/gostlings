@@ -1,10 +1,16 @@
 // Problem: receiving an int from a closed channel also produces the zero value.
+//
 // Without this pattern: value == 0 cannot tell real data from a closed stream.
-// Channels: ch is a receive-only data channel; ok reports whether a value was
+//
+// Channels: ch is a receive-only data channel. ok reports whether a value was
 // received before closure.
-// Timeline: close(ch) -> receive value=0, ok=false
-// Hint: use the comma-ok receive form. ok is false only when ch is closed and
-// drained; do not infer channel state from the value alone.
+//
+// Timeline:
+//   close(ch) -> receive value=0, ok=false
+//
+// Hint:
+//   Use the comma-ok receive form. ok is false only when ch is closed and
+//   drained; do not infer channel state from the value alone.
 
 package main
 

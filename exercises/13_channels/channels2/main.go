@@ -1,9 +1,18 @@
 // Problem: a producer wants to publish two values before the consumer reads.
+//
 // Without this pattern: an unbuffered send waits immediately for a receiver.
+//
 // Channels: ch carries data; its buffer is the temporary handoff capacity.
-// Timeline: send 1 -> buffer; send 2 -> buffer; receive 1; receive 2
-// Hint: give ch capacity for exactly two values. A buffer delays blocking; it
-// does not make sends unlimited or remove the need for a receiver (Go Tour: Concurrency 3).
+//
+// Timeline:
+//   send 1 -> buffer
+//   send 2 -> buffer
+//   receive 1 -> receive 2
+//
+// Hint:
+//   Give ch capacity for exactly two values. A buffer delays blocking; it does
+//   not make sends unlimited or remove the need for a receiver
+//   (Go Tour: Concurrency 3).
 
 package main
 

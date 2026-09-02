@@ -3,10 +3,17 @@
 // Without this pattern: the producer blocks forever on the next output send.
 // Channels: stop is a receive-only cancellation request; out carries values and
 // is closed by the producer on normal completion or cancellation.
-// Timeline: produce value -> select out/stop -> repeat -> close(out)
-// Hint: create out and defer close(out) in one goroutine. For every value, select
-// between `out <- value` and `<-stop`; never leave a producer blocked on an
-// abandoned output send.
+// Timeline:
+//   produce a value
+//   select on out or stop
+//   repeat
+//   close(out)
+//
+// Hint:
+//   Create out and defer close(out) in one goroutine.
+//   For every value, select between `out <- value` and `<-stop`.
+//   Never leave a producer blocked on an abandoned output send.
+
 package main
 
 import "fmt"

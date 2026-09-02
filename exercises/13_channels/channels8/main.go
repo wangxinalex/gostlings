@@ -1,11 +1,18 @@
 // Problem: one input may be ready while another input is silent forever.
+//
 // Without this pattern: receiving from the silent input first can block even
 // though useful data is already available elsewhere.
-// Channels: fast and slow are receive-only data inputs; no channel is closed by
+//
+// Channels: fast and slow are receive-only data inputs. No channel is closed by
 // this function.
-// Timeline: select waits on fast and slow -> first ready receive wins
-// Hint: put one receive case per input in select. If several cases are ready,
-// select chooses among them without giving source order priority.
+//
+// Timeline:
+//   select waits on fast and slow
+//   first ready receive wins
+//
+// Hint:
+//   Put one receive case per input in select. If several cases are ready,
+//   select chooses among them without giving source order priority.
 
 package main
 

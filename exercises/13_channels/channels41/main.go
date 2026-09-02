@@ -5,10 +5,18 @@
 // its zero value, starving the other input or spinning forever.
 // Channels: first and second carry data; assigning a local input to nil removes
 // that case from select. No function here owns either input.
-// Timeline: receive until ok=false -> set that input to nil -> drain other input -> return
-// Hint: loop while first != nil || second != nil. Use comma-ok in each receive
-// case; when !ok, set only that local input variable to nil. Append only values
-// received with ok=true.
+// Timeline:
+//   receive until ok=false
+//   set that input to nil
+//   drain the other input
+//   return
+//
+// Hint:
+//   Loop while first != nil || second != nil.
+//   Use comma-ok in each receive case.
+//   When !ok, set only that local input variable to nil.
+//   Append only values received with ok=true.
+
 package main
 
 import "fmt"

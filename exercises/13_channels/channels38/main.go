@@ -3,9 +3,18 @@
 // requires knowing the observer count in advance.
 // Channels: done carries no data and is closed by the operation owner; each
 // returned output carries one observer-specific message and is closed by watch.
-// Timeline: close(done) -> every watcher receives -> each watcher sends "done" -> closes its output
-// Hint: wait for `<-done` in a goroutine, send one string on a capacity-one output,
-// then close that output. A closed done channel can be received by every watcher.
+// Timeline:
+//   operation owner closes done
+//   every watcher receives from done
+//   each watcher sends "done"
+//   each watcher closes its output
+//
+// Hint:
+//   Wait for `<-done` in a goroutine.
+//   Send one string on a capacity-one output.
+//   Close that output.
+//   A closed done channel can be received by every watcher.
+
 package main
 
 import "fmt"

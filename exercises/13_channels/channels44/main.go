@@ -4,11 +4,23 @@
 // the caller has stopped waiting.
 // Channels: tokens carries permits; stop requests cancellation; results carries
 // indexed data; exited/done join every started worker before return.
-// Timeline: select token/stop -> work -> release token -> select result/stop -> join -> return
-// Hint: select between `<-stop` and `<-tokens`; skip the job if stop wins. Run
-// work, return the token before publishing, then select between stop and the
-// result send. A coordinator waits for every started goroutine and closes results
-// before the collector finishes. Return false only after joining cancellation.
+// Timeline:
+//   select on token or stop
+//   perform work
+//   release the token
+//   select on result or stop
+//   join workers
+//   return
+//
+// Hint:
+//   Select between `<-stop` and `<-tokens`.
+//   Skip the job if stop wins.
+//   Run work and return the token before publishing.
+//   Select between stop and the result send.
+//   A coordinator waits for every started goroutine.
+//   The coordinator closes results before the collector finishes.
+//   Return false only after joining cancellation.
+
 package main
 
 import "fmt"

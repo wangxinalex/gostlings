@@ -5,15 +5,28 @@
 // Channels: jobs carries requests; each request.reply is a private destination;
 // stop cancels; results carries shared responses; exited joins workers; done is
 // the final completion signal. Workers close none of the shared channels.
-// Timeline: receive job/stop -> reply and publish result -> worker exits -> coordinator closes results -> close(done)
-// Hint: follow the lifecycle in this order:
+// Timeline:
+//   receive job or stop
+//   send the private reply and publish the result
+//   worker exits
+//   coordinator closes results
+//   coordinator closes done
 //
-//	workers select on stop before receiving a job; a closed jobs channel ends a worker normally.
-//	For an accepted request, compute one response and attempt one reply send with a stop case.
-//	If cancellation has not won, publish the same response to results with another stop case.
-//	Each worker sends one exit acknowledgement on every return path.
-//	A coordinator receives one acknowledgement per worker, closes results, then closes done.
-//	Workers never close shared channels; done cannot close until every worker has joined.
+// Hint:
+//   Follow the lifecycle in this order:
+//
+//       workers select on stop before receiving a job
+//       a closed jobs channel ends a worker normally
+//       accepted requests produce one response
+//       the response is sent to the private reply channel with a stop case
+//       the same response is published to results with another stop case
+//       each worker sends one exit acknowledgement on every return path
+//       the coordinator receives one acknowledgement per worker
+//       the coordinator closes results, then closes done
+//
+//   Workers never close shared channels.
+//   done cannot close until every worker has joined.
+
 package main
 
 import "fmt"
