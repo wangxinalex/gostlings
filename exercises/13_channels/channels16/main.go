@@ -1,11 +1,19 @@
 // Problem: a producer may keep generating after the consumer has abandoned its
 // output, leaving the producer blocked on the next send.
+//
 // Without this pattern: closing stop does not interrupt a plain `out <- value`.
-// Channels: stop is a receive-only cancellation signal; out carries values and
+//
+// Channels: stop is a receive-only cancellation signal. out carries values and
 // is closed by the producer when it exits.
-// Timeline: produce -> select send or stop -> close(out) on normal finish/cancel
-// Hint: put every output send in a select with `<-stop`. Defer close(out) inside
-// the producer goroutine so both cancellation and normal completion close it.
+//
+// Timeline:
+//   produce value
+//   select: send value or receive stop
+//   close(out) on normal finish or cancellation
+//
+// Hint:
+//   Put every output send in a select with `<-stop`. Defer close(out) inside the
+//   producer goroutine so both cancellation and normal completion close it.
 
 package main
 

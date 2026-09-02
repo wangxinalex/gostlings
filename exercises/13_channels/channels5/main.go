@@ -1,10 +1,16 @@
 // Problem: a channel may be closed while buffered data is still waiting.
-// Without this pattern: stopping on close or on value==0 can lose data or reject
-// a legitimate zero value.
-// Channels: ch is a receive-only data stream; the sender already closed it.
-// Timeline: buffered values -> close(ch) -> receive all values -> ok=false
-// Hint: receive with comma-ok in a loop. Append while ok is true, and return
-// only after the receive reports that ch is closed and drained.
+//
+// Without this pattern: stopping on close or on value == 0 can lose data or
+// reject a legitimate zero value.
+//
+// Channels: ch is a receive-only data stream. The sender already closed it.
+//
+// Timeline:
+//   buffered values -> close(ch) -> receive all values -> ok=false
+//
+// Hint:
+//   Receive with comma-ok in a loop. Append while ok is true, and return only
+//   after the receive reports that ch is closed and drained.
 
 package main
 

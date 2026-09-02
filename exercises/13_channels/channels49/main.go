@@ -5,13 +5,25 @@
 // Channels: caller stop and internal cancel are separate requests; jobs carries
 // work; failure carries the first error; results carries successful values; exited
 // joins workers. Only the coordinator closes internal cancel.
-// Timeline: job error -> failure -> close(internal cancel) -> producer/workers exit -> join -> return
-// Hint: keep caller stop and internal cancel separate. The producer selects on
-// both before each job send and closes jobs when it stops. Workers select on both
-// before receiving, publishing success, and reporting errors. Send the first
-// non-nil job.err through a capacity-one failure channel; the coordinator records
-// it, closes internal cancel once, drains every worker acknowledgement, and only
-// then returns. Stop admitting later jobs after cancellation.
+// Timeline:
+//   job reports an error
+//   failure carries the error
+//   coordinator closes internal cancel
+//   producer and workers exit
+//   coordinator joins workers
+//   function returns
+//
+// Hint:
+//   Keep caller stop and internal cancel separate.
+//   The producer selects on both before each job send.
+//   The producer closes jobs when it stops.
+//   Workers select on both before receiving, publishing success, and reporting
+//   errors.
+//   Send the first non-nil job.err through a capacity-one failure channel.
+//   The coordinator records it and closes internal cancel once.
+//   Drain every worker acknowledgement before returning.
+//   Stop admitting later jobs after cancellation.
+
 package main
 
 import "fmt"

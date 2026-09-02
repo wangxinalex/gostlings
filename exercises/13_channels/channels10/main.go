@@ -1,11 +1,19 @@
 // Problem: a producer wants to publish opportunistically without waiting for a
 // receiver or free buffer space.
+//
 // Without this pattern: a send can block the producer indefinitely.
-// Channels: ch is a send-only data channel; default means this attempt will not
+//
+// Channels: ch is a send-only data channel. default means this attempt will not
 // be queued when the send is not ready.
-// Timeline: try send -> ready: value enters ch; not ready: default -> return false
-// Hint: select between `ch <- value` and default. Return true only from the send
-// case and false from default.
+//
+// Timeline:
+//   try send
+//   ready -> value enters ch
+//   not ready -> default -> return false
+//
+// Hint:
+//   Select between `ch <- value` and default. Return true only from the send
+//   case and false from default.
 
 package main
 

@@ -1,12 +1,20 @@
 // Problem: a relay can block while waiting for input and again while delivering
 // a value to a slow downstream consumer.
+//
 // Without this pattern: protecting only one side leaves a goroutine leaked on
 // the other blocked operation.
-// Channels: in carries data and is caller-owned; stop is a receive-only cancel
-// signal; out carries data and is producer-owned and closed by the relay.
-// Timeline: receive in or stop -> send out or stop -> repeat -> close(out)
-// Hint: use one select for the receive and a second select for the send. Check
-// comma-ok on in so normal input closure also ends the relay.
+//
+// Channels: in carries data and is caller-owned. stop is a receive-only cancel
+// signal. out carries data and is producer-owned and closed by the relay.
+//
+// Timeline:
+//   select: receive in or stop
+//   select: send out or stop
+//   repeat, or close(out)
+//
+// Hint:
+//   Use one select for the receive and a second select for the send. Check
+//   comma-ok on in so normal input closure also ends the relay.
 
 package main
 

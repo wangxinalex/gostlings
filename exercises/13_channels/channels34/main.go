@@ -4,10 +4,20 @@
 // the caller cannot distinguish “no capacity” from slow work.
 // Channels: jobs and results are internal; workers own job receives, and one
 // coordinator owns result closure. The zero-worker policy is an API decision.
-// Timeline: workers < 1 -> return empty result; otherwise produce -> workers -> close results
-// Hint: handle workers < 1 before starting the jobs producer. For positive
-// workers, reuse the pool protocol: close jobs after production, acknowledge
-// every worker exit, close results once, and collect results to completion.
+// Timeline:
+//   workers < 1 -> return an empty result
+//   otherwise produce jobs
+//   workers process jobs
+//   coordinator closes results
+//
+// Hint:
+//   Handle workers < 1 before starting the jobs producer.
+//   For positive workers, reuse the pool protocol:
+//   close jobs after production.
+//   Acknowledge every worker exit.
+//   Close results once.
+//   Collect results to completion.
+
 package main
 
 import "fmt"

@@ -1,14 +1,21 @@
 // Problem: several independent producers need to look like one stream to a
 // downstream consumer.
+//
 // Without this pattern: the consumer must know every input and cannot range one
 // output until all producers finish.
-// Channels: each input is receive-only and producer-owned; out is created and
-// closed by merge; exited carries one acknowledgement per forwarder.
-// Timeline: inputs -> one forwarder each -> shared out -> coordinator closes out after all exit tokens
-// Hint: start one forwarder goroutine per input. It ranges its input and sends
-// values to out, then sends one buffered acknowledgement. A separate coordinator
-// receives len(inputs) acknowledgements and is the only goroutine that closes out.
-// With no inputs, return an already-closed output.
+//
+// Channels: each input is receive-only and producer-owned. out is created and
+// closed by merge. exited carries one acknowledgement per forwarder.
+//
+// Timeline:
+//   inputs -> one forwarder each -> shared out
+//   all forwarders exit -> coordinator closes out
+//
+// Hint:
+//   Start one forwarder goroutine per input. It ranges its input and sends values
+//   to out, then sends one buffered acknowledgement. A separate coordinator
+//   receives len(inputs) acknowledgements and is the only goroutine that closes
+//   out. With no inputs, return an already-closed output.
 
 package main
 

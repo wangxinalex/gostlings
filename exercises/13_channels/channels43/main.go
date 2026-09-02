@@ -5,10 +5,19 @@
 // Channels: tokens carries capacity permits, not business data; each worker
 // receives one token before work and sends it back afterward. Indexed results
 // restore input order.
-// Timeline: acquire token -> work -> release token -> store indexed result
-// Hint: prefill a buffered tokens channel with limit empty structs. Receive one
-// token before work and return it afterward. Carry each job's index with its
-// result and store results by index.
+// Timeline:
+//   acquire a token
+//   perform work
+//   release the token
+//   store the indexed result
+//
+// Hint:
+//   Prefill a buffered tokens channel with limit empty structs.
+//   Receive one token before work.
+//   Return the token afterward.
+//   Carry each job's index with its result.
+//   Store results by index.
+
 package main
 
 import "fmt"

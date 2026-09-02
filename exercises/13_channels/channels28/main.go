@@ -1,16 +1,25 @@
 // Problem: one failed job should stop admitting new work, but other workers may
 // still be receiving or processing jobs.
-// Without this pattern: continuing after failure wastes work; returning
+//
+// Without this pattern: continuing after failure wastes work. Returning
 // immediately can leak workers and race with later sends.
-// Channels: jobs carries work; failure is a capacity-one first-error signal;
-// stop broadcasts cancellation; exited joins workers. The coordinator owns the
+//
+// Channels: jobs carries work. failure is a capacity-one first-error signal.
+// stop broadcasts cancellation. exited joins workers. The coordinator owns the
 // one close(stop) and returns only after every worker exits.
-// Timeline: worker observes error -> failure -> coordinator closes stop -> producer/workers exit -> join -> return error
-// Hint: keep production, failure reporting, and joining separate. The producer
-// stops sending when stop closes and closes jobs. A worker reports the first
-// error and exits; successful workers select on jobs or stop. The coordinator
-// captures the first failure, closes stop once, drains every exit acknowledgement,
-// and returns the error only after cleanup.
+//
+// Timeline:
+//   worker observes error -> failure
+//   coordinator closes stop
+//   producer and workers exit -> join
+//   return error
+//
+// Hint:
+//   Keep production, failure reporting, and joining separate. The producer stops
+//   sending when stop closes and closes jobs. A worker reports the first error
+//   and exits; successful workers select on jobs or stop. The coordinator captures
+//   the first failure, closes stop once, drains every exit acknowledgement, and
+//   returns the error only after cleanup.
 
 package main
 

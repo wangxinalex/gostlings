@@ -1,11 +1,19 @@
 // Problem: a caller cannot wait forever for a result from an unhealthy or slow
 // operation.
+//
 // Without this pattern: a silent result channel blocks the caller indefinitely.
-// Channels: ch carries the result; time.After(100*time.Millisecond) provides a
-// deadline signal; this function owns neither channel.
-// Timeline: wait for result and deadline -> result wins early, or deadline wins at 100ms
-// Hint: use exactly 100 milliseconds in a select with the result receive and
-// `<-time.After(...)`. This is a maximum wait, not a mandatory 100ms sleep.
+//
+// Channels: ch carries the result. time.After(100*time.Millisecond) provides a
+// deadline signal. This function owns neither channel.
+//
+// Timeline:
+//   wait for result and deadline
+//   result ready -> return early
+//   deadline ready at 100ms -> return timeout
+//
+// Hint:
+//   Use exactly 100 milliseconds in a select with the result receive and
+//   `<-time.After(...)`. This is a maximum wait, not a mandatory 100ms sleep.
 
 package main
 

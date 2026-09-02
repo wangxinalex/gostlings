@@ -4,10 +4,21 @@
 // the rest of the pipeline has stopped.
 // Channels: in is receive-only upstream data; stop is cancellation; out is
 // producer-owned output and is closed by the relay.
-// Timeline: receive in/stop -> check ok -> send out/stop -> repeat -> close(out)
-// Hint: defer close(out). Select between stop and receiving in, check comma-ok,
-// then select between stop and sending the received value to out. This repeats
-// the two-sided cancellation protocol from the earlier relay exercises.
+// Timeline:
+//   receive in or stop
+//   check comma-ok
+//   send out or stop
+//   repeat
+//   close(out)
+//
+// Hint:
+//   Defer close(out).
+//   Select between stop and receiving in.
+//   Check comma-ok.
+//   Select between stop and sending the value to out.
+//   This repeats the two-sided cancellation protocol from the earlier
+//   relay exercises.
+
 package main
 
 import "fmt"

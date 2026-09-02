@@ -1,13 +1,22 @@
 // Problem: a worker pool can be blocked waiting for new jobs or blocked handing a
 // result to a downstream consumer when cancellation arrives.
+//
 // Without this pattern: stopping the pool leaves workers alive and prevents the
 // shared output from ever closing.
-// Channels: jobs is receive-only input; stop requests cancellation; out carries
-// results and is closed by the coordinator; exited confirms worker termination.
-// Timeline: select jobs/stop -> compute -> select out/stop -> all exited -> close(out)
-// Hint: use a stop case around the jobs receive and another around every result
-// send. Each worker reports one exit acknowledgement, including cancellation;
-// the coordinator waits for all acknowledgements before closing out.
+//
+// Channels: jobs is receive-only input. stop requests cancellation. out carries
+// results and is closed by the coordinator. exited confirms worker termination.
+//
+// Timeline:
+//   select: jobs or stop
+//   compute
+//   select: out or stop
+//   all workers exit -> close(out)
+//
+// Hint:
+//   Use a stop case around the jobs receive and another around every result send.
+//   Each worker reports one exit acknowledgement, including cancellation. The
+//   coordinator waits for all acknowledgements before closing out.
 
 package main
 

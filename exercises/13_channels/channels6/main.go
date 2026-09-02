@@ -1,12 +1,21 @@
 // Problem: callers should consume a stream without knowing how its producer is
 // implemented or when it will finish.
+//
 // Without this pattern: the caller must coordinate the producer and may wait
 // forever because nobody closes the output.
-// Channels: out carries values; the producer owns sending and closing; callers
-// receive and range over it.
-// Timeline: create out -> producer sends values -> producer closes out -> caller's range ends
-// Hint: create out, start the producer goroutine, defer close(out) inside that
-// goroutine, and return out immediately. Empty input must close the stream too.
+//
+// Channels: out carries values. The producer owns sending and closing; callers
+// only receive and range over it.
+//
+// Timeline:
+//   create out
+//   producer sends values
+//   producer closes out
+//   caller's range ends
+//
+// Hint:
+//   Create out, start the producer goroutine, defer close(out) inside that
+//   goroutine, and return out immediately. Empty input must close the stream too.
 
 package main
 

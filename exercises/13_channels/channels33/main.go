@@ -4,10 +4,18 @@
 // close; closing out after one forwarder drops values from the others.
 // Channels: sources are receive-only inputs; out is shared data owned by the
 // collector; exited carries one acknowledgement per forwarder.
-// Timeline: sources drain independently -> each sends exited -> coordinator receives all -> close(out)
-// Hint: give each forwarder one exit acknowledgement. A coordinator receives
-// every acknowledgement and then closes out. No forwarder may close the shared
-// output.
+// Timeline:
+//   sources drain independently
+//   each forwarder sends one exit acknowledgement
+//   coordinator receives all acknowledgements
+//   coordinator closes out
+//
+// Hint:
+//   Give each forwarder one exit acknowledgement.
+//   A coordinator receives every acknowledgement.
+//   The coordinator then closes out.
+//   No forwarder may close the shared output.
+
 package main
 
 import "fmt"

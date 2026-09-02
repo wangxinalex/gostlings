@@ -1,12 +1,20 @@
 // Problem: a forwarder can be stuck before it has a value, or after it has a
 // value but no downstream receiver is ready.
+//
 // Without this pattern: cancellation may release one wait while leaving the
 // goroutine blocked on the other side.
-// Channels: in carries caller-owned data; stop requests cancellation; out is
+//
+// Channels: in carries caller-owned data. stop requests cancellation. out is
 // owned and closed by the forwarder.
-// Timeline: select receive in/stop -> select send out/stop -> repeat -> close(out)
-// Hint: use comma-ok for the input receive and two separate selects: one around
-// receiving, one around sending. Defer close(out) exactly once.
+//
+// Timeline:
+//   select: receive in or stop
+//   select: send out or stop
+//   repeat, or close(out)
+//
+// Hint:
+//   Use comma-ok for the input receive and two separate selects: one around
+//   receiving, one around sending. Defer close(out) exactly once.
 
 package main
 
