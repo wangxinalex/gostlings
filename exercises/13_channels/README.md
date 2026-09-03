@@ -12,7 +12,7 @@ Who closes the channel?
 What event lets every goroutine stop?
 ```
 
-Read the exercises from `channels1` through `channels50`. Later exercises reuse
+Read the exercises from `channels1` through `channels30`. Later exercises reuse
 earlier protocols and add one constraint at a time. If an exercise feels
 arbitrary, first identify the production failure it prevents; the pattern is
 there to solve that failure.
@@ -128,15 +128,15 @@ The coordinator waits for one exit acknowledgement per sender and closes `out`
 exactly once. Exercises 23–24 add cancellation to the receive and send sides;
 exercise 25 isolates empty, closed, buffered, and nil-input lifecycle edges.
 
-### Stage 5: Worker pools and constraints — exercises 26–40
+### Stage 5: Worker pools and constraints — exercises 26–30
 
 Build a pool from the pieces already learned: a jobs producer, shared jobs
 channel, workers, results channel, and one results closer. Then add one real
 constraint at a time:
 
 ```text
-basic pool -> input order -> channel direction -> bounded queue
-            -> first result -> request/reply -> error cancellation
+basic pool -> ordered results -> error cancellation -> directional handles
+            -> bounded queue
 ```
 
 The pool exists to bound concurrency and reuse workers. A bounded jobs channel
@@ -144,14 +144,6 @@ adds backpressure: the producer must slow down when workers cannot keep up.
 Indexed results restore input order because parallel completion order is not
 input order. Error cancellation stops new work but still requires every worker
 to exit before the function returns.
-
-### Stage 6: Advanced edges and capstones — exercises 41–50
-
-Nil-channel switching, token channels, rate limiting, and service shutdown are
-useful but less frequent than ownership, cancellation, joining, fan-in, and
-worker pools. Each is introduced once with its motivating problem and then used
-only in a final composition. Do not memorize these as isolated tricks; connect
-each one to the blocking operation or resource limit it controls.
 
 ## Exercise map
 
@@ -167,11 +159,11 @@ each one to the blocking operation or resource limit it controls.
 | 18–20 | How do workers broadcast stop and prove that cleanup finished? |
 | 21 | How are jobs shared by a group of workers? |
 | 22–25 | How are input streams merged and safely closed? |
-| 26–30 | How is a basic pool built and bounded? |
-| 31–38 | How do first-result, reply, error, and cancellation protocols compose? |
-| 39–40 | How do control messages coexist with work and cancellation? |
-| 41–46 | How do less common channel techniques control readiness and capacity? |
-| 47–50 | How is a complete bounded service shut down without leaks? |
+| 26 | How is a basic worker pool built? |
+| 27 | How are parallel results returned in input order? |
+| 28 | How does error cancellation stop new work and join every worker? |
+| 29 | How do directional channel handles express ownership? |
+| 30 | How does a bounded queue apply backpressure? |
 
 ## A repeatable implementation checklist
 
