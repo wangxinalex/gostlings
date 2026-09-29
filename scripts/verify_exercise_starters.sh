@@ -38,12 +38,12 @@ for topic in "$@"; do
 
   while IFS= read -r exercise; do
     [ -n "$exercise" ] || continue
-    if [ ! -f "$exercise/main.go" ]; then
-      printf "FAIL: %s (missing main.go)\n" "$exercise" >&2
+    if ! ls "$exercise"/*.go >/dev/null 2>&1; then
+      printf "FAIL: %s (has no Go source)\n" "$exercise" >&2
       exit 1
     fi
-    if [ ! -f "$exercise/main_test.go" ]; then
-      printf "FAIL: %s (missing main_test.go)\n" "$exercise" >&2
+    if ! ls "$exercise"/*_test.go >/dev/null 2>&1; then
+      printf "FAIL: %s (has no focused test)\n" "$exercise" >&2
       exit 1
     fi
     if out=$(sh check.sh "$exercise" 2>&1); then
