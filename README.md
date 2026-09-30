@@ -48,6 +48,8 @@ tests instead of relying only on stdout. Topics 25–26 are applied additions
 `05_slices`. Topics 27–33 are standard-library additions (strings, formatting,
 flags, sorting, regexp, subprocesses, and templating) that can be done any
 time after the Core topics; each chapter README notes its prerequisites.
+Topic `34_taskqueue` is the capstone: the only exercise that asks for a
+multi-file program instead of a function, best done last.
 
 | Level | What it verifies |
 |---|---|
@@ -96,6 +98,7 @@ and `27_strings`–`33_template`) → Intermediate
 | 31_regexp | 3 | [regexp progression](exercises/31_regexp/README.md) |
 | 32_os_exec | 2 | [os/exec progression](exercises/32_os_exec/README.md) |
 | 33_template | 2 | [text/template progression](exercises/33_template/README.md) |
+| 34_taskqueue | 1 | [Multi-file capstone](exercises/34_taskqueue/README.md) |
 
 ## Checking your work
 
