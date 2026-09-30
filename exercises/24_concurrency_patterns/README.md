@@ -1,7 +1,7 @@
 # Concurrency patterns: integrated concurrency problem set
 
 After finishing the goroutine, channel, context, sync, and time chapters,
-practice 1–18 in order. Every exercise here combines at least two learned
+practice 1–20 in order. Every exercise here combines at least two learned
 primitives and adds one new lifecycle or failure strategy; do not jump back
 to this chapter to repeat basic channel-closing exercises.
 
@@ -13,6 +13,7 @@ to this chapter to repeat basic channel-closing exercises.
 | 10–12 | Fan-in coordinator, ordered results, cancellable retry/backoff |
 | 13–15 | Context-aware Once, atomic metrics, bounded load shedding |
 | 16–18 | Buffered cancellation, deadline shutdown, request/reply capstone |
+| 19–20 | Nil-channel retirement of a closed input, internally bounded concurrency with ordered results |
 
 The shared checking order is: stop receiving or delivering → let blocking
 operations exit → join workers → let the single coordinator close the output.
