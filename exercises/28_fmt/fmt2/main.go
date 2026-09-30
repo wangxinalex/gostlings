@@ -1,7 +1,9 @@
 // Concept: width and precision with fmt
 // Task: complete padName and formatPrice
 // Expected output: [Ada       ] $3.50
-// Hint: fmt.Sprintf("%-10s", name) left-aligns to width 10; fmt.Sprintf("%.2f", price) (Go doc: fmt)
+// Hint: one verb pads to a fixed width, left-aligned so the spaces follow the
+//       name, and the other fixes the number of decimals (Go doc: fmt)
+// Stuck?: %-10s for the padded name and %.2f for the price.
 
 package main
 

@@ -1,7 +1,9 @@
 // Concept: sync.Mutex protects shared data from concurrent access
 // Task: add a mutex to protect the counter so the total always equals 1000 (equal increments per goroutine)
 // Expected output: total: 1000
-// Hint: Lock before reading-modifying-writing, Unlock after; defer m.Unlock() is the common pattern (Go doc: sync)
+// Hint: hold the lock across the whole read-modify-write, not just one step, and
+//       release it on every path (Go doc: sync)
+// Stuck?: lock the mutex before touching the counter and defer its Unlock.
 
 package main
 

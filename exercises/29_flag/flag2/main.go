@@ -1,7 +1,9 @@
 // Concept: flags mixed with positional arguments
 // Task: complete parseCommand so it reads -port and returns the leftover positional args in order
 // Expected behavior: parseCommand returns the port and the positional args
-// Hint: after fs.Parse, fs.Args() returns the non-flag arguments (Go doc: flag)
+// Hint: after parsing, the flag set still holds the arguments that were not
+//       flags (Go doc: flag)
+// Stuck?: the flag set's Args method returns the positionals in order.
 
 package main
 

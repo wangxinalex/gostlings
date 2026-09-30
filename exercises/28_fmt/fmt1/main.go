@@ -3,7 +3,9 @@
 // Expected output: {Ada 36}
 // {Name:Ada Age:36}
 // main.Person{Name:"Ada", Age:36}
-// Hint: fmt.Sprintf("%v", p) prints values; "%+v" adds field names; "%#v" adds the type (Go doc: fmt)
+// Hint: the same value has three levels of detail: plain values, values with
+//       field names, and a Go-syntax literal that includes the type (Go doc: fmt)
+// Stuck?: the %v verb with the + and # modifiers, in that order.
 
 package main
 

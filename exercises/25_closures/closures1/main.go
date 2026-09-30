@@ -3,8 +3,9 @@
 //       increments it, and returns the new value
 // Expected output: 3
 // 2
-// Hint: return func() int { ... }; the counter variable lives in the closure's
-//       captured scope, and each newCounter call gets its own copy
+// Hint: the returned function closes over a variable declared by the enclosing
+//       call, so that variable outlives the call; every new instance gets its own
+//       variable
 //       (builds on Go Tour: Basics 4-7; closures are not covered in the Tour)
 
 package main

@@ -1,7 +1,10 @@
 // Concept: building a string efficiently with strings.Builder
 // Task: complete joinWords so it joins the words with a single space
 // Expected output: hello gostlings
-// Hint: var b strings.Builder; use b.WriteString and b.WriteByte(' ') (Go doc: strings)
+// Hint: repeated concatenation copies the whole string every time; the strings
+//       package offers a builder that appends without that cost (Go doc: strings)
+// Stuck?: strings.Builder's WriteString and WriteByte; append the separating
+//       space yourself.
 
 package main
 

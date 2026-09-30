@@ -1,6 +1,8 @@
 // Concept: pass the caller's context through helper layers.
 // Task: call source with the exact same context; do not replace it with Background.
-// Hint: this helper is intentionally small: return source(ctx).
+// Hint: the helper adds no behavior of its own, so hand the caller's context
+//       straight through instead of deriving a new one
+
 package main
 
 import "context"

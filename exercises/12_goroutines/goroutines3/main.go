@@ -1,9 +1,12 @@
 // Concept: passing values into goroutines
 // Task: pass each label as an explicit goroutine argument
 // Expected behavior: every label is returned, and empty input returns an empty slice.
-// Hint: use go func(index int, label string) { ... }(index, labels[index]) so the worker receives a value;
-// read that parameter inside the body instead of capturing the outer loop variable.
-// Explicit parameters work consistently before and after Go 1.22's range-variable change.
+// Hint: pass the loop values into the goroutine as parameters and read them from
+//       the parameters inside the body instead of capturing the outer variables.
+// Stuck?: a function literal can declare parameters and be called right away, so
+//       each launch gets its own copy of the values.
+// Note: explicit parameters work consistently before and after Go 1.22's
+//       range-variable change.
 
 package main
 
