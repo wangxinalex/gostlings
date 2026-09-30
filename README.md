@@ -67,25 +67,25 @@ and `27_strings`–`33_template`) → Intermediate
 | 00_intro | 2 | Basics 1 |
 | 01_variables | 4 | Basics 8-12 |
 | 02_functions | 6 | Basics 4-7 |
-| 03_control_flow | 5 | Flowcontrol 1-13 |
+| 03_control_flow | 7 | Flowcontrol 1-13 |
 | 04_pointers | 3 | Moretypes 1; Methods 5 |
-| 05_slices | 5 | Moretypes 7-15; [sort](https://pkg.go.dev/sort) |
+| 05_slices | 7 | Moretypes 7-15; [sort](https://pkg.go.dev/sort) |
 | 06_maps | 3 | Moretypes 19-22 |
 | 07_structs | 3 | Moretypes 2-5 |
 | 08_methods | 3 | Methods 1-6 |
-| 09_interfaces | 5 | Methods 9-17 |
+| 09_interfaces | 7 | Methods 9-17 |
 | 10_errors | 10 | [Errors progression](exercises/10_errors/README.md) |
 | 11_generics | 6 | Generics 1-2 |
-| 12_goroutines | 10 | [Goroutines progression](exercises/12_goroutines/README.md) |
+| 12_goroutines | 12 | [Goroutines progression](exercises/12_goroutines/README.md) |
 | 13_channels | 30 | [Channel patterns guide](exercises/13_channels/README.md) |
 | 14_testing | 11 | [Testing progression](exercises/14_testing/README.md) |
-| 15_context | 14 | [Context progression](exercises/15_context/README.md) |
+| 15_context | 16 | [Context progression](exercises/15_context/README.md) |
 | 16_sync | 14 | [sync progression](exercises/16_sync/README.md) |
 | 17_panic_recover | 2 | [builtin](https://pkg.go.dev/builtin) |
 | 18_embedding | 3 | [Effective Go: Embedding](https://go.dev/doc/effective_go#embedding) |
 | 19_json | 3 | [encoding/json](https://pkg.go.dev/encoding/json) |
 | 20_io | 2 | [io](https://pkg.go.dev/io) |
-| 21_time | 8 | [time progression](exercises/21_time/README.md) |
+| 21_time | 10 | [time progression](exercises/21_time/README.md) |
 | 22_strconv | 2 | [strconv](https://pkg.go.dev/strconv) |
 | 23_http | 3 | [net/http](https://pkg.go.dev/net/http), [httptest](https://pkg.go.dev/net/http/httptest) |
 | 24_concurrency_patterns | 20 | [Concurrency patterns progression](exercises/24_concurrency_patterns/README.md) |

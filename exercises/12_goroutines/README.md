@@ -2,8 +2,9 @@
 
 This chapter is a deliberately small foundation. Each exercise launches work in
 goroutines and makes completion observable before the function returns. The
-completion primitive for all ten exercises is `sync.WaitGroup`; channels begin
-in the next chapter, where they carry values, completion, and cancellation.
+completion primitive for the first ten exercises is `sync.WaitGroup`; the last
+two combine it with partitioned work and with error reporting. Channels begin in
+the next chapter, where they carry values, completion, and cancellation.
 
 ## Progression
 
@@ -21,6 +22,8 @@ Work through the directories in order:
 | 8 | Pass immutable job input into each worker |
 | 9 | Use deferred `Done` safely across an early return |
 | 10 | Review the complete parameterized-worker lifecycle, including empty input |
+| 11 | Give every worker its own partition and partial total, then combine after the join |
+| 12 | Run independent jobs concurrently and report the first failure once every job has finished |
 
 The recurring rule is: call `Add` before `go`, call `Done` in the worker (usually
 with `defer`), and call `Wait` before returning. Do not use `Sleep` as a join.
