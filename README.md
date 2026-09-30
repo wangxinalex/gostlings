@@ -86,7 +86,7 @@ and `27_strings`–`33_template`) → Intermediate
 | 21_time | 8 | [time progression](exercises/21_time/README.md) |
 | 22_strconv | 2 | [strconv](https://pkg.go.dev/strconv) |
 | 23_http | 3 | [net/http](https://pkg.go.dev/net/http), [httptest](https://pkg.go.dev/net/http/httptest) |
-| 24_concurrency_patterns | 18 | [Concurrency patterns progression](exercises/24_concurrency_patterns/README.md) |
+| 24_concurrency_patterns | 20 | [Concurrency patterns progression](exercises/24_concurrency_patterns/README.md) |
 | 25_closures | 2 | builds on [Go Tour: Basics 4-7](https://go.dev/tour/basics/4); closures are not in the Tour |
 | 26_files | 3 | [os](https://pkg.go.dev/os), [bufio](https://pkg.go.dev/bufio) |
 | 27_strings | 4 | [strings progression](exercises/27_strings/README.md) |
