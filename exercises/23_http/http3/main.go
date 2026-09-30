@@ -1,7 +1,8 @@
 // Concept: HTTP client lifecycle and response status handling
 // Task: return a 2xx response body, return an error for non-2xx responses, and always close the body
 // Expected output: focused httptest checks pass (run `go test ./exercises/23_http/http3`)
-// Hint: defer resp.Body.Close() immediately after a successful client.Do/Get; check StatusCode before accepting the body
+// Hint: close the response body once the request succeeds, and decide on the
+//       status before reading the body; the error must name the status code
 
 package main
 

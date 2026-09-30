@@ -1,7 +1,10 @@
 // Concept: checking a pattern with regexp.MatchString
 // Task: complete isHex so it reports whether s is a two-digit hex code
 // Expected output: true false
-// Hint: regexp.MatchString(`^[0-9a-fA-F]{2}$`, s) (Go doc: regexp)
+// Hint: match the whole string rather than a substring of it, so both ends of the
+//       pattern are anchored (Go doc: regexp)
+// Stuck?: regexp.MatchString returns a bool and an error; the class covers 0-9
+//       and a-f, twice.
 
 package main
 

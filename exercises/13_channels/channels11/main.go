@@ -12,8 +12,10 @@
 //   deadline ready at 100ms -> return timeout
 //
 // Hint:
-//   Use exactly 100 milliseconds in a select with the result receive and
-//   `<-time.After(...)`. This is a maximum wait, not a mandatory 100ms sleep.
+//   Wait for the result and a deadline at the same time: add a second select
+//   case whose channel becomes ready after the configured duration. This is a
+//   maximum wait, not a mandatory 100ms sleep.
+// Stuck?: time.After produces a one-shot channel; use exactly 100 milliseconds.
 
 package main
 

@@ -1,7 +1,9 @@
 // Concept: HTTP middleware and request-scoped context values
 // Task: copy X-Request-ID into a private context key and response header before calling the next handler
 // Expected output: focused httptest checks pass (run `go test ./exercises/23_http/http2`)
-// Hint: use r.WithContext(context.WithValue(...)) and call next.ServeHTTP with the new request
+// Hint: derive a new request that carries the value, set the response header,
+//       then hand the derived request to the next handler
+// Stuck?: http.Request's WithContext plus context.WithValue, keyed by a private type.
 
 package main
 

@@ -1,7 +1,10 @@
 // Concept: cancellation propagates from a parent context to its children.
 // Task: start count children derived from ctx and close the result only after all stop.
-// Hint: each child should use context.WithCancel(ctx), defer its cancel function,
-// and wait for child.Done().
+// Hint: derive every child from the parent context, release each derived context
+//       on the way out, and wait for each child's Done channel before closing the
+//       result.
+// Stuck?: context.WithCancel returns the child plus its cancel function; defer it.
+
 package main
 
 import "context"

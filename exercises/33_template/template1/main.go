@@ -1,7 +1,9 @@
 // Concept: rendering text templates with text/template
 // Task: complete render so it fills the {{.Name}} placeholder
 // Expected output: Hello, Ada!
-// Hint: template.New("greeting").Parse(tmplText); tmpl.Execute(&buf, data) (Go doc: text/template)
+// Hint: parse the template text, execute it with the data into a buffer, and
+//       return the buffer's contents; both steps can fail (Go doc: text/template)
+// Stuck?: template.New's Parse and Execute methods; bytes.Buffer satisfies io.Writer.
 
 package main
 

@@ -1,7 +1,10 @@
 // Concept: extracting captured groups with FindStringSubmatch
 // Task: complete parseDate so it returns year, month, and day from "YYYY-MM-DD"
 // Expected output: 2026 08 13
-// Hint: re := regexp.MustCompile(`^(\d{4})-(\d{2})-(\d{2})$`); re.FindStringSubmatch(s) (Go doc: regexp)
+// Hint: capture the three parts in the pattern and read them back as a slice of
+//       submatches, where element zero is the whole match (Go doc: regexp)
+// Stuck?: regexp.MustCompile for a constant pattern; the submatch method returns
+//       the full match followed by the three groups.
 
 package main
 

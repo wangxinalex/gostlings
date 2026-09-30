@@ -1,7 +1,9 @@
 // Concept: io.Copy streams data from a Reader to a Writer
 // Task: use io.Copy to copy from the reader to the builder, then print the builder's content
 // Expected output: streamed: hello world
-// Hint: io.Copy(dst, src) copies until EOF; strings.Builder implements io.Writer (Go doc: io)
+// Hint: let the io package move the bytes until the source ends; the destination
+//       only has to satisfy the writer interface (Go doc: io)
+// Stuck?: io.Copy takes the destination first, then the source.
 
 package main
 

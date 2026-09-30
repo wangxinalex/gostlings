@@ -16,10 +16,12 @@
 //   return
 //
 // Hint:
-//   Create `stop` and a capacity-one `result`, then wrap runProducer in a
-//   goroutine with `defer close(done)`. Select on result versus
-//   `<-time.After(25*time.Millisecond)`. In both branches close stop, wait for
-//   done, and only then return. The timeout branch returns exactly "timed out".
+//   Create `stop` and a capacity-one `result`, then run the producer in a
+//   goroutine that defers closing `done`. Wait for either the result or the
+//   deadline; in both branches close stop, wait for done, and only then return.
+//   The timeout branch returns exactly "timed out".
+// Stuck?: time.After supplies the 25ms deadline case; the buffer lets a late
+//   producer publish without a receiver.
 
 package main
 
