@@ -1,6 +1,6 @@
 # Time: timers and periodic tasks
 
-Work through 1–8 in order. This chapter is dedicated to creating, stopping,
+Work through 1–10 in order. This chapter is dedicated to creating, stopping,
 draining, resetting, and setting deadlines for `time.Timer`/`time.Ticker`;
 channel token streams and integrated worker protocols remain in later
 chapters.
@@ -13,6 +13,8 @@ chapters.
 | 6 | Reusable timer ordering: Stop, drain, Reset |
 | 7 | Every exit path and done in a ticker-driven loop |
 | 8 | Combine context, ticker, deadline, and final resource release |
+| 9 | Measure elapsed work against a budget through an injected clock |
+| 10 | Retry with a timer between attempts and stop at the first success |
 
 Tests use injected gates or watchdogs, never a fixed `Sleep`, to prove that a
 goroutine has finished. Every timer/ticker created in an implementation must

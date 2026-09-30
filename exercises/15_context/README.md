@@ -1,6 +1,6 @@
 # Context: from cancellation signals to request cleanup
 
-Work through 1–14 in order; do not skip. Every exercise keeps an explicit
+Work through 1–16 in order; do not skip. Every exercise keeps an explicit
 `TODO:` seam; the focused test checks the real blocking point, context
 propagation, and cleanup rather than only a literal result.
 
@@ -13,6 +13,8 @@ propagation, and cleanup rather than only a literal result.
 | 10–12 | Worker join, pre-cancellation checks, passing the same context through a helper chain |
 | 13 | `WithCancelCause` and `context.Cause` |
 | 14 | Request-level composition of deadline, workers, result, cancellation, and final join |
+| 15 | Fan out over tasks with results in task order, first-error cancellation, and a join before returning |
+| 16 | Cleanup work that must outlive the caller's cancellation while still seeing its values |
 
 The Hints give each exercise's minimal contract: blocking operations must also
 listen on `ctx.Done()`, functions that derive a context must release it, and
