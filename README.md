@@ -64,12 +64,12 @@ and `27_strings`–`33_template`) → Intermediate
 | 10_errors | 10 | [Errors progression](exercises/10_errors/README.md) |
 | 11_generics | 3 | Generics 1-2 |
 | 12_goroutines | 10 | [Goroutines progression](exercises/12_goroutines/README.md) |
-| 13_channels | 50 | [Channel patterns guide](exercises/13_channels/README.md) |
+| 13_channels | 30 | [Channel patterns guide](exercises/13_channels/README.md) |
 | 14_testing | 11 | [Testing progression](exercises/14_testing/README.md) |
 | 15_context | 14 | [Context progression](exercises/15_context/README.md) |
 | 16_sync | 14 | [sync progression](exercises/16_sync/README.md) |
 | 17_panic_recover | 2 | [builtin](https://pkg.go.dev/builtin) |
-| 18_embedding | 2 | [Effective Go: Embedding](https://go.dev/doc/effective_go#embedding) |
+| 18_embedding | 3 | [Effective Go: Embedding](https://go.dev/doc/effective_go#embedding) |
 | 19_json | 3 | [encoding/json](https://pkg.go.dev/encoding/json) |
 | 20_io | 2 | [io](https://pkg.go.dev/io) |
 | 21_time | 8 | [time progression](exercises/21_time/README.md) |
@@ -92,11 +92,21 @@ and `27_strings`–`33_template`) → Intermediate
 sh check.sh                      # run exercises/ in order, stop at the first failure and show its output
 sh check.sh --run-all            # run every exercise and report all PASS/FAIL
 sh check.sh exercises/13_channels/channels6 # check one exercise directly
+sh scripts/verify_exercise_starters.sh exercises/* # prove every untouched starter fails
 sh scripts/verify_solutions.sh   # overlay exercise tests and verify every reference solution passes
+sh scripts/verify_curriculum.sh  # check the curriculum invariants below
 sh check.sh solutions --run-all  # compile/run every reference solution as a stdout smoke
 sh check.sh solutions --run-all --race # verify selectively listed reference solutions with the race detector
 sh check.sh solutions --run-all --race-all # audit every selected reference solution with the race detector
 ```
+
+`scripts/verify_curriculum.sh` guards invariants that running the exercises
+cannot see: the topic table in this README matches the exercise tree, every
+exercise still has a `TODO` seam and a focused test, and no CJK text appears
+anywhere outside the ignored `working-progress/` worktree. Its own test suite
+is `sh scripts/test_curriculum_guards.sh`. Both run in CI along with the starter
+audit, so a count that drifts or a solved starter committed by mistake fails the
+build instead of a review.
 
 Every exercise ships with a `main_test.go` that asserts the program's stdout
 against the header's Expected output (order-insensitively where the header says

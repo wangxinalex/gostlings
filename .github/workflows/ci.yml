@@ -51,6 +51,28 @@ jobs:
             exit 1
           fi
 
+  curriculum:
+    name: Curriculum invariants
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Verify curriculum invariants
+        run: sh scripts/verify_curriculum.sh
+
+      - name: Test the curriculum guards
+        run: sh scripts/test_curriculum_guards.sh
+
+      - name: Verify untouched starters fail
+        run: sh scripts/verify_exercise_starters.sh exercises/*
+
   solutions:
     name: Reference solutions
     runs-on: ubuntu-latest
