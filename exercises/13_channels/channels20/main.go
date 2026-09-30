@@ -15,7 +15,16 @@
 //   coordinator closes done
 //
 // Hint:
-//   Create `exited := make(chan struct{}, workers)` and `done`.
+//   Create a buffered `exited` channel with one slot per worker, plus `done`.
+//   Start each worker in a loop:
+//
+//       wait for <-stop
+//       call onShutdownWorkerExit
+//       send one exited token
+//
+//   Start a coordinator goroutine that checks whether stop is already closed
+//   before closing it, receives exactly workers tokens, and closes done once.
+//   Return done immediately; the caller performs the join with `<-done`.
 //   Start each worker in a loop:
 //
 //       wait for <-stop

@@ -28,6 +28,17 @@ Go 1.26.5+ (check with `go version`)
 5. Output matches the expected output → done. Stuck? Peek at the matching path
    under `solutions/`.
 
+### How much the hints give away
+
+Chapters `00_intro`–`11_generics` teach syntax, so their hints spell out the
+exact form to write. From `12_goroutines` onward the hints are clues instead:
+`Hint:` describes the idea and points at the package, and `Stuck?:` names the
+API, but neither hands over a copyable expression — looking up the signature and
+writing the code is part of the exercise. The channel chapter is the one
+exception by design: its hints state the ownership and closing contract, because
+that contract is what the exercise checks. `scripts/verify_curriculum.sh`
+enforces this split.
+
 ## Topic order, levels, and Go Tour mapping
 
 Topics 00–22 form the core and applied tracks. Topics 23–24 are intermediate
@@ -64,7 +75,7 @@ and `27_strings`–`33_template`) → Intermediate
 | 08_methods | 3 | Methods 1-6 |
 | 09_interfaces | 5 | Methods 9-17 |
 | 10_errors | 10 | [Errors progression](exercises/10_errors/README.md) |
-| 11_generics | 3 | Generics 1-2 |
+| 11_generics | 6 | Generics 1-2 |
 | 12_goroutines | 10 | [Goroutines progression](exercises/12_goroutines/README.md) |
 | 13_channels | 30 | [Channel patterns guide](exercises/13_channels/README.md) |
 | 14_testing | 11 | [Testing progression](exercises/14_testing/README.md) |
@@ -77,7 +88,7 @@ and `27_strings`–`33_template`) → Intermediate
 | 21_time | 8 | [time progression](exercises/21_time/README.md) |
 | 22_strconv | 2 | [strconv](https://pkg.go.dev/strconv) |
 | 23_http | 3 | [net/http](https://pkg.go.dev/net/http), [httptest](https://pkg.go.dev/net/http/httptest) |
-| 24_concurrency_patterns | 18 | [Concurrency patterns progression](exercises/24_concurrency_patterns/README.md) |
+| 24_concurrency_patterns | 20 | [Concurrency patterns progression](exercises/24_concurrency_patterns/README.md) |
 | 25_closures | 2 | builds on [Go Tour: Basics 4-7](https://go.dev/tour/basics/4); closures are not in the Tour |
 | 26_files | 3 | [os](https://pkg.go.dev/os), [bufio](https://pkg.go.dev/bufio) |
 | 27_strings | 4 | [strings progression](exercises/27_strings/README.md) |
@@ -105,11 +116,12 @@ sh check.sh solutions --run-all --race-all # audit every selected reference solu
 
 `scripts/verify_curriculum.sh` guards invariants that running the exercises
 cannot see: the topic table in this README matches the exercise tree, every
-exercise still has a `TODO` seam and a focused test, and no CJK text appears
-anywhere outside the ignored `working-progress/` worktree. Its own test suite
-is `sh scripts/test_curriculum_guards.sh`. Both run in CI along with the starter
-audit, so a count that drifts or a solved starter committed by mistake fails the
-build instead of a review.
+exercise still has a `TODO` seam and a focused test, hints past the core track do
+not hand over copyable answers, and no CJK text appears anywhere outside the
+ignored `working-progress/` worktree. Its own test suite is
+`sh scripts/test_curriculum_guards.sh`. Both run in CI along with the starter
+audit, so a count that drifts, a solved starter committed by mistake, or a hint
+that gives the answer away fails the build instead of a review.
 
 Every exercise ships with a `main_test.go` that asserts the program's stdout
 against the header's Expected output (order-insensitively where the header says

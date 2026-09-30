@@ -12,8 +12,8 @@
 //   not ready -> default -> return false
 //
 // Hint:
-//   Select between `ch <- value` and default. Return true only from the send
-//   case and false from default.
+//   Select between offering the value and the default case. Return true only
+//   from the send case and false from default.
 
 package main
 

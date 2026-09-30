@@ -1,7 +1,9 @@
 // Concept: checking substring membership with strings.Contains
 // Task: complete contains so it reports whether text contains substr
 // Expected output: true
-// Hint: strings.Contains(text, substr) returns true when substr appears anywhere in text (Go doc: strings)
+// Hint: the strings package has a predicate that answers "does text contain
+//       substr?" (Go doc: strings)
+// Stuck?: strings.Contains; check its argument order and what it returns.
 
 package main
 

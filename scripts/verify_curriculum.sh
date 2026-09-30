@@ -4,7 +4,8 @@
 #   1. the topic table in README.md matches the exercise tree
 #   2. every exercise still has a TODO seam
 #   3. every exercise ships a focused test
-#   4. no CJK text outside the untracked working-progress worktree
+#   4. hints in chapters 12+ stay clues rather than copyable answers
+#   5. no CJK text outside the untracked working-progress worktree
 #
 # Read-only and dependency-free; exits non-zero on the first batch of
 # violations it finds (it always reports all of them).
@@ -74,7 +75,52 @@ for dir in $(find exercises -mindepth 2 -maxdepth 2 -type d | sort); do
   fi
 done
 
-# --- 4. no CJK text outside working-progress --------------------------------
+# --- 4. hints stay clues, not answers ---------------------------------------
+#
+# Chapters 12 and up are past the syntax tour, so their Hint and Stuck? blocks
+# must not carry a copyable call, declaration, or template action. Naming an API
+# is allowed; handing over the expression is not. Chapters 00-11 keep explicit
+# hints on purpose, because beginners still need the exact form.
+
+hint_files=$(find exercises -mindepth 3 -maxdepth 3 -name '*.go' ! -name '*_test.go' | sort)
+hint_hits=$(awk '
+  function spoil(text) {
+    # A call that passes arguments hands over the expression, unless it is the
+    # channel protocol notation close(name) that the channel ledgers also use.
+    if (text ~ /[A-Za-z_][A-Za-z0-9_.]*\([^)]/) {
+      if (text !~ /close\(/) return "a call with arguments"
+    }
+    if (text ~ /:=/) return "a declaration or assignment"
+    if (text ~ /\{\{/) return "template syntax"
+    return ""
+  }
+  FNR == 1 {
+    count = split(FILENAME, parts, "/")
+    topic = parts[count - 2]
+    exempt = (topic ~ /^0[0-9]_/ || topic ~ /^1[01]_/)
+    inblock = 0
+  }
+  /^\/\/[[:space:]]*(Hint|Stuck\?):/ { inblock = 1 }
+  inblock && !exempt {
+    why = spoil($0)
+    if (why != "") printf "%s:%d: %s\n", FILENAME, FNR, why
+  }
+  /^\/\/[[:space:]]*[A-Z][A-Za-z ]*:/ {
+    if ($0 !~ /^\/\/[[:space:]]*(Hint|Stuck\?):/) inblock = 0
+  }
+  !/^\/\// { inblock = 0 }
+' $hint_files)
+if [ -n "$hint_hits" ]; then
+  old_ifs=$IFS
+  IFS='
+'
+  for hit in $hint_hits; do
+    report "hint gives away the answer: $hit"
+  done
+  IFS=$old_ifs
+fi
+
+# --- 5. no CJK text outside working-progress --------------------------------
 #
 # working-progress is git-ignored, so listing tracked plus untracked but
 # non-ignored files exempts it without naming it. [\344-\351] matches the

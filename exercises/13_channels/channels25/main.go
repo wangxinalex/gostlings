@@ -15,7 +15,7 @@
 // Hint:
 //   Handle no inputs explicitly. Start one forwarder per supplied input and range
 //   it so buffered values drain and already-closed inputs exit immediately. Size
-//   exited to len(inputs); the coordinator receives every acknowledgement before
+//   exited one slot per input; the coordinator receives every acknowledgement before
 //   closing out. Do not let a forwarder close the shared output.
 
 package main

@@ -1,6 +1,9 @@
 // Concept: context cancellation must unblock a blocked channel send.
 // Task: send value or return ctx.Err when no receiver is ready and the request is canceled.
-// Hint: select between out <- value and ctx.Done(); do not send without a cancellation case.
+// Hint: offer the value on one select case and the cancellation signal on the
+//       other; never send without a cancellation case.
+// Stuck?: select between the send and ctx.Done; return ctx.Err when canceled.
+
 package main
 
 import "context"
