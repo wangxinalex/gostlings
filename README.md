@@ -73,7 +73,7 @@ and `27_strings`–`33_template`) → Intermediate
 | 08_methods | 3 | Methods 1-6 |
 | 09_interfaces | 5 | Methods 9-17 |
 | 10_errors | 10 | [Errors progression](exercises/10_errors/README.md) |
-| 11_generics | 3 | Generics 1-2 |
+| 11_generics | 6 | Generics 1-2 |
 | 12_goroutines | 10 | [Goroutines progression](exercises/12_goroutines/README.md) |
 | 13_channels | 30 | [Channel patterns guide](exercises/13_channels/README.md) |
 | 14_testing | 11 | [Testing progression](exercises/14_testing/README.md) |
