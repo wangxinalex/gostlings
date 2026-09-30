@@ -16,6 +16,7 @@ trap 'rm -rf "$tmp"' EXIT HUP INT TERM
 fixture() {
   rm -rf "$tmp/repo"
   mkdir -p "$tmp/repo/scripts" "$tmp/repo/exercises/00_intro/intro1" \
+    "$tmp/repo/exercises/03_control_flow/flow1" "$tmp/repo/exercises/27_strings/strings1" \
     "$tmp/repo/solutions/00_intro/intro1" "$tmp/repo/working-progress"
   cp "$repo_root/scripts/verify_curriculum.sh" "$tmp/repo/scripts/"
 
@@ -23,6 +24,8 @@ fixture() {
 | Topic | # | Go Tour section |
 |---|---|---|
 | 00_intro | 1 | Basics 1 |
+| 03_control_flow | 1 | Flowcontrol |
+| 27_strings | 1 | strings |
 EOF
 
   cat > "$tmp/repo/exercises/00_intro/intro1/main.go" <<'EOF'
@@ -46,6 +49,46 @@ func TestOutput(t *testing.T) {
 	}
 }
 EOF
+
+  cat > "$tmp/repo/exercises/03_control_flow/flow1/main.go" <<'EOF'
+// Concept: fixture
+// Task: make the fixture pass
+// Hint: compare the loop index with the slice length.
+package main
+
+func main() {
+	// TODO: print the expected value.
+}
+EOF
+
+  cp "$tmp/repo/exercises/03_control_flow/flow1/main.go" \
+    "$tmp/repo/exercises/03_control_flow/flow1/main.go.tmp"
+  cat > "$tmp/repo/exercises/03_control_flow/flow1/main_test.go" <<'EOF'
+package main
+
+import "testing"
+
+func TestOutput(t *testing.T) {
+	if false {
+		t.Fatal("fixture starter must fail until solved")
+	}
+}
+EOF
+  rm -f "$tmp/repo/exercises/03_control_flow/flow1/main.go.tmp"
+
+  cat > "$tmp/repo/exercises/27_strings/strings1/main.go" <<'EOF'
+// Concept: fixture
+// Task: make the fixture pass
+// Hint: the strings package has a predicate for substring membership.
+package main
+
+func main() {
+	// TODO: print the expected value.
+}
+EOF
+
+  cp "$tmp/repo/exercises/03_control_flow/flow1/main_test.go" \
+    "$tmp/repo/exercises/27_strings/strings1/main_test.go"
 
   cat > "$tmp/repo/solutions/00_intro/intro1/main.go" <<'EOF'
 package main
@@ -98,6 +141,16 @@ expect_fail "a starter with no TODO seam"
 fixture
 rm "$tmp/repo/exercises/00_intro/intro1/main_test.go"
 expect_fail "an exercise with no focused test"
+
+fixture
+sed -i.bak 's/the strings package has a predicate for substring membership/strings.Contains(text, substr) is the answer/' \
+  "$tmp/repo/exercises/27_strings/strings1/main.go"
+expect_fail "an answer-carrying hint in a chapter past the core track"
+
+fixture
+sed -i.bak 's/compare the loop index with the slice length/strings.Contains(text, substr) is fine here/' \
+  "$tmp/repo/exercises/03_control_flow/flow1/main.go"
+expect_pass "a core chapter that keeps its explicit hint"
 
 fixture
 # CJK bytes are written as octal escapes on purpose: the guard needs CJK input

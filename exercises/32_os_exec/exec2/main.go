@@ -1,7 +1,9 @@
 // Concept: handling a non-zero exit with exec.ExitError
 // Task: complete exitCode so it returns the command's exit code, or an error if it failed to start
 // Expected behavior: exitCode returns (0, nil) on success and (3, nil) for a command that exits 3
-// Hint: err := cmd.Run(); if exitErr, ok := err.(*exec.ExitError); ok { return exitErr.ExitCode(), nil } (Go doc: os/exec)
+// Hint: a command that started and exited non-zero reports a typed error that
+//       carries the code; any other error means it never ran (Go doc: os/exec)
+// Stuck?: exec.ExitError and its ExitCode method, matched with errors.As.
 
 package main
 

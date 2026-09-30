@@ -5,7 +5,9 @@
 // running
 // running
 // (any order)
-// Hint: var once sync.Once; once.Do(f) ensures f runs exactly once regardless of how many goroutines call it (Go doc: sync)
+// Hint: hand the initialization to a value that runs its function exactly once,
+//       no matter how many goroutines call it (Go doc: sync)
+// Stuck?: sync.Once and its Do method; callers still observe a single init.
 
 package main
 

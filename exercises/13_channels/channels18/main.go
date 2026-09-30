@@ -15,17 +15,11 @@
 //   coordinator receives count tokens and closes(done)
 //
 // Hint:
-//   In the loop, start each worker with:
-//
-//       go func() {
-//           <-stop
-//           onWorkerExit()
-//           exited <- struct{}{}
-//       }()
-//
-//   Use a buffered exited channel so every worker can report without depending
-//   on the coordinator's exact scheduling. A coordinator receives exactly count
-//   tokens and closes done once. For count <= 0, return an already-closed done.
+//   In the loop, start one worker goroutine per iteration. Each worker waits for
+//   the stop signal, reports its exit, and sends one token on a buffered exited
+//   channel, so no worker depends on the coordinator's exact scheduling. A
+//   coordinator receives exactly count tokens and closes done once. For count <= 0,
+//   return an already-closed done.
 
 package main
 

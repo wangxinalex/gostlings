@@ -1,6 +1,9 @@
 // Concept: check cancellation before starting work.
 // Task: run work exactly once only when ctx is still active, and report whether it started.
-// Hint: use a non-blocking select on ctx.Done() before calling work.
+// Hint: test the cancellation signal without blocking before running the work;
+//       a canceled context means the work must not start.
+// Stuck?: a select on ctx.Done with a default branch.
+
 package main
 
 import "context"

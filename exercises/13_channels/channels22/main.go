@@ -14,7 +14,7 @@
 // Hint:
 //   Start one forwarder goroutine per input. It ranges its input and sends values
 //   to out, then sends one buffered acknowledgement. A separate coordinator
-//   receives len(inputs) acknowledgements and is the only goroutine that closes
+//   receives one acknowledgement per input and is the only goroutine that closes
 //   out. With no inputs, return an already-closed output.
 
 package main

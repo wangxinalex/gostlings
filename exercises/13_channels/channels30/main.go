@@ -13,9 +13,9 @@
 //   worker frees slot -> producer continues
 //
 // Hint:
-//   Create jobsCh with `make(chan int, buffer)`. Send every job from a producer
+//   Create jobsCh with capacity `buffer`. Send every job from a producer
 //   goroutine and close jobsCh afterward. Collect results concurrently; the queue
-//   capacity, not len(jobs), controls buffered work.
+//   capacity, not the job count, controls buffered work.
 
 package main
 

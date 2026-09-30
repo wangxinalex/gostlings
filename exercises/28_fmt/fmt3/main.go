@@ -1,7 +1,9 @@
 // Concept: writing formatted output to any io.Writer with fmt.Fprintf
 // Task: complete greet so it writes "Hello, Ada!" to w
 // Expected output: Hello, Ada!
-// Hint: fmt.Fprintf(w, "Hello, %s!", name) (Go doc: fmt)
+// Hint: the fmt package can print to any destination writer passed as its first
+//       argument, so nothing has to go to stdout directly (Go doc: fmt)
+// Stuck?: fmt.Fprintf; the two return values can be ignored here.
 
 package main
 
