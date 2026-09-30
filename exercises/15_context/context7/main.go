@@ -1,6 +1,9 @@
 // Concept: canceling a child context does not cancel its parent or siblings.
 // Task: derive and cancel one child, then return both contexts.
-// Hint: use context.WithCancel(parent) and defer the returned cancel function.
+// Hint: derive the child from the parent, keep its cancel function, and release
+//       only the child; the parent and any siblings must keep running.
+// Stuck?: context.WithCancel with the parent as its argument.
+
 package main
 
 import "context"

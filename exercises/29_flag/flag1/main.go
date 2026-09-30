@@ -1,7 +1,10 @@
 // Concept: command-line flags with flag.NewFlagSet
 // Task: complete parseArgs so it reads -name, -count, and -verbose
 // Expected behavior: parseArgs returns the flag values and no error for valid input
-// Hint: fs := flag.NewFlagSet("app", flag.ContinueOnError); register String/Int/Bool flags, then fs.Parse(args) (Go doc: flag)
+// Hint: build a private flag set that reports errors instead of exiting, register
+//       one flag per type, then parse the argument slice (Go doc: flag)
+// Stuck?: flag.NewFlagSet with flag.ContinueOnError, plus the String, Int, and
+//       Bool registration methods.
 
 package main
 

@@ -2,10 +2,11 @@
 // Task: write "hello, disk!" to demo.txt, read it back, print the contents,
 //       then remove the file
 // Expected output: hello, disk!
-// Hint: os.WriteFile("demo.txt", []byte("hello, disk!"), 0o644) creates or
-//       overwrites the file; read it back with os.ReadFile, then clean up with
-//       os.Remove. Run from this directory (`cd exercises/26_files/files2 &&
-//       go run .`) or verify with `go test ./exercises/26_files/files2` (Go doc: os)
+// Hint: the os package writes bytes with a permission mode, reads them back, and
+//       removes the file; cleanup is part of the task. Run from this directory
+//       (`cd exercises/26_files/files2 && go run .`) or verify with
+//       `go test ./exercises/26_files/files2` (Go doc: os)
+// Stuck?: os.WriteFile takes the bytes and a mode literal such as 0o644.
 
 package main
 

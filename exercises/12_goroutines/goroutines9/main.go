@@ -1,7 +1,9 @@
 // Concept: deferred completion covers early returns
 // Task: ensure every launched worker completes its WaitGroup bookkeeping, even when it returns early
 // Expected behavior: the stopAt worker leaves its result empty, but every worker is joined before return.
-// Hint: put defer wg.Done() first in the worker. The stopAt branch may then return safely.
+// Hint: the stopAt branch returns early, so arrange the worker's bookkeeping to
+//       run on every return path instead of at the end of the function.
+// Stuck?: sync.WaitGroup's Done; defer it as the worker's first statement.
 
 package main
 

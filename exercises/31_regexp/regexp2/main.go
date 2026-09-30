@@ -1,7 +1,10 @@
 // Concept: compiling a regexp and finding all matches
 // Task: complete findNumbers so it returns every digit sequence in s
 // Expected output: [123 45]
-// Hint: re, err := regexp.Compile(`\d+`); re.FindAllString(s, -1) (Go doc: regexp)
+// Hint: compile the pattern first, because that step can fail, then ask the
+//       compiled pattern for every non-overlapping match (Go doc: regexp)
+// Stuck?: regexp.Compile returns the compiled pattern and an error; the find-all
+//       method takes a limit where -1 means "all".
 
 package main
 

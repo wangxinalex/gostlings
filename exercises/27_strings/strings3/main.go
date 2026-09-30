@@ -1,7 +1,9 @@
 // Concept: cleaning input with TrimSpace and ReplaceAll
 // Task: complete normalize so it trims surrounding whitespace and turns every tab into a single space
 // Expected output: hello gostlings
-// Hint: strings.TrimSpace(s) and strings.ReplaceAll(s, old, new) (Go doc: strings)
+// Hint: the strings package trims the ends of a string, and it replaces every
+//       occurrence of one substring with another (Go doc: strings)
+// Stuck?: strings.TrimSpace for the ends; strings.ReplaceAll for the tabs.
 
 package main
 

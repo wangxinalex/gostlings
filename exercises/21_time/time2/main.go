@@ -2,7 +2,9 @@
 // Task: the Ticker is created but never used; read from its channel in a select to print "tick" twice, then stop
 // Expected output: tick
 // tick
-// Hint: t := time.NewTicker(d); its C field is a channel that fires every d; call t.Stop() to clean up (Go doc: time)
+// Hint: a ticker exposes a channel that delivers one value per interval; receive
+//       twice from it and stop the ticker before returning (Go doc: time)
+// Stuck?: time.NewTicker's channel field is C, and Stop releases the ticker.
 
 package main
 

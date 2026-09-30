@@ -1,7 +1,9 @@
 // Concept: parsing numbers from strings — strconv.ParseFloat
 // Task: parse "3.14" as a float64, double it, then format and print to 2 decimal places
 // Expected output: 6.28
-// Hint: strconv.ParseFloat(s, 64) returns (float64, error); fmt.Sprintf("%.2f", f) formats to 2 decimal places (Go doc: strconv)
+// Hint: the strconv package parses text into a float and reports failure
+//       separately; format the result with two decimals through fmt (Go doc: strconv)
+// Stuck?: strconv.ParseFloat takes a bit size (64 here); fmt's precision verb sets decimals.
 
 package main
 

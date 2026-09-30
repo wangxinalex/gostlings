@@ -1,7 +1,10 @@
 // Concept: running an external command with exec.Command and Output
 // Task: complete echo so it runs "echo" with args and returns the trimmed output
 // Expected output: hello gostlings
-// Hint: out, err := exec.Command("echo", args...).Output(); strings.TrimSpace(string(out)) (Go doc: os/exec)
+// Hint: the os/exec package builds a command from a program name and its
+//       arguments, and a helper collects its standard output (Go doc: os/exec)
+// Stuck?: exec.Command and its Output method; strings.TrimSpace drops the
+//       trailing newline.
 
 package main
 

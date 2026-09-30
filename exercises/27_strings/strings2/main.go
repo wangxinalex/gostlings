@@ -2,7 +2,9 @@
 // Task: complete joinParts and splitParts
 // Expected output: go,rust,python
 // go rust python
-// Hint: strings.Join(parts, sep) and strings.Split(s, sep) (Go doc: strings)
+// Hint: the strings package both joins a slice with a separator and splits a
+//       string on a separator (Go doc: strings)
+// Stuck?: strings.Join takes the slice first; strings.Split returns a slice.
 
 package main
 
