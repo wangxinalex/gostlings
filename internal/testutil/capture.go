@@ -3,7 +3,9 @@ package testutil
 import (
 	"io"
 	"os"
+	"runtime"
 	"testing"
+	"time"
 )
 
 // CaptureStdout runs f and returns everything it writes to os.Stdout.
@@ -51,4 +53,37 @@ func CaptureStdout(t *testing.T, f func()) string {
 		t.Fatal(result.err)
 	}
 	return string(result.data)
+}
+
+// TrackGoroutines records the current goroutine count and returns a function
+// that fails the test when the program under test left goroutines running.
+//
+// Call it from the test goroutine and defer the returned function, so a leaked
+// goroutine fails the test even when the program's own output looks right:
+//
+//	settle := testutil.TrackGoroutines(t)
+//	defer settle()
+//	got := testutil.CaptureStdout(t, main)
+//
+// Goroutines that are still winding down are given a short grace period, so the
+// check reports leaks without depending on scheduler timing.
+func TrackGoroutines(t *testing.T) func() {
+	t.Helper()
+	before := runtime.NumGoroutine()
+	return func() {
+		t.Helper()
+		deadline := time.Now().Add(2 * time.Second)
+		for {
+			if after := runtime.NumGoroutine(); after <= before {
+				return
+			}
+			if time.Now().After(deadline) {
+				buffer := make([]byte, 1<<16)
+				stack := buffer[:runtime.Stack(buffer, true)]
+				t.Fatalf("the program left goroutines running: %d before, %d after\n%s",
+					before, runtime.NumGoroutine(), stack)
+			}
+			time.Sleep(10 * time.Millisecond)
+		}
+	}
 }

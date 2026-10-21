@@ -117,11 +117,13 @@ sh check.sh solutions --run-all --race-all # audit every selected reference solu
 `scripts/verify_curriculum.sh` guards invariants that running the exercises
 cannot see: the topic table in this README matches the exercise tree, every
 exercise still has a `TODO` seam and a focused test, hints past the core track do
-not hand over copyable answers, and no CJK text appears anywhere outside the
-ignored `working-progress/` worktree. Its own test suite is
+not hand over copyable answers, no CJK text appears anywhere outside the ignored
+`working-progress/` worktree, and every reference solution that reaches for
+shared-memory primitives has a `race.list` entry. Its own test suite is
 `sh scripts/test_curriculum_guards.sh`. Both run in CI along with the starter
-audit, so a count that drifts, a solved starter committed by mistake, or a hint
-that gives the answer away fails the build instead of a review.
+audit, so a count that drifts, a solved starter committed by mistake, a hint
+that gives the answer away, or a shared-state exercise dropping out of the race
+audit fails the build instead of a review.
 
 Every exercise ships with a `main_test.go` that asserts the program's stdout
 against the header's Expected output (order-insensitively where the header says
@@ -152,6 +154,14 @@ GOCACHE=/tmp/gostlings-go-cache sh check.sh solutions --run-all --race-all
 The exercise tree is intentionally incomplete; `verify_solutions.sh` checks the
 reference answers against the exercise tests, and the learner validates each
 exercise after fixing it.
+
+If `go test` aborts with `[setup failed] ... operation not permitted`, the Go
+build cache is not writable in your environment (some sandboxes block
+`~/Library/Caches/go-build`). Point it somewhere writable and rerun:
+
+~~~sh
+export GOCACHE=/tmp/gostlings-go-cache
+~~~
 
 ## Release workflow
 

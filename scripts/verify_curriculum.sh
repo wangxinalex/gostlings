@@ -6,6 +6,7 @@
 #   3. every exercise ships a focused test
 #   4. hints in chapters 12+ stay clues rather than copyable answers
 #   5. no CJK text outside the untracked working-progress worktree
+#   6. every shared-state solution has a race.list entry
 #
 # Read-only and dependency-free; exits non-zero on the first batch of
 # violations it finds (it always reports all of them).
@@ -140,6 +141,25 @@ if [ -n "$cjk_hits" ]; then
   done
   IFS=$old_ifs
 fi
+
+# --- 6. shared-state solutions are covered by the race audit -----------------
+#
+# race.list stays curated, because a race-enabled run is slow and not every
+# concurrency exercise needs it. The list must not silently miss a solution that
+# reaches for shared-memory primitives, though, so this check walks the reference
+# solutions and requires an entry for each one that imports sync/atomic or uses a
+# shared-state sync type. Entries beyond that (worker pools, chained lifecycles)
+# are allowed; only the shared-state direction is enforced.
+
+shared_state='"sync/atomic"|sync\.(Mutex|RWMutex|Cond|Map|Pool|Once)|atomic\.'
+for dir in $(find solutions -mindepth 2 -maxdepth 2 -type d | sort); do
+  rel=${dir#solutions/}
+  if grep -hv '^[[:space:]]*//' "$dir"/*.go 2>/dev/null | grep -qE "$shared_state"; then
+    if ! grep -Fxq "$rel" race.list 2>/dev/null; then
+      report "$rel uses shared-state primitives but has no race.list entry"
+    fi
+  fi
+done
 
 # --- summary ----------------------------------------------------------------
 

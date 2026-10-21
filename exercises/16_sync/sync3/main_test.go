@@ -9,6 +9,8 @@ import (
 )
 
 func TestOutput(t *testing.T) {
+	settle := testutil.TrackGoroutines(t)
+	defer settle()
 	got := testutil.CaptureStdout(t, main)
 	gotLines := strings.Split(strings.TrimSpace(got), "\n")
 	wantLines := strings.Split(strings.TrimSpace("config initialized\nrunning\nrunning\nrunning"), "\n")
