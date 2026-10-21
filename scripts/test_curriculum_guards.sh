@@ -168,4 +168,39 @@ fixture
 printf '\350\277\233\345\272\246\357\274\232\345\267\262\345\256\214\346\210\220\n' > "$tmp/repo/working-progress/notes.md"
 expect_pass "CJK text inside the ignored working-progress worktree"
 
+fixture
+cat > "$tmp/repo/solutions/00_intro/intro1/main.go" <<'EOF'
+package main
+
+import "sync"
+
+var guard sync.Mutex
+
+func main() {
+	guard.Lock()
+	defer guard.Unlock()
+}
+EOF
+expect_fail "a shared-state solution with no race.list entry"
+
+fixture
+cat > "$tmp/repo/solutions/00_intro/intro1/main.go" <<'EOF'
+package main
+
+import "sync"
+
+var guard sync.Mutex
+
+func main() {
+	guard.Lock()
+	defer guard.Unlock()
+}
+EOF
+printf '00_intro/intro1\n' > "$tmp/repo/race.list"
+expect_pass "a shared-state solution listed in race.list"
+
+fixture
+printf '00_intro/intro1\n' > "$tmp/repo/race.list"
+expect_pass "a race.list entry for a solution without shared state"
+
 printf '\nall curriculum guard cases behave as specified\n'

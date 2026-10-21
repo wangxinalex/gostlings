@@ -7,6 +7,8 @@ import (
 )
 
 func TestMainRangesUntilProducerCloses(t *testing.T) {
+	settle := testutil.TrackGoroutines(t)
+	defer settle()
 	gotCh := make(chan string, 1)
 	go func() { gotCh <- testutil.CaptureStdout(t, main) }()
 	select {

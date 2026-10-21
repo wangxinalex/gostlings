@@ -9,6 +9,8 @@ import (
 )
 
 func TestMainLaunchesAndJoinsGreeting(t *testing.T) {
+	settle := testutil.TrackGoroutines(t)
+	defer settle()
 	originalGreeting := greeting
 	started := make(chan struct{})
 	release := make(chan struct{})
