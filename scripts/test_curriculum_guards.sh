@@ -169,6 +169,11 @@ printf '\350\277\233\345\272\246\357\274\232\345\267\262\345\256\214\346\210\220
 expect_pass "CJK text inside the ignored working-progress worktree"
 
 fixture
+# Non-CJK UTF-8 punctuation starts with \342 and must not trip the CJK guard.
+printf '// \342\200\223 \342\200\234 \342\234\223\n' >> "$tmp/repo/exercises/00_intro/intro1/main.go"
+expect_pass "non-CJK punctuation in an exercise file"
+
+fixture
 cat > "$tmp/repo/solutions/00_intro/intro1/main.go" <<'EOF'
 package main
 
@@ -202,5 +207,27 @@ expect_pass "a shared-state solution listed in race.list"
 fixture
 printf '00_intro/intro1\n' > "$tmp/repo/race.list"
 expect_pass "a race.list entry for a solution without shared state"
+
+fixture
+awk '{ print }
+  /^\/\/ Task: make the fixture pass$/ {
+    print "// Note:"
+    print "//   first step"
+    print "//   second step"
+    print "//   third step"
+    print "//   first step"
+    print "//   second step"
+    print "//   third step"
+  }' "$tmp/repo/exercises/00_intro/intro1/main.go" > "$tmp/repo/exercises/00_intro/intro1/main.go.new"
+mv "$tmp/repo/exercises/00_intro/intro1/main.go.new" "$tmp/repo/exercises/00_intro/intro1/main.go"
+if out=$(guard); then
+  printf 'FAIL: guard accepted a duplicated exercise header\n' >&2
+  printf '%s\n' "$out" >&2
+  exit 1
+fi
+case "$out" in
+  *duplicated*) printf 'PASS: %s\n' "a duplicated comment block in an exercise header" ;;
+  *) printf 'FAIL: guard failed for the wrong reason: %s\n' "$out" >&2; exit 1 ;;
+esac
 
 printf '\nall curriculum guard cases behave as specified\n'

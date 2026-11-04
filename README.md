@@ -19,12 +19,16 @@ Go 1.26.5+ (check with `go version`)
 4. Verify it:
 
    ```sh
-   go run ./exercises/01_variables/variables1
+   sh check.sh exercises/01_variables/variables1
    ```
 
-   (For the 14_testing topic, use `go test ./exercises/14_testing/testing1`.)
-   (For the 26_files topic, the exercises read files next to `main.go`, so run
-   them from their own directory: `cd exercises/26_files/files1 && go run .`.)
+   `check.sh` uses `go test` whenever the exercise has a focused test (every
+   exercise has one) and falls back to `go run` otherwise, so a plain
+   `go run ./exercises/01_variables/variables1` also works for the early
+   chapters. Two chapters are worth calling out: in `14_testing` the test file
+   is the deliverable, so `go test ./exercises/14_testing/testing1` is the most
+   direct check; in `26_files` the exercises read files next to `main.go`, so
+   run them from their own directory: `cd exercises/26_files/files1 && go run .`.
 5. Output matches the expected output → done. Stuck? Peek at the matching path
    under `solutions/`.
 
@@ -57,10 +61,21 @@ multi-file program instead of a function, best done last.
 | Applied | Coordination, cancellation, synchronization, and standard-library APIs |
 | Intermediate | HTTP behavior, channel ownership, cancellation, error paths, and race-safe state |
 
-Recommended progression: Core (`00_intro`–`11_generics`) → Applied
-(`12_goroutines`–`22_strconv`, plus the stdlib additions `25_closures`–`26_files`
-and `27_strings`–`33_template`) → Intermediate
-(`23_http`–`24_concurrency_patterns`).
+The topic numbers record when a chapter was added, not the order to study it.
+Follow this path instead:
+
+1. **Core** — `00_intro` through `11_generics`, in order.
+2. **Applied** — `12_goroutines` through `22_strconv`, in order.
+3. **Extras** — `25_closures`–`26_files` (any time after `02_functions` and
+   `05_slices`) and `27_strings`–`33_template` (any time after the Core
+   chapters). Each chapter README states its own prerequisites.
+4. **Intermediate** — `23_http` and `24_concurrency_patterns`. These combine
+   everything above and belong after the Applied and Extras chapters, even
+   though their numbers are lower.
+5. **Capstone** — `34_taskqueue`, last. It is the only multi-file exercise.
+
+In particular, do not jump into `23_http` at number 23 just because it follows
+`22_strconv`; the chapters numbered 25–33 were appended later.
 
 | Topic | # | Go Tour section |
 |---|---|---|
@@ -117,22 +132,24 @@ sh check.sh solutions --run-all --race-all # audit every selected reference solu
 `scripts/verify_curriculum.sh` guards invariants that running the exercises
 cannot see: the topic table in this README matches the exercise tree, every
 exercise still has a `TODO` seam and a focused test, hints past the core track do
-not hand over copyable answers, no CJK text appears anywhere outside the ignored
-`working-progress/` worktree, and every reference solution that reaches for
-shared-memory primitives has a `race.list` entry. Its own test suite is
-`sh scripts/test_curriculum_guards.sh`. Both run in CI along with the starter
-audit, so a count that drifts, a solved starter committed by mistake, a hint
-that gives the answer away, or a shared-state exercise dropping out of the race
-audit fails the build instead of a review.
+not hand over copyable answers, exercise headers do not repeat a comment block,
+no CJK text appears anywhere outside the ignored `working-progress/` worktree,
+and every reference solution that reaches for shared-memory primitives has a
+`race.list` entry. Its own test suite is `sh scripts/test_curriculum_guards.sh`.
+Both run in CI along with the starter audit, so a count that drifts, a solved
+starter committed by mistake, a hint that gives the answer away, a duplicated
+hint paragraph, or a shared-state exercise dropping out of the race audit fails
+the build instead of a review.
 
-Every exercise ships with a `main_test.go` that asserts the program's stdout
+Every exercise ships with a `main_test.go`. Most assert the program's stdout
 against the header's Expected output (order-insensitively where the header says
-"any order"). Exercises that do not compile or that deadlock when unmodified
-simply fail their test until fixed, so a solution that merely exits 0 cannot
-pass. `check.sh` uses `go test` whenever a `_test.go` is present, runs packages
-with `Benchmark` functions using `-bench=.`, and falls back to `go run` for any
-directory without tests. It also accepts an individual exercise directory as
-the target.
+"any order"); the intermediate chapters instead assert behavior such as
+concurrency bounds, cancellation, and final joins. Exercises that do not compile
+or that deadlock when unmodified simply fail their test until fixed, so a
+solution that merely exits 0 cannot pass. `check.sh` uses `go test` whenever a
+`_test.go` is present, runs packages with `Benchmark` functions using `-bench=.`,
+and falls back to `go run` for any directory without tests. It also accepts an
+individual exercise directory as the target.
 
 `scripts/verify_solutions.sh` temporarily copies each exercise's `*_test.go`
 into the matching solution directory, runs `go test ./solutions/...`, then
@@ -151,9 +168,9 @@ GOCACHE=/tmp/gostlings-go-cache sh check.sh solutions --run-all --race
 GOCACHE=/tmp/gostlings-go-cache sh check.sh solutions --run-all --race-all
 ~~~
 
-The exercise tree is intentionally incomplete; `verify_solutions.sh` checks the
-reference answers against the exercise tests, and the learner validates each
-exercise after fixing it.
+Every starter in the exercise tree is intentionally left unsolved;
+`verify_solutions.sh` checks the reference answers against the exercise tests,
+and the learner validates each exercise after fixing it.
 
 If `go test` aborts with `[setup failed] ... operation not permitted`, the Go
 build cache is not writable in your environment (some sandboxes block

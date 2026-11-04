@@ -7,6 +7,7 @@
 #   4. hints in chapters 12+ stay clues rather than copyable answers
 #   5. no CJK text outside the untracked working-progress worktree
 #   6. every shared-state solution has a race.list entry
+#   7. exercise headers do not repeat a comment block
 #
 # Read-only and dependency-free; exits non-zero on the first batch of
 # violations it finds (it always reports all of them).
@@ -124,14 +125,19 @@ fi
 # --- 5. no CJK text outside working-progress --------------------------------
 #
 # working-progress is git-ignored, so listing tracked plus untracked but
-# non-ignored files exempts it without naming it. [\344-\351] matches the
-# leading UTF-8 byte of CJK ideographs, which leaves the repository's existing
-# en dashes, curly quotes, and arrows alone. LC_ALL=C keeps grep in byte mode so
-# the raw byte pattern is accepted on both BSD and GNU grep.
+# non-ignored files exempts it without naming it. The six bytes \344-\351 are
+# the leading UTF-8 bytes of CJK ideographs; matching them as fixed strings
+# leaves the repository's en dashes, curly quotes, and arrows (which start with
+# \342) alone. Some grep implementations reject a high-byte bracket range with
+# "illegal byte sequence" (toybox 0.8.13 does), which silently disables this
+# check, so -F with one -e per byte takes the place of [\344-\351]. LC_ALL=C
+# keeps grep in byte mode on BSD, toybox, and GNU grep.
 
-cjk=$(printf '[\344-\351]')
+b1=$(printf '\344'); b2=$(printf '\345'); b3=$(printf '\346')
+b4=$(printf '\347'); b5=$(printf '\350'); b6=$(printf '\351')
 cjk_hits=$(git ls-files --cached --others --exclude-standard -z |
-  LC_ALL=C xargs -0 grep -lI "$cjk" 2>/dev/null || true)
+  LC_ALL=C xargs -0 grep -lIF -e "$b1" -e "$b2" -e "$b3" -e "$b4" -e "$b5" -e "$b6" \
+  2>/dev/null || true)
 if [ -n "$cjk_hits" ]; then
   old_ifs=$IFS
   IFS='
@@ -160,6 +166,47 @@ for dir in $(find solutions -mindepth 2 -maxdepth 2 -type d | sort); do
     fi
   fi
 done
+
+# --- 7. exercise headers do not repeat a comment block ----------------------
+#
+# A duplicated hint paragraph is easy to miss in review, and it doubles the
+# reading load on a learner. Look for two non-overlapping runs of at least three
+# identical, non-blank header comment lines in one file.
+
+comment_files=$(find exercises solutions -mindepth 3 -maxdepth 3 -name '*.go' ! -name '*_test.go' | sort)
+dup_hits=$(awk '
+  function check(   i, j, k) {
+    for (i = 1; i <= n - 2; i++) {
+      for (j = i + 3; j <= n - 2; j++) {
+        k = 0
+        while (k <= j - i && i + k <= n && j + k <= n && line[i + k] == line[j + k] && line[i + k] !~ /^\/\/[[:space:]]*$/) k++
+        if (k >= 3) {
+          printf "%s: duplicated %d-line comment block at lines %d and %d\n", current, k, ln[i], ln[j]
+          return
+        }
+      }
+    }
+  }
+  FNR == 1 {
+    if (NR > 1 && inhead) check()
+    n = 0
+    inhead = 1
+    current = FILENAME
+  }
+  inhead && /^\/\// { n++; line[n] = $0; ln[n] = FNR; next }
+  inhead && /^[[:space:]]*$/ { next }
+  inhead { inhead = 0; check() }
+  END { if (inhead) check() }
+' $comment_files)
+if [ -n "$dup_hits" ]; then
+  old_ifs=$IFS
+  IFS='
+'
+  for hit in $dup_hits; do
+    report "duplicated exercise header: $hit"
+  done
+  IFS=$old_ifs
+fi
 
 # --- summary ----------------------------------------------------------------
 
