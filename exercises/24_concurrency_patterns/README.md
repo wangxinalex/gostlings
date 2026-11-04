@@ -21,6 +21,27 @@ Errors in the exercises use `errors.Is` semantics; results must have
 order/count/closure assertions, and you cannot pass with empty slices,
 ignored errors, or early returns.
 
+## Working through the larger exercises
+
+Some exercises in this chapter ask for a whole function rather than a one-line
+fix. Treat those as small projects and build them in stages:
+
+1. Write down the concurrency bound and the role of each channel or context
+   before writing code.
+2. Get ordered responses working without cancellation.
+3. Add the bound (a semaphore or a fixed worker pool) and check the peak.
+4. Add first-error cancellation from one derived context.
+5. Add the final join, so no worker is still running when the function returns.
+6. Check the edges: an empty request list, invalid limits, an already-canceled
+   context.
+
+`concurrency18` is the clearest example. Its tests replace the package-level
+`serviceWork` function to hold requests open, so they can observe how many run
+at once and whether `runService` waits for all of them. Handle every request
+through `serviceWork`; an implementation that inlines the calculation fails the
+concurrency check. The same substitution pattern appears in `concurrency5`
+with `poolWork`.
+
 ```sh
 sh check.sh exercises/24_concurrency_patterns --run-all
 sh scripts/verify_exercise_starters.sh exercises/24_concurrency_patterns
